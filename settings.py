@@ -183,7 +183,6 @@ INSTALLED_APPS = (
     'django_nose',
 
     # Propias
-    'apps.api2',
     'apps.catastro',
     'apps.core',
     'apps.usuarios',
@@ -191,14 +190,6 @@ INSTALLED_APPS = (
     'apps.mobile_updates',
     'apps.editor',
 )
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('apps.api2.permissions.ReadOnly',),
-    'PAGE_SIZE': 10,
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework_jsonp.renderers.JSONPRenderer',
-    ),
-}
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
@@ -303,11 +294,10 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'geocualbondidb',
-            'USER': 'postgres',
-            'PASSWORD': '',
-            'HOST': '',
-            'PORT': '',
+            'NAME': os.environ.get('POSTGRES_DB', 'geocualbondidb'),
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', 'db')
         }
     }
 
@@ -374,11 +364,10 @@ if WERCKER_DB_IPADDR:
     DATABASES = {
         'default': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': 'cb',
-            'HOST': WERCKER_DB_IPADDR,
-            'PORT': os.environ.get('POSTGIS_PORT_5432_TCP_PORT', False)
+            'NAME': os.environ.get('POSTGRES_DB', 'geocualbondidb'),
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', 'db')
         }
     }
     print DATABASES

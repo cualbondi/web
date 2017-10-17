@@ -1,3 +1,5 @@
+        var API_URL = '//api.cualbondi.com.ar/'
+
         function check_layout(){
             if ($(window).width() > 980){
                 // bootstrap 100% height (similar googlemaps)
@@ -341,14 +343,14 @@
                     }
                 }
                 $.ajax({
-                    url: "/api/v2/geocoder/?q="+$("#inputDesde").val()+"&c="+GLOBAL_ci,
+                    url: API_URL + "v2/geocoder/?q="+$("#inputDesde").val()+"&c="+GLOBAL_ci,
                     dataType: 'jsonp',
                     success: function (data) {
                         mostrarResultadoCatastro(data, 1)
                     }
                 })
                 $.ajax({
-                    url: "/api/v2/geocoder/?q="+$("#inputHasta").val()+"&c="+GLOBAL_ci,
+                    url: API_URL + "v2/geocoder/?q="+$("#inputHasta").val()+"&c="+GLOBAL_ci,
                     dataType: 'jsonp',
                     success: function (data) {
                         mostrarResultadoCatastro(data, 2)
@@ -432,7 +434,7 @@
                 $("#ajaxLoader").tmpl().appendTo($("#sidebarResultados").empty());
                 function ll2str (ll) { return ll.lng + ',' + ll.lat + ',' + $('#button-radio').val() };
                 $.ajax({
-                    url: "/api/v2/recorridos/",
+                    url: API_URL + "v2/recorridos/",
                     data: {
                         l: ll2str(lla) + '|' + ll2str(llb),
                         c: GLOBAL_ci,
@@ -603,7 +605,7 @@
             function inputLinea() {
                 buscar = false
                 ajaxInputLinea = $.ajax({
-                    url: "/api/v2/recorridos/",
+                    url: API_URL + "v2/recorridos/",
                     data: {
                         q: $('#inputLinea').val(),
                         c: GLOBAL_ci,
