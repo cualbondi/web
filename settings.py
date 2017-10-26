@@ -3,15 +3,20 @@ import os
 
 CUALBONDI_ENV = os.environ.get('CUALBONDI_ENV', 'development')
 
-DEBUG = True
+if CUALBONDI_ENV != 'production':
+    DEBUG = True
+else:
+    DEBUG = False
+
+
 TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['*',]
+ALLOWED_HOSTS = ['*', ]
 
 LOGIN_REDIRECT_URL = '/'
 
 ABSOLUTE_URL_OVERRIDES = {
-    'auth.user': lambda u: "/usuarios/%s/" % u.username, 
+    'auth.user': lambda u: "/usuarios/%s/" % u.username,
 }
 
 ADMINS = (
@@ -98,7 +103,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -108,7 +113,7 @@ SECRET_KEY = '=tr&%05vw6&s4eoq)wdj(d&(56#cq@5k0b-c$^v6vr)#%e(c+&'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    # 'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -148,10 +153,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Put strings here, like "/home/html/django_templates"
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__),'templates'),
+    os.path.join(os.path.dirname(__file__), 'templates'),
 )
 
 GOOGLE_API = "//maps.google.com/maps/api/js?v=3.6&sensor=false"
@@ -175,9 +180,9 @@ INSTALLED_APPS = (
     'imagekit',
     'leaflet',
     'piston',
-#    'moderacion',
-#    'editor',
-#    'django_extensions',
+    # 'moderacion',
+    # 'editor',
+    # 'django_extensions',
     'rest_framework',
     'rest_framework_tracking',
     'django_nose',
@@ -198,7 +203,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # the site admins on every HTTP 500 error.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-here = lambda *x: os.path.join(os.path.dirname(os.path.realpath(__file__)), *x)
+# here=lambda *x: os.path.join(os.path.dirname(os.path.realpath(__file__)), *x)
 LOGGING = {
     'version': 1,
     'filters': {
@@ -220,16 +225,11 @@ LOGGING = {
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         },
-        'console':{
+        'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'json'
         },
-#        'file': {
-#            'level': 'DEBUG',
-#            'class': 'logging.FileHandler',
-#            'filename': '/tmp/django.log',
-#        }
     },
     'loggers': {
         'django.request': {
@@ -277,8 +277,8 @@ if CUALBONDI_ENV == 'production':
     FACEBOOK_APP_ID = "516530425068934"
     FACEBOOK_API_SECRET = 'f90d27d49f50939996db0f299dec129d'
     FACEBOOK_EXTENDED_PERMISSIONS = ['email']
-    SOCIAL_AUTH_FACEBOOK_KEY="516530425068934"
-    SOCIAL_AUTH_FACEBOOK_SECRET='f90d27d49f50939996db0f299dec129d'
+    SOCIAL_AUTH_FACEBOOK_KEY = "516530425068934"
+    SOCIAL_AUTH_FACEBOOK_SECRET = 'f90d27d49f50939996db0f299dec129d'
     SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 
     HOME_URL = "http://cualbondi.com.ar"
@@ -301,24 +301,25 @@ else:
         }
     }
 
-    #MIDDLEWARE_CLASSES = ('debug_panel.middleware.DebugPanelMiddleware', ) + MIDDLEWARE_CLASSES
-    
+    # MIDDLEWARE_CLASSES = \
+    # ('debug_panel.middleware.DebugPanelMiddleware', ) + MIDDLEWARE_CLASSES
+
     FACEBOOK_APP_ID = "370174876416548"
     FACEBOOK_APP_ID = "516530425068934"
     FACEBOOK_API_SECRET = 'f90d27d49f50939996db0f299dec129d'
     FACEBOOK_EXTENDED_PERMISSIONS = ['email']
-    SOCIAL_AUTH_FACEBOOK_KEY="516530425068934"
-    SOCIAL_AUTH_FACEBOOK_SECRET='f90d27d49f50939996db0f299dec129d'
+    SOCIAL_AUTH_FACEBOOK_KEY = "516530425068934"
+    SOCIAL_AUTH_FACEBOOK_SECRET = 'f90d27d49f50939996db0f299dec129d'
     SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
     HOME_URL = "http://local.cualbondi.com.ar"
-    #INSTALLED_APPS += ('debug_toolbar', 'debug_panel','django_extensions')
-    DEBUG_TOOLBAR_PATCH_SETTINGS = False 
+    # INSTALLED_APPS += ('debug_toolbar', 'debug_panel','django_extensions')
+    DEBUG_TOOLBAR_PATCH_SETTINGS = False
     INSTALLED_APPS += ('debug_toolbar', 'django_extensions')
-    
+
     import logging
-    l = logging.getLogger('django.db.backends')
-    l.setLevel(logging.DEBUG)
-    l.addHandler(logging.StreamHandler())
+    logger = logging.getLogger('django.db.backends')
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
     LOGGING.update({
         'handlers': {
             'console': {
@@ -350,7 +351,7 @@ else:
             }
         }
     }
-    
+
     REQUEST_LOGGING_BACKEND = {
         'host': 'localhost',
         'port': 9200,
