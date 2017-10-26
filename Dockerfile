@@ -20,6 +20,6 @@ RUN pip install -r requirements.txt
 
 COPY . $APP_PATH/
 
-CMD ["uwsgi", "--ini", "/app/uwsgi.ini"]
+CMD python manage.py collectstatic --noinput && uwsgi --ini /app/uwsgi.ini
 
 EXPOSE 8000
