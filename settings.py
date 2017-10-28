@@ -245,135 +245,34 @@ LOGGING = {
     },
 }
 
-if CUALBONDI_ENV == 'production':
 
-    LOGGING.update({
-        'handlers': {
-            'logstash': {
-                'level': 'DEBUG',
-                'class': 'logstash.LogstashHandler',
-                'host': '78.47.196.202',  # stats.cualbondi.com.ar
-                'port': 5000,
-                'version': 1,
-                'message_type': 'logstash',
-                'fqdn': False,
-                'tags': [],
-            },
-        },
-        'loggers': {
-            'django.request': {
-                'handlers': ['logstash'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-            'logstash': {
-                'handlers': ['logstash'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-        },
-    })
+HOME_URL = os.environ.get('HOME_URL')
 
-    FACEBOOK_APP_ID = "516530425068934"
-    FACEBOOK_API_SECRET = 'f90d27d49f50939996db0f299dec129d'
-    FACEBOOK_EXTENDED_PERMISSIONS = ['email']
-    SOCIAL_AUTH_FACEBOOK_KEY = "516530425068934"
-    SOCIAL_AUTH_FACEBOOK_SECRET = 'f90d27d49f50939996db0f299dec129d'
-    SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
 
-    HOME_URL = "http://cualbondi.com.ar"
+FACEBOOK_APP_ID = os.environ.get('FACEBOOK_APP_ID', '')
+FACEBOOK_API_SECRET = os.environ.get('FACEBOOK_API_SECRET', '')
+FACEBOOK_EXTENDED_PERMISSIONS = ['email']
+SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get('FACEBOOK_APP_ID', '')
+SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get('FACEBOOK_API_SECRET', '')
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 
-    EMAIL_HOST = 'mail.cualbondi.com.ar'
-    EMAIL_PORT = 25
 
-    from settings_local import *
-    INSTALLED_APPS += LOCAL_INSTALLED_APPS
-
-else:
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': os.environ.get('POSTGRES_DB', 'geocualbondidb'),
-            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
-            'HOST': os.environ.get('DB_HOST', 'db')
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': os.environ.get('POSTGRES_DB', 'geocualbondidb'),
+        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'db')
     }
+}
 
-    # MIDDLEWARE_CLASSES = \
-    # ('debug_panel.middleware.DebugPanelMiddleware', ) + MIDDLEWARE_CLASSES
-
-    FACEBOOK_APP_ID = "370174876416548"
-    FACEBOOK_APP_ID = "516530425068934"
-    FACEBOOK_API_SECRET = 'f90d27d49f50939996db0f299dec129d'
-    FACEBOOK_EXTENDED_PERMISSIONS = ['email']
-    SOCIAL_AUTH_FACEBOOK_KEY = "516530425068934"
-    SOCIAL_AUTH_FACEBOOK_SECRET = 'f90d27d49f50939996db0f299dec129d'
-    SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
-    HOME_URL = "http://local.cualbondi.com.ar"
-    # INSTALLED_APPS += ('debug_toolbar', 'debug_panel','django_extensions')
-    DEBUG_TOOLBAR_PATCH_SETTINGS = False
+if CUALBONDI_ENV == 'development':
+    DEBUG_TOOLBAR_PATCH_SETTINGS = False 
     INSTALLED_APPS += ('debug_toolbar', 'django_extensions')
 
-    import logging
-    logger = logging.getLogger('django.db.backends')
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
-    LOGGING.update({
-        'handlers': {
-            'console': {
-                'level': 'DEBUG',
-                'class': 'logging.StreamHandler',
-            }
-        },
-        'loggers': {
-            'django.db.backends': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
-            }
-        }
-    })
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': '127.0.0.1:11211',
-        },
-
-        # this cache backend will be used by django-debug-panel
-        'debug-panel': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/debug-panel-cache',
-            'TIMEOUT': 300,
-            'OPTIONS': {
-                'MAX_ENTRIES': 200
-            }
-        }
-    }
-
-    REQUEST_LOGGING_BACKEND = {
-        'host': 'localhost',
-        'port': 9200,
-        'index': 'cualbondi',
-        'type': 'requests'
-    }
-
-
-WERCKER_DB_IPADDR = os.environ.get('POSTGIS_PORT_5432_TCP_ADDR', False)
-if WERCKER_DB_IPADDR:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': os.environ.get('POSTGRES_DB', 'geocualbondidb'),
-            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
-            'HOST': os.environ.get('DB_HOST', 'db')
-        }
-    }
-    print DATABASES
-
-# fix logging https://www.caktusgroup.com/blog/2015/01/27/Django-Logging-Configuration-logging_config-default-settings-logger/
-LOGGING_CONFIG = None
-import logging.config
-logging.config.dictConfig(LOGGING)
+if CUALBONDI_ENV == 'production':
+    from settings_local import *
+    INSTALLED_APPS += LOCAL_INSTALLED_APPS
