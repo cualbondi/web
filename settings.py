@@ -3,6 +3,8 @@ import os
 
 CUALBONDI_ENV = os.environ.get('CUALBONDI_ENV', 'development')
 
+API_URL = os.environ.get('API_URL', 'https://api.cualbondi.com.ar/')
+
 if CUALBONDI_ENV != 'production':
     DEBUG = True
 else:
@@ -34,7 +36,7 @@ USE_CACHE = True
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'LOCATION': os.environ.get('MEMCACHED_HOST', '127.0.0.1:11211'),
     }
 }
 CACHE_TIMEOUT = 60*60

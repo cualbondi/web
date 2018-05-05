@@ -1,4 +1,4 @@
-        var API_URL = '//api.cualbondi.com.ar/'
+        API_URL = API_URL || '//api.cualbondi.com.ar/';
 
         function check_layout(){
             if ($(window).width() > 980){
