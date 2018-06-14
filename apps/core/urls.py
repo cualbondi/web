@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-
+from django.views.generic.base import RedirectView
 
 urlpatterns = patterns('',
     url(r'^$', 'apps.core.views.index', name='index'),
@@ -25,7 +25,11 @@ urlpatterns = patterns('',
 
     # Ciudades
     url(r'^(?P<nombre_ciudad>[\w-]+)/$', 'apps.core.views.ver_ciudad', name='ver_ciudad'),
-    url(r'^mapa/(?P<nombre_ciudad>[\w-]+)/$', 'apps.core.views.ver_mapa_ciudad', name='ver_mapa_ciudad'),
+    url(r'^mapa/(?P<nombre_ciudad>[\w-]+)/$',
+        'apps.core.views.ver_mapa_ciudad', name='ver_mapa_ciudad'),
+    url(r'^mapa_nuevo/(?P<nombre_ciudad>[\w-]+)/$',
+        'apps.core.views.ver_mapa_ciudad_nuevo', name='ver_mapa_ciudad_nuevo'),
+    url(r'^sockjs-node/', 'apps.core.views.redirect_sockjs_dev'),
 
     # Lineas
     url(r'^(?P<nombre_ciudad>[\w-]+)/(?P<nombre_linea>[\w-]+)/$', 'apps.core.views.ver_linea', name='ver_linea'),

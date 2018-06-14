@@ -35,6 +35,9 @@ from django.conf import settings
 
 from apps.core.models import FacebookPage
 
+from geoip import geolite2
+from ipware import get_client_ip
+
 def is_complete_authentication(request):
     return request.user.is_authenticated() and FacebookBackend.__name__ in request.session.get(BACKEND_SESSION_KEY, '')
 
@@ -258,6 +261,34 @@ def ver_mapa_ciudad(request, nombre_ciudad):
                                     'API_URL': API_URL,
                               },
                               context_instance=RequestContext(request))
+
+@csrf_exempt
+@require_GET
+def ver_mapa_ciudad_nuevo(request, nombre_ciudad):
+    slug_ciudad = slugify(nombre_ciudad)
+    ciudad_actual = get_object_or_404(Ciudad, slug=slug_ciudad, activa=True)
+
+    VUE_STATIC_URL = settings.VUE_STATIC_URL or '/mapa_nuevo'
+    ip, is_routable = get_client_ip(request, proxy_trusted_ips=['172.18.',])
+    lat = 0
+    lng = 0
+    if ip is not None:
+        match = geolite2.lookup(ip)
+        if match:
+            lat, lng = match.location
+
+    return render_to_response('core/buscador_nuevo.html', {
+        'ciudad_actual': ciudad_actual,
+        'VUE_STATIC_URL': VUE_STATIC_URL,
+        'locationlat': lat,
+        'locationlng': lng,
+        'ip': ip
+    },
+        context_instance=RequestContext(request))
+
+@csrf_exempt
+def redirect_sockjs_dev(request):
+    return redirect('http://localhost:8083' + request.path + '?' + request.GET.urlencode())
 
 @csrf_exempt
 @require_GET

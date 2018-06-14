@@ -274,6 +274,7 @@ DATABASES = {
 if CUALBONDI_ENV == 'development':
     DEBUG_TOOLBAR_PATCH_SETTINGS = False 
     INSTALLED_APPS += ('debug_toolbar', 'django_extensions')
+    VUE_STATIC_URL = 'http://localhost:8083/mapa_nuevo'
 
 if CUALBONDI_ENV == 'production':
     from settings_local import *

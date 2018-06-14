@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <!--[if IE]><link rel="icon" href="{{VUE_STATIC_URL}}/favicon.ico"><![endif]-->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{VUE_STATIC_URL}}/img/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{VUE_STATIC_URL}}/img/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{VUE_STATIC_URL}}/img/icons/apple-touch-icon.png">
+    <link rel="manifest" href="{{VUE_STATIC_URL}}/manifest.json">
+    <link rel="mask-icon" href="{{VUE_STATIC_URL}}/img/icons/safari-pinned-tab.svg" color="#5bbad5">
+
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons">
+
+    <meta name="google-site-verification" content="NVSk_0zcZdYua2ILJ4L0DvspOCmHujouihZPlo3mDco">
+    <link href="https://plus.google.com/117455886911192315188" rel="publisher">
+
+    <title>Cualbondi</title>
+    <link as="script" href="{{VUE_STATIC_URL}}/app.js" rel="preload">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{VUE_STATIC_URL}}/img/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{VUE_STATIC_URL}}/img/icons/favicon-16x16.png">
+    <link rel="manifest" href="{{VUE_STATIC_URL}}/manifest.json">
+    <meta name="theme-color" content="#4DBA87">
+    <meta name="apple-mobile-web-app-capable" content="no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="web-buscador">
+    <link rel="apple-touch-icon" href="{{VUE_STATIC_URL}}/img/icons/apple-touch-icon-152x152.png">
+    <link rel="mask-icon" href="{{VUE_STATIC_URL}}/img/icons/safari-pinned-tab.svg" color="#4DBA87">
+    <meta name="msapplication-TileImage" content="{{VUE_STATIC_URL}}/img/icons/msapplication-icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#000000">
+</head>
+
+<body>
+    <noscript>
+        <strong>We're sorry but vuetest doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <script>
+        var CONFIG = {
+            ciudad: {
+                slug: "{{ ciudad_actual.slug }}",
+                lat: new Array{{ ciudad_actual.centro.coords }}[0],
+                lng: new Array{{ ciudad_actual.centro.coords }}[1],
+                zoom: {{ ciudad_actual.zoom }}
+            },
+            iplocation: {
+                lat: {{ locationlat }},
+                lng: {{ locationlng }}
+            },
+            ip: "{{ip}}"
+        }
+    </script>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <script type="text/javascript" src="{{VUE_STATIC_URL}}/app.js"></script>
+</body>
+
+</html>
