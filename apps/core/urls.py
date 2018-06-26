@@ -27,7 +27,7 @@ urlpatterns = patterns('',
     url(r'^(?P<nombre_ciudad>[\w-]+)/$', 'apps.core.views.ver_ciudad', name='ver_ciudad'),
     url(r'^mapa/(?P<nombre_ciudad>[\w-]+)/$',
         'apps.core.views.ver_mapa_ciudad', name='ver_mapa_ciudad'),
-    url(r'^mapa_nuevo/(?P<nombre_ciudad>[\w-]+)/$',
+    url(r'^mapa_nuevo/(?P<nombre_ciudad>[\w-]+)/',
         'apps.core.views.ver_mapa_ciudad_nuevo', name='ver_mapa_ciudad_nuevo'),
     url(r'^sockjs-node/', 'apps.core.views.redirect_sockjs_dev'),
 
