@@ -86,13 +86,13 @@
                         markerA.confirmado = true
                         markerAaux.setPoint(markerA.getLatlng())
                         markerBaux.setPoint(markerB.getLatlng())
-                        piwikLog("/click/mapa/drag/A")
+                        //piwikLog("/click/mapa/drag/A")
                     }
                     if ( self.id == markerB.id ) {
                         markerB.confirmado = true
                         markerAaux.setPoint(markerA.getLatlng())
                         markerBaux.setPoint(markerB.getLatlng())
-                        piwikLog("/click/mapa/drag/B")
+                        //piwikLog("/click/mapa/drag/B")
                     }
                     if (markerA !== null && markerB !== null) {
                         $('a[data-toggle="tab"]').first().tab('show')
@@ -131,14 +131,14 @@
                     markerA.setPoint(e.latlng)
                     markerAaux.setPoint(e.latlng)
                     markerA.confirmado = true
-                    piwikLog("/click/mapa/marker/A")
+                    //piwikLog("/click/mapa/marker/A")
                 }
                 else
                     if ( !markerB.listo ) {
                         markerB.setPoint(e.latlng)
                         markerBaux.setPoint(e.latlng)
                         markerB.confirmado = true
-                        piwikLog("/click/mapa/marker/B")
+                        //piwikLog("/click/mapa/marker/B")
                         pagina_input = 1
                         buscarporclick(markerA.getLatlng(), markerB.getLatlng())
                     }
@@ -500,10 +500,10 @@
                             id = $(this).attr("id")
                             mostrar_resultado(id, porNombre, true)
                             e.preventDefault()
-                            if (porNombre)
-                                piwikLog("/click/resultado/porNombre/"+$.map(resultados[porNombre][id], function(e){ e.name } ).join("+"))
-                            else
-                                piwikLog("/click/resultado/busqueda/"+$.map(resultados[porNombre][id], function(e){ e.name } ).join("+"))
+                            //if (porNombre)
+                                //piwikLog("/click/resultado/porNombre/"+$.map(resultados[porNombre][id], function(e){ e.name } ).join("+"))
+                            //else
+                                //piwikLog("/click/resultado/busqueda/"+$.map(resultados[porNombre][id], function(e){ e.name } ).join("+"))
                         })
                         $(this).children().bind("mouseenter", function(e) {
                             id = $(this).attr("id")
@@ -557,13 +557,13 @@
 
             $("#button-limpiar").bind("click", function(e) {
                 e.preventDefault();
-                piwikLog("/click/limpiar/");
+                //piwikLog("/click/limpiar/");
                 limpiar();
             })
 
             $("[data-slider]").bind("slider:release", function (event, data) {
                 if (markerA.listo && markerB.listo) {
-                    piwikLog("/click/buscarRadio/"+data.value);
+                    //piwikLog("/click/buscarRadio/"+data.value);
                     buscarporclick(markerA.getLatlng(), markerB.getLatlng(), false, true);
                 }
             });
@@ -581,14 +581,14 @@
             $('#inputLinea').keypress(function (e) {
                 if (e.which == 13){
                     e.preventDefault();
-                    piwikLog("/click/buscarNombre/enter/"+$("#inputLinea").val())
+                    //piwikLog("/click/buscarNombre/enter/"+$("#inputLinea").val())
                     buscar_por_nombre()
                 }
             })
 
             $("#button-buscarnombre").bind("click", function(e) {
                 e.preventDefault();
-                piwikLog("/click/buscarNombre/button/"+$("#inputLinea").val())
+                //piwikLog("/click/buscarNombre/button/"+$("#inputLinea").val())
                 buscar_por_nombre();
             })
 
@@ -635,7 +635,7 @@
                 e.preventDefault()
                 $("#ayudaTempl").tmpl().appendTo($("#modal-ayuda-content").empty());
                 $("#modal-ayuda").modal();
-                piwikLog("/click/botonera/ayuda")
+                //piwikLog("/click/botonera/ayuda")
             })
 
             function invalidarMarkers() {
@@ -649,7 +649,7 @@
             function input_press_enter(e){
                 if (e.which == 13){
                     e.preventDefault();
-                    piwikLog("/click/buscar/enter/"+$("#inputDesde").val()+"/"+$("#inputHasta").val())
+                    //piwikLog("/click/buscar/enter/"+$("#inputDesde").val()+"/"+$("#inputHasta").val())
                     buscar_por_inputs();
                 }
             }
@@ -659,13 +659,13 @@
 
             $("#button-buscarinputs").bind("click", function(e) {
                 e.preventDefault();
-                piwikLog("/click/buscar/button/"+$("#inputDesde").val()+"/"+$("#inputHasta").val())
+                //piwikLog("/click/buscar/button/"+$("#inputDesde").val()+"/"+$("#inputHasta").val())
                 buscar_por_inputs();
             })
 
             $("#button-origendestino").bind("click", function(e) {
                 e.preventDefault()
-                piwikLog("/click/botonera/darVuelta")
+                //piwikLog("/click/botonera/darVuelta")
                 desde = $("#inputDesde").val()
                 hasta = $("#inputHasta").val()
                 if ( $.trim(desde) != '' && $.trim(hasta) != '' ) {
@@ -693,7 +693,7 @@
                 
                 $('span[href]').not('.binded').bind('click', function(e) {
                     e.preventDefault();
-                    piwikLog("/click/verMasInfo/"+$(this).parent().parent().attr('id'))
+                    //piwikLog("/click/verMasInfo/"+$(this).parent().parent().attr('id'))
                     window.open($(this).attr('href'));
                 }).addClass("binded");
                 
@@ -701,14 +701,14 @@
                 if (!porNombre) {
                     $("#button_buscar_transbordo").not('.binded').bind("click", function(e) {
                         e.preventDefault();
-                        piwikLog("/click/buscar/transbordo")
+                        //piwikLog("/click/buscar/transbordo")
                         buscarTransbordo();
                     }).addClass("binded")
 
                     $("#button-seleccionarSugerencias").not('.binded').bind("click", function(e) {
                         e.preventDefault();
                         //trackear nombre de seleccionadas
-                        piwikLog("/click/buscar/suggest/")
+                        //piwikLog("/click/buscar/suggest/")
                         seleccionarSugerencias();
                     }).addClass("binded")
 
@@ -732,7 +732,7 @@
                     if      ( n <  0 ) pps = "ant";
                     else if ( n == 0 ) pps = "sig";
                     else if ( n >  0 ) pps = n;
-                    piwikLog("/click/pagina/"+pps)
+                    //piwikLog("/click/pagina/"+pps)
                     pasarPagina($(this).attr("data_pagina"), $(this).attr("combinar"), porNombre);
                 }).addClass("binded");
             }
