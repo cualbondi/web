@@ -42,9 +42,11 @@
                 </ul>
             </div>
             {% endfor %}
-            <div class="span12">
-                {% include "ad_contenido_infeed.html"%}
-            </div>
+            {% if not forloop.last %}
+                <div class="span12 ad">
+                    {% include "ad_contenido_infeed.html"%}
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 

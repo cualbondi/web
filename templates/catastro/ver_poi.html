@@ -35,7 +35,7 @@
     {% if recorridos %}
         <div class="row-fluid">
             <h2>Recorridos de transporte público que pasan por esta parada</h2>
-            {% for cols in recorridos|partition_horizontal:30 %}
+            {% for cols in recorridos|partition_horizontal:48 %}
                 {% for columna in cols|dividir_columnas:3 %}
                 <div class="span4">
                     <ul class="nav nav-pills nav-stacked">
@@ -46,7 +46,7 @@
                 </div>
                 {% endfor %}
                 {% if not forloop.last %}
-                    <div class="span12">
+                    <div class="span12 ad">
                         {% include "ad_contenido_infeed.html"%}
                     </div>
                 {% endif %}
