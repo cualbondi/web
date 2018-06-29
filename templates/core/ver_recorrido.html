@@ -90,14 +90,21 @@
     {% if recorridos_similares %}
         <div class="row-fluid">
             <h2>Recorridos similares</h2>
-            {% for columna in recorridos_similares|dividir_columnas:3 %}
-            <div class="span4">
-                <ul class="nav nav-pills nav-stacked">
-                {% for rs in columna %}
-                    <li><a href="{{rs.get_absolute_url}}">{{rs.linea_nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+            {% for cols in recorridos_similares|partition_horizontal:30 %}
+                {% for columna in cols|dividir_columnas:3 %}
+                    <div class="span4">
+                        <ul class="nav nav-pills nav-stacked">
+                        {% for rs in columna %}
+                            <li><a href="{{rs.get_absolute_url}}">{{rs.linea_nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 {% endfor %}
-                </ul>
-            </div>
+                {% if not forloop.last %}
+                    <div class="span12">
+                        {% include "ad_contenido_infeed.html"%}
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}
@@ -105,14 +112,21 @@
     {% if pois %}
         <div class="row-fluid">
             <h2>Puntos de interés por donde pasa</h2>
-            {% for columna in pois|dividir_columnas:3 %}
-            <div class="span4">
-                <ul class="nav nav-pills nav-stacked">
-                {% for p in columna %}
-                    <li><a href="{{p.get_absolute_url}}">{{ p.nom }}</a></li>
+            {% for cols in pois|partition_horizontal:30 %}
+                {% for columna in cols|dividir_columnas:3 %}
+                    <div class="span4">
+                        <ul class="nav nav-pills nav-stacked">
+                        {% for p in columna %}
+                            <li><a href="{{p.get_absolute_url}}">{{ p.nom }}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
                 {% endfor %}
-                </ul>
-            </div>
+                {% if not forloop.last %}
+                    <div class="span12">
+                        {% include "ad_contenido_infeed.html"%}
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}

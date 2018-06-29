@@ -32,14 +32,19 @@
 
     <div class="row-fluid">
         <h2>Lineas de transporte público</h2>
-        {% for columna in lineas|dividir_columnas:6 %}
-        <div class="span2">
-            <ul class="nav nav-pills nav-stacked">
-            {% for linea in columna %}
-                <li><a href={{linea.slug}}/>{{linea.nombre}}</a></li>
+        {% for cols in lineas|partition_horizontal:60 %}
+            {% for columna in cols|dividir_columnas:6 %}
+            <div class="span2">
+                <ul class="nav nav-pills nav-stacked">
+                {% for linea in columna %}
+                    <li><a href={{linea.slug}}/>{{linea.nombre}}</a></li>
+                {% endfor %}
+                </ul>
+            </div>
             {% endfor %}
-            </ul>
-        </div>
+            <div class="span12">
+                {% include "ad_contenido_infeed.html"%}
+            </div>
         {% endfor %}
     </div>
 

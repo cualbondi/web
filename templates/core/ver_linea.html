@@ -49,14 +49,21 @@
 
     <div class="row-fluid">
         <h2>Recorridos de la linea {{linea_actual.nombre}}</h2>
-        {% for columna in recorridos|dividir_columnas:3 %}
-        <div class="span4">
-            <ul class="nav nav-pills nav-stacked">
-            {% for recorrido in columna %}
-                <li style="text-align:left"><a href={{recorrido.slug}}/>{{recorrido.nombre}}{% if recorrido.inicio and recorrido.fin %} <span class="light">de {{recorrido.inicio}} a {{recorrido.fin}}</span>{% endif %}</a></li>
+        {% for cols in recorridos|partition_horizontal:30 %}
+            {% for columna in cols|dividir_columnas:3 %}
+                <div class="span4">
+                    <ul class="nav nav-pills nav-stacked">
+                    {% for recorrido in columna %}
+                        <li style="text-align:left"><a href={{recorrido.slug}}/>{{recorrido.nombre}}{% if recorrido.inicio and recorrido.fin %} <span class="light">de {{recorrido.inicio}} a {{recorrido.fin}}</span>{% endif %}</a></li>
+                    {% endfor %}
+                    </ul>
+                </div>
             {% endfor %}
-            </ul>
-        </div>
+            {% if not forloop.last %}
+                <div class="span12">
+                    {% include "ad_contenido_infeed.html"%}
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 

@@ -45,17 +45,26 @@
         </div>
     {% endif %}
 
+    {% include "ad_contenido.html"%}
+
     {% if recorridosn %}
         <div class="row-fluid">
             <h2>Recorridos de transporte público que pasan cerca de esta parada (no paran aquí)</h2>
-            {% for columna in recorridosn|dividir_columnas:3 %}
-            <div class="span4">
-                <ul class="nav nav-pills nav-stacked">
-                {% for rs in columna %}
-                    <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+            {% for cols in recorridosn|partition_horizontal:30 %}
+                {% for columna in cols|dividir_columnas:3 %}
+                    <div class="span4">
+                        <ul class="nav nav-pills nav-stacked">
+                        {% for rs in columna %}
+                            <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
                 {% endfor %}
-                </ul>
-            </div>
+                {% if not forloop.last %}
+                    <div class="span12">
+                        {% include "ad_contenido_infeed.html"%}
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}
