@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, include, url
 from django.views.generic.base import RedirectView
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^$', 'apps.core.views.index', name='index'),
 
     # Agregar contenido
@@ -27,9 +27,6 @@ urlpatterns = patterns('',
     url(r'^(?P<nombre_ciudad>[\w-]+)/$', 'apps.core.views.ver_ciudad', name='ver_ciudad'),
     url(r'^mapa/(?P<nombre_ciudad>[\w-]+)/$',
         'apps.core.views.ver_mapa_ciudad', name='ver_mapa_ciudad'),
-    url(r'^mapa_nuevo/(?P<nombre_ciudad>[\w-]+)/',
-        'apps.core.views.ver_mapa_ciudad_nuevo', name='ver_mapa_ciudad_nuevo'),
-    url(r'^sockjs-node/', 'apps.core.views.redirect_sockjs_dev'),
 
     # Lineas
     url(r'^(?P<nombre_ciudad>[\w-]+)/(?P<nombre_linea>[\w-]+)/$', 'apps.core.views.ver_linea', name='ver_linea'),
@@ -37,6 +34,11 @@ urlpatterns = patterns('',
     # Recorridos
     url(r'^(?P<nombre_ciudad>[\w-]+)/(?P<nombre_linea>[\w-]+)/(?P<nombre_recorrido>[\w-]+)/$', 'apps.core.views.ver_recorrido', name='ver_recorrido'),
 
-)
+]
+
+#        // *** TODO: django debug toolbar ** * //
+#        // *** TODO: mover calles arriba ** * //
+#        // *** TODO: cache nginx? ** * //
+
 
 #cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/

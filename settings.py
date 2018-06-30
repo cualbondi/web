@@ -10,27 +10,58 @@ if CUALBONDI_ENV != 'production':
 else:
     DEBUG = False
 
-
-TEMPLATE_DEBUG = DEBUG
-
 ALLOWED_HOSTS = ['*', ]
 
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
+# AUTH_USER_MODEL = 'users.User'
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = '/'
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+LOGIN_URL = 'account_login'
+
+# PASSWORDS
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
+PASSWORD_HASHERS = [
+    # https://docs.djangoproject.com/en/dev/topics/auth/passwords/#using-argon2-with-django
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+]
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda u: "/usuarios/%s/" % u.username,
 }
 
+# ADMIN
+# ------------------------------------------------------------------------------
+# Django Admin URL regex.
+ADMIN_URL = r'^admin/'
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
-DEFAULT_FROM_EMAIL = "info@cualbondi.com.ar"
-
 MANAGERS = ADMINS
 
-BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_FROM_EMAIL = "info@cualbondi.com.ar"
 
-DATABASES = {}
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 USE_CACHE = True
 CACHES = {
@@ -67,7 +98,10 @@ USE_I18N = False
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
-USE_L10N = True
+USE_L10N = False
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
+USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -94,77 +128,98 @@ STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-)
+]
 
 # List of finder classes that know how to find static files in
 # various locations.
-STATICFILES_FINDERS = (
+STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
+]
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '=tr&%05vw6&s4eoq)wdj(d&(56#cq@5k0b-c$^v6vr)#%e(c+&'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    # 'django.template.loaders.eggs.Loader',
-)
+# TEMPLATES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#templates
+TEMPLATES = [
+    {
+        # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
+        'DIRS': [
+            os.path.join(os.path.dirname(__file__), 'templates'),
+        ],
+        'OPTIONS': {
+            # https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
+            'debug': DEBUG,
+            # https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
+            # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
+            'loaders': [
+                (
+                    'django.template.loaders.cached.Loader',
+                    [
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                    ]
+                ),
+            ],
+            # https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
+            'context_processors': [
+                # 'social.apps.django_app.context_processors.backends',
+                # 'social.apps.django_app.context_processors.login_redirect',
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+                "apps.core.context_processors.lista_ciudades",
+                "apps.core.context_processors.get_ciudad_actual",
+                "apps.core.context_processors.home_url",
+                "apps.core.context_processors.facebook_app_id",
+            ],
+        },
+    },
+]
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
+# MIDDLEWARE
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#middleware
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.core.middleware.WhodidMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-)
+]
 
 AUTHENTICATION_BACKENDS = (
-    'social.backends.facebook.FacebookAppOAuth2',
-    'social.backends.facebook.FacebookOAuth2',
-    'social_auth.backends.facebook.FacebookBackend',
+    #'social.backends.facebook.FacebookAppOAuth2',
+    #'social.backends.facebook.FacebookOAuth2',
+    #'social_auth.backends.facebook.FacebookBackend',
     'django.contrib.auth.backends.ModelBackend',
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'social.apps.django_app.context_processors.backends',
-    'social.apps.django_app.context_processors.login_redirect',
-    "django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.contrib.messages.context_processors.messages",
-    "django.core.context_processors.request",
-    "apps.core.context_processors.lista_ciudades",
-    "apps.core.context_processors.get_ciudad_actual",
-    "apps.core.context_processors.show_android_alert",
-    "apps.core.context_processors.home_url",
-    "apps.core.context_processors.facebook_app_id",
 )
 
 ROOT_URLCONF = 'urls'
 
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates"
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), 'templates'),
-)
-
 GOOGLE_API = "//maps.google.com/maps/api/js?v=3.6&sensor=false"
 
 INSTALLED_APPS = (
-    'social.apps.django_app.default',
+    #'social.apps.django_app.default',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -177,28 +232,16 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
 
     # Externas
-    'bootstrap_toolkit',
-    'floppyforms',
     'imagekit',
     'leaflet',
-    'piston',
-    # 'moderacion',
-    # 'editor',
-    # 'django_extensions',
     'rest_framework',
-    'rest_framework_tracking',
-    'django_nose',
 
     # Propias
-    'apps.catastro',
-    'apps.core',
-    'apps.usuarios',
-    'apps.anuncios',
-    'apps.mobile_updates',
-    'apps.editor',
+    # DEPRECATED: 'apps.usuarios',
+    'apps.catastro.apps.CatastroConfig',
+    'apps.core.apps.CoreConfig',
+    'apps.editor.apps.EditorConfig',
 )
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -217,9 +260,6 @@ LOGGING = {
         'simple': {
             'format': '%(levelname)s | %(message)s'
         },
-        'json': {
-            '()': 'django_log_formatter_json.JSONFormatter',
-        }
     },
     'handlers': {
         'mail_admins': {
@@ -230,7 +270,7 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'json'
+            'formatter': 'simple'
         },
     },
     'loggers': {
@@ -250,6 +290,10 @@ LOGGING = {
 
 HOME_URL = os.environ.get('HOME_URL')
 
+# EMAIL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 
@@ -270,11 +314,17 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'db')
     }
 }
+DATABASES['default']['ATOMIC_REQUESTS'] = True
+
 
 if CUALBONDI_ENV == 'development':
-    DEBUG_TOOLBAR_PATCH_SETTINGS = False 
-    INSTALLED_APPS += ('debug_toolbar', 'django_extensions')
+    #INSTALLED_APPS += ('debug_toolbar', 'django_extensions',)
     VUE_STATIC_URL = 'http://localhost:8083/mapa_nuevo'
+    # MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    DEBUG = True
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda request: True
+    }
 
 if CUALBONDI_ENV == 'production':
     from settings_local import *

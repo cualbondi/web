@@ -2,8 +2,7 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AnonymousUser
-from django.urls import reverse
-from django.db.models import Manager as GeoManager
+from django.core.urlresolvers import reverse
 
 from apps.catastro.models import Ciudad
 
@@ -18,11 +17,11 @@ MODERATION_CHOICES = (
 )
 
 class RecorridoProposed(models.Model):
-    recorrido = models.ForeignKey('core.Recorrido', on_delete=models.CASCADE)
+    recorrido = models.ForeignKey('core.Recorrido')
     parent = models.UUIDField(default=uuid.uuid4)
     uuid = models.UUIDField(default=uuid.uuid4)
     nombre = models.CharField(max_length=100)
-    linea = models.ForeignKey('core.Linea', on_delete=models.CASCADE)
+    linea = models.ForeignKey('core.Linea')
     ruta = models.LineStringField()
     sentido = models.CharField(max_length=100, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
@@ -47,7 +46,7 @@ class RecorridoProposed(models.Model):
     def ciudades(self):
         return Ciudad.objects.filter(lineas=self.linea)
 
-    objects = GeoManager()
+    objects = models.GeoManager()
 
     def save(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -165,7 +164,7 @@ class RecorridoProposed(models.Model):
             kwargs={
                 'id_revision': self.id,
             })
-        print("URL: " + url)
+        print "URL: " + url
         return url
 
     class Meta:
@@ -175,8 +174,8 @@ class RecorridoProposed(models.Model):
 
 
 class LogModeracion(models.Model):
-    recorridoProposed = models.ForeignKey(RecorridoProposed, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    recorridoProposed = models.ForeignKey(RecorridoProposed)
+    created_by = models.ForeignKey(User, blank=True, null=True)
     date_create = models.DateTimeField(auto_now_add=True)
     # Nuevo Estado de la moderación
     newStatus = models.CharField( max_length=1, choices=MODERATION_CHOICES, default='E')
