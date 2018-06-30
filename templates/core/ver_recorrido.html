@@ -140,7 +140,7 @@
         </ul>
     {% endif %}
 
-    <!--[if (!IE)|(gt IE 7)]-->
+    <!--
     <h2>Dejanos un comentario sobre el recorrido "{{linea_actual.nombre}} {{recorrido_actual.nombre}}"</h2>
 	<p>Si el recorrido esta mal, podés ayudar haciendo <a href="/editor/{{ recorrido_actual.id }}/">click acá</a></p>
         <div id="disqus_thread"></div>
@@ -156,5 +156,5 @@
             })();
         </script>
         <noscript>Habilita Javascript para ver los comentarios</noscript>
-    <!--[endif]-->
+    -->
 {% endblock %}
