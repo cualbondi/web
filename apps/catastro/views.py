@@ -16,7 +16,7 @@ from django.views.decorators.http import require_GET
 @require_GET
 def poi(request, slug=None):
     poi = get_object_or_404(Poi, slug=slug)
-    recorridos = Recorrido.objects.filter(ruta__dwithin=(poi.latlng, 0.00111)).select_related('linea').order_by('linea__nombre', 'nombre')
+    recorridos = Recorrido.objects.filter(ruta__dwithin=(poi.latlng, 0.00111)).select_related('linea').prefetch_related('linea__ciudad_set').order_by('linea__nombre', 'nombre')
     pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
     return render_to_response(

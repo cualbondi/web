@@ -124,7 +124,7 @@ class Recorrido(models.Model):
                 ciudad_slug = self.ciudad_slug
             except:
                 try:
-                    ciudad_slug = Ciudad.objects.filter(lineas=self.linea)[0].slug
+                    ciudad_slug = self.linea.ciudad_set[0].slug
                 except:
                     print self
                     return ""
