@@ -82,7 +82,7 @@ class RecorridoProposed(models.Model):
 
     def get_pretty_user(self):
         user = self.get_moderacion_last_user()
-        if user.is_anonymous():
+        if user.is_anonymous:
             return "Usuario Anónimo"
         else:
             if user.first_name or user.last_name:

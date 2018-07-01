@@ -241,6 +241,7 @@ INSTALLED_APPS = (
     'apps.catastro.apps.CatastroConfig',
     'apps.core.apps.CoreConfig',
     'apps.editor.apps.EditorConfig',
+    'apps.usuarios.apps.UsuariosConfig',
 )
 
 # A sample logging configuration. The only tangible logging

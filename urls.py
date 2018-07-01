@@ -10,6 +10,7 @@ from apps.catastro.models import Poi
 from django.views.static import serve
 from apps.core.urls import urlpatterns as urlpatternscore
 from apps.editor.urls import urlpatterns as editorUrls
+from apps.usuarios.urls import urlpatterns as usuariosUrls
 from apps.editor.views import revision
 from apps.catastro.urls import urlpatterns as catastroUrls
 from apps.core.views import agradecimientos
@@ -40,6 +41,7 @@ urlpatterns = [
     # APPS de CualBondi
     url(r'^admin/', admin.site.urls),
     url(r'^editor/', include(editorUrls)),
+    url(r'^usuarios/', include(usuariosUrls)),
     url(r'^revision/(?P<id_revision>\d+)/$', revision, name='revision_externa'),
 
     url(r'^como-llegar/', include(catastroUrls)),
