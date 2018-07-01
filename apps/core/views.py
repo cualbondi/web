@@ -4,6 +4,7 @@ from django.shortcuts import (get_object_or_404, render,
 from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_GET, require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.gis.measure import D
 
 from apps.core.models import Linea, Recorrido, Tarifa, Parada
 from apps.catastro.models import Ciudad, ImagenCiudad, Poi, Zona
