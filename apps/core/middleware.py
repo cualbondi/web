@@ -7,7 +7,7 @@ from django.db.models.fields import FieldDoesNotExist
 class WhodidMiddleware(object):
     def process_request(self, request):
         if not request.method in ('HEAD', 'OPTIONS', 'TRACE'):
-            if hasattr(request, 'user') and request.user.is_authenticated():
+            if hasattr(request, 'user') and request.user.is_authenticated:
                 user = request.user
             else:
                 user = None

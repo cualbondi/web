@@ -31,7 +31,7 @@ def editor_recorrido(request, id_recorrido):
     elif request.method == 'POST':
         # save anyway! all info is useful
         recorrido = get_object_or_404(Recorrido, pk=id_recorrido)
-        user = request.user if request.user.is_authenticated() else None
+        user = request.user if request.user.is_authenticated else None
         if (request.POST.get("uuid", False)):
             r = get_object_or_404(RecorridoProposed, uuid=request.POST.get("uuid"))
         else:
@@ -62,7 +62,7 @@ def editor_recorrido(request, id_recorrido):
             "linea" : r.linea.nombre,
             "ciudad": ciudad 
         }
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return HttpResponse(json.dumps(data), content_type="application/json")
         else:
             return HttpResponse(json.dumps(data), content_type="application/json", status=403)

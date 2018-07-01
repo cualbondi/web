@@ -11,6 +11,7 @@ from apps.catastro.models import Ciudad, ImagenCiudad, Poi, Zona
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 from apps.editor.models import LogModeracion
+from django.contrib.gis.measure import D
 
 
 from django.views.decorators.csrf import csrf_exempt
@@ -263,7 +264,7 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     horarios = recorrido_actual.horario_set.all().prefetch_related('parada')
 
     favorito = False
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         favorito = recorrido_actual.es_favorito(request.user)
 
     template = "core/ver_recorrido.html"

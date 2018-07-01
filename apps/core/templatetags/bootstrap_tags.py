@@ -33,7 +33,7 @@ def dividir_columnas(lista, cantidad_columnas):
     except (ValueError, TypeError):
         return [lista]
     result = []
-    tamano = len(lista) / (cantidad_columnas)
+    tamano = len(lista) // (cantidad_columnas)
     if tamano * cantidad_columnas < len(lista):
         tamano = tamano + 1
     for i in range(cantidad_columnas):
@@ -60,5 +60,5 @@ def partition_horizontal(thelist, n):
         return [thelist]
     newlists = [list() for i in range(int(ceil(len(thelist) / float(n))))]
     for i, val in enumerate(thelist):
-        newlists[i/n].append(val)
+        newlists[i//n].append(val)
     return newlists
