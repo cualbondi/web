@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
-from django.shortcuts import (get_object_or_404, render_to_response,
+from django.shortcuts import (get_object_or_404, render,
                               redirect)
-from django.template import RequestContext
 from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_GET, require_http_methods
 from django.core.exceptions import ObjectDoesNotExist
@@ -44,13 +43,12 @@ def agradecimientos(request):
     except:
         flatpage_edicion = None
 
-    return render_to_response(
+    return render(request,
         'core/agradecimientos.html',
         {
             'usuarios': us2,
             'flatpage_edicion': flatpage_edicion,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -69,10 +67,9 @@ def natural_sort_qs(qs, key):
 
 @require_http_methods(["GET"])
 def index(request):
-    return render_to_response(
-        'core/seleccionar_ciudad.html',
-        {},
-        context_instance=RequestContext(request)
+    return render(
+        request,
+        'core/seleccionar_ciudad.html'
     )
 
 
@@ -91,13 +88,13 @@ def ver_ciudad(request, nombre_ciudad):
     if ( request.GET.get("dynamic_map") ):
         template = "core/ver_obj_map.html"
 
-    return render_to_response(template,
+    return render(request, template,
                               {'obj': ciudad_actual,
                                'ciudad_actual': ciudad_actual,
                                'imagenes': imagenes,
                                'lineas': lineas,
-                               'tarifas': tarifas},
-                              context_instance=RequestContext(request))
+                               'tarifas': tarifas}
+                               )
 
 
 @csrf_exempt
@@ -114,14 +111,13 @@ def ver_mapa_ciudad(request, nombre_ciudad):
 
     API_URL = settings.API_URL
 
-    return render_to_response('core/buscador.html', {
+    return render(request, 'core/buscador.html', {
                                     'es_vista_mapa': True,
                                     'ciudad_actual': ciudad_actual,
                                     'desde': desde,
                                     'hasta': hasta,
                                     'API_URL': API_URL,
-                              },
-                              context_instance=RequestContext(request))
+                              })
 
 
 @csrf_exempt
@@ -146,13 +142,12 @@ def ver_linea(request, nombre_ciudad, nombre_linea):
     if ( request.GET.get("dynamic_map") ):
         template = "core/ver_obj_map.html"
 
-    return render_to_response(template,
+    return render(request, template,
                               {'obj': linea_actual,
                                'ciudad_actual': ciudad_actual,
                                'linea_actual': linea_actual,
                                'recorridos': recorridos
-                               },
-                              context_instance=RequestContext(request))
+                               })
 
 
 @csrf_exempt
@@ -275,7 +270,7 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     if ( request.GET.get("dynamic_map") ):
         template = "core/ver_obj_map.html"
 
-    return render_to_response(
+    return render(request,
         template,
         {
             'obj': recorrido_actual,
@@ -288,8 +283,7 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
             'zonas': zonas,
             'horarios': horarios,
             'recorridos_similares': Recorrido.objects.similar_hausdorff(recorrido_actual)
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -302,7 +296,7 @@ def ver_parada(request, id=None):
     #Recorrido.objects.filter(horarios_set__parada=p).select_related('linea').order_by('linea__nombre', 'nombre')
     pois = Poi.objects.filter(latlng__dwithin=(p.latlng, 300)) # este esta en metros en vez de degrees... no se por que, pero esta genial!
     ps = Parada.objects.filter(latlng__dwithin=(p.latlng, 0.004)).exclude(id=p.id)
-    return render_to_response(
+    return render(request,
         "core/ver_parada.html",
         {
             'ciudad_actual': Ciudad.objects.filter(poligono__intersects=p.latlng),
@@ -311,8 +305,7 @@ def ver_parada(request, id=None):
             'recorridosn': recorridosn,
             'recorridosp': recorridosp,
             'pois': pois
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 

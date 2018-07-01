@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, url
-
+from django.conf.urls import url
+from . import views
 
 urlpatterns = [
-    url(r'^zona/(?P<slug>[^/]+)/$', 'apps.catastro.views.zona', name='zona'),
-    url(r'^(?P<slug>[^/]+)/$', 'apps.catastro.views.poi', name='poi'),
+    url(r'^zona/(?P<slug>[^/]+)/$', views.zona, name='zona'),
+    url(r'^(?P<slug>[^/]+)/$', views.poi, name='poi'),
 ]

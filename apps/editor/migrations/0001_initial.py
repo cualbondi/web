@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date_create', models.DateTimeField(auto_now_add=True)),
                 ('newStatus', models.CharField(default=b'E', max_length=1, choices=[(b'E', b'Esperando Mod'), (b'S', b'Aceptado'), (b'N', b'Rechazado'), (b'R', b'Retirado')])),
-                ('created_by', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True)),
+                ('created_by', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -44,8 +44,8 @@ class Migration(migrations.Migration):
                 ('date_create', models.DateTimeField(auto_now_add=True)),
                 ('date_update', models.DateTimeField(auto_now=True)),
                 ('paradas_completas', models.BooleanField(default=False)),
-                ('linea', models.ForeignKey(to='core.Linea')),
-                ('recorrido', models.ForeignKey(to='core.Recorrido')),
+                ('linea', models.ForeignKey(to='core.Linea', on_delete=models.CASCADE)),
+                ('recorrido', models.ForeignKey(to='core.Recorrido', on_delete=models.CASCADE)),
             ],
             options={
                 'permissions': (('moderate_recorridos', 'Can moderate (accept/decline) recorridos'),),
@@ -54,6 +54,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='logmoderacion',
             name='recorridoProposed',
-            field=models.ForeignKey(to='editor.RecorridoProposed'),
+            field=models.ForeignKey(to='editor.RecorridoProposed', on_delete=models.CASCADE),
         ),
     ]
