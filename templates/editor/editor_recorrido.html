@@ -124,7 +124,6 @@
     <script>
         $("#alertGuardado").hide();
         function abrirAyuda(){
-            piwikLog("editor/ayuda");
             $('#modalayuda').modal();
             return false;
         }
@@ -236,7 +235,7 @@
             var p = $("#pass").val();
             $.ajax({
                 "method": "POST",
-                "url":"{% url "apps.usuarios.views.iniciar_sesion" %}",
+                "url":"{% url "iniciar_sesion" %}",
                 "data": {
                     "username": u,
                     "password": p
@@ -269,7 +268,6 @@
         
         var token = null;
         function loginFB(){
-            piwikLog("editor/loginFB");
             FB.login(
                 function(response) {
                     if (response.authResponse) {
@@ -355,7 +353,6 @@
         var jqxhrSave
         // Guardar con estado saved en la base de datos via POST ajax
         map.on('draw:edited', function (e) {
-            piwikLog("editor/guardar");
             if ( !authenticated ) {
                 guardarRecorrido(true)
                 openLogin()            

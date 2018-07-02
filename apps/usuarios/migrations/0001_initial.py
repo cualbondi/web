@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('nombre', models.CharField(max_length=100)),
                 ('latlng', django.contrib.gis.db.models.fields.PointField(srid=4326)),
-                ('usuario', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('usuario', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -37,8 +37,8 @@ class Migration(migrations.Migration):
                 ('confirmacion_key', models.CharField(max_length=40)),
                 ('fecha_envio_confirmacion', models.DateTimeField(auto_now_add=True)),
                 ('fecha_verificacion', models.DateTimeField(default=None, null=True, blank=True)),
-                ('ciudad', models.ForeignKey(blank=True, to='catastro.Ciudad', null=True)),
-                ('usuario', models.ForeignKey(to=settings.AUTH_USER_MODEL, blank=True)),
+                ('ciudad', models.ForeignKey(blank=True, to='catastro.Ciudad', null=True, on_delete=models.CASCADE)),
+                ('usuario', models.ForeignKey(to=settings.AUTH_USER_MODEL, blank=True, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -46,8 +46,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('activo', models.BooleanField()),
-                ('recorrido', models.ForeignKey(to='core.Recorrido')),
-                ('usuario', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('recorrido', models.ForeignKey(to='core.Recorrido', on_delete=models.CASCADE)),
+                ('usuario', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

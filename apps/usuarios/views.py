@@ -1,17 +1,15 @@
 # -*- coding: UTF-8 -*-
-import urlparse
 import settings
 from random import random
 from datetime import datetime, timedelta
 from django.contrib.auth import logout
-from django.shortcuts import get_object_or_404, render_to_response, redirect
+from django.shortcuts import get_object_or_404, render,  redirect
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
-from django.contrib.sites.models import get_current_site
-from django.template import RequestContext
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
@@ -22,31 +20,29 @@ from apps.usuarios.models import PerfilUsuario
 from apps.usuarios.forms import RegistracionForm
 from apps.usuarios.forms import PerfilUsuarioForm
 
-from social.apps.django_app.utils import strategy
-from django.contrib.auth.models import User
-from django.contrib.auth import login
+#from social.apps.django_app.utils import strategy
 
 from apps.editor.models import RecorridoProposed
 
-@strategy('social:complete')
-def ajax_auth(request, backend):
-    access_token = request.POST.get('access_token', False)
-    if access_token:
-        request.strategy.clean_partial_pipeline()
-        ret = request.backend.do_auth(access_token)
-        user = User.objects.get(username=ret)
-        if user:
-            if user.is_active:
-                user.backend = 'social.backends.facebook.FacebookOAuth2'
-                login(request, user)
-                return HttpResponse(status=200)
-            else:
-                return HttpResponse("Disabled Account", status=403)
-        else:
-            return HttpResponse("Invalid Login", status=403)
-    else:
-        return HttpResponse("No token found", status=403)
-    
+# @strategy('social:complete')
+# def ajax_auth(request, backend):
+#     access_token = request.POST.get('access_token', False)
+#     if access_token:
+#         request.strategy.clean_partial_pipeline()
+#         ret = request.backend.do_auth(access_token)
+#         user = User.objects.get(username=ret)
+#         if user:
+#             if user.is_active:
+#                 user.backend = 'social.backends.facebook.FacebookOAuth2'
+#                 login(request, user)
+#                 return HttpResponse(status=200)
+#             else:
+#                 return HttpResponse("Disabled Account", status=403)
+#         else:
+#             return HttpResponse("Invalid Login", status=403)
+#     else:
+#         return HttpResponse("No token found", status=403)
+
 
 @csrf_protect
 @never_cache
@@ -62,16 +58,7 @@ def iniciar_sesion(request, template_name='registration/login.html',
     if request.method == "POST":
         form = authentication_form(data=request.POST)
         if form.is_valid():
-            netloc = urlparse.urlparse(redirect_to)[1]
-
-            # Use default setting if redirect_to is empty
-            if not redirect_to:
-                redirect_to = settings.LOGIN_REDIRECT_URL
-
-            # Security check -- don't allow redirection to a different
-            # host.
-            elif netloc and netloc != request.get_host():
-                redirect_to = settings.LOGIN_REDIRECT_URL
+            redirect_to = settings.LOGIN_REDIRECT_URL
 
             # Okay, security checks complete. Log the user in.
             auth_login(request, form.get_user())
@@ -110,8 +97,7 @@ def iniciar_sesion(request, template_name='registration/login.html',
     if request.is_ajax():
         return HttpResponseForbidden()
     else:
-        return render_to_response(template_name, context,
-                              context_instance=RequestContext(request, current_app=current_app))
+        return render(request, template_name, context)
 
 
 def cerrar_sesion(request):
@@ -134,7 +120,7 @@ def _generar_link_activacion(request, email):
 def _enviar_mail_activacion(email, url_activacion):
     subject = "CualBondi: Confirmación de Email"
     message = "Click <a href='"+url_activacion+"'>aqui</a> para confirmar tu email."
-    print url_activacion
+    print(url_activacion)
 #            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
 
 
@@ -177,7 +163,7 @@ def registrar_usuario(request, **kwargs):
             return redirect('/')
         form = RegistracionForm()
 
-    return render_to_response("usuarios/registracion.html", RequestContext(request, {'form': form}))
+    return render(request, "usuarios/registracion.html")
 
 
 def confirmar_email(request, confirmacion_key=None):
@@ -230,19 +216,19 @@ def confirmar_email(request, confirmacion_key=None):
 
 def ver_perfil(request, username):
     usuario = get_object_or_404(User, username=username)
-    #perfil = PerfilUsuario.objects.get(usuario=usuario)
+    # perfil = PerfilUsuario.objects.get(usuario=usuario)
     ediciones = []
     for r in RecorridoProposed.objects.order_by('-date_update'):
         if r.get_moderacion_last_user() == usuario:
             ediciones.append(r)
-    #ediciones = [ r if r.get_moderacion_last_user() == usuario for r in RecorridoProposed.objects.order_by('-date_update') ]
-    return render_to_response(
+    # ediciones = [ r if r.get_moderacion_last_user() == usuario for r in RecorridoProposed.objects.order_by('-date_update') ]
+    return render(
+        request,
         'usuarios/perfil.html',
         {
             'usuario': usuario,
             'ediciones': ediciones,
-        },
-        context_instance=RequestContext(request)
+        }
     )
 
 
@@ -260,11 +246,11 @@ def editar_perfil(request):
                             'Tu perfil ha sido editado correctamente.')
             return redirect('/usuarios/perfil/')
         else:
-            return render_to_response('usuarios/editar_perfil.html',
-                                        {'form': form},
-                                        context_instance=RequestContext(request))
+            return render(request, 'usuarios/editar_perfil.html',
+                                        {'form': form}
+                        )
     else:
         form = PerfilUsuarioForm(instance=perfil)
-        return render_to_response('usuarios/editar_perfil.html',
-                                    {'form': form},
-                                    context_instance=RequestContext(request))
+        return render(request, 'usuarios/editar_perfil.html',
+                                    {'form': form}
+                    )
