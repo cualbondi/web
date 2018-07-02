@@ -216,13 +216,14 @@ def confirmar_email(request, confirmacion_key=None):
 
 def ver_perfil(request, username):
     usuario = get_object_or_404(User, username=username)
-    #perfil = PerfilUsuario.objects.get(usuario=usuario)
+    # perfil = PerfilUsuario.objects.get(usuario=usuario)
     ediciones = []
     for r in RecorridoProposed.objects.order_by('-date_update'):
         if r.get_moderacion_last_user() == usuario:
             ediciones.append(r)
-    #ediciones = [ r if r.get_moderacion_last_user() == usuario for r in RecorridoProposed.objects.order_by('-date_update') ]
-    return render(request, 
+    # ediciones = [ r if r.get_moderacion_last_user() == usuario for r in RecorridoProposed.objects.order_by('-date_update') ]
+    return render(
+        request,
         'usuarios/perfil.html',
         {
             'usuario': usuario,

@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404, render
-from django.template import RequestContext
 from apps.core.models import Recorrido
 from apps.editor.models import RecorridoProposed
 from django.contrib.gis.geos import GEOSGeometry
@@ -11,6 +10,7 @@ import json
 
 from django.views.decorators.http import require_http_methods, require_GET
 from task import crear_thumbs
+
 
 @ensure_csrf_cookie
 @csrf_protect

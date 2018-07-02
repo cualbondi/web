@@ -12,8 +12,6 @@ from apps.catastro.models import Ciudad, ImagenCiudad, Poi, Zona
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 from apps.editor.models import LogModeracion
-from django.contrib.gis.measure import D
-
 
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -29,9 +27,9 @@ def agradecimientos(request):
         # Obtener los logmoderacion de este usuario
         lms = LogModeracion.objects.filter(created_by=u)
         # Obtener todos los recorridosproposed que son de esos logmoderacion
-        rps = [ x.recorridoProposed for x in lms ]
+        rps = [x.recorridoProposed for x in lms]
         # de esos solo tomar aquellos que alguna vez fueron aceptados (que tienen un logmoderacion aceptado)
-        count = len([ 1 for x in rps if x.logmoderacion_set.filter(newStatus='S') ])
+        count = len([1 for x in rps if x.logmoderacion_set.filter(newStatus='S')])
         # devolver el contador de eso
         u.count_ediciones_aceptadas = count
         # eliminar los usuarios que tienen count = 0
@@ -45,7 +43,8 @@ def agradecimientos(request):
     except:
         flatpage_edicion = None
 
-    return render(request,
+    return render(
+        request,
         'core/agradecimientos.html',
         {
             'usuarios': us2,
@@ -60,11 +59,13 @@ def natural_sort_qs(qs, key):
         ej de algo ordenado naturalmente:             ['xx1', 'xx20', 'xx100']
         lo mismo ordenado con sort comun (asciisort): ['xx1', 'xx100', 'xx20']
     """
-    import re, operator
+    import re
+    import operator
+
     def natural_key(string_):
         return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
     op = operator.attrgetter(key)
-    return sorted(qs, key=lambda a:natural_key(op(a)) )
+    return sorted(qs, key=lambda a: natural_key(op(a)))
 
 
 @require_http_methods(["GET"])
@@ -87,7 +88,7 @@ def ver_ciudad(request, nombre_ciudad):
     imagenes = ImagenCiudad.objects.filter(ciudad=ciudad_actual)
 
     template = "core/ver_ciudad.html"
-    if ( request.GET.get("dynamic_map") ):
+    if (request.GET.get("dynamic_map")):
         template = "core/ver_obj_map.html"
 
     return render(request, template,

@@ -7,11 +7,13 @@ from math import ceil
 
 register = template.Library()
 
+
 @register.filter
 def as_bootstrap(form):
     template = get_template("bootstrap/form.html")
     c = Context({"form": form})
     return template.render(c)
+
 
 @register.filter
 def is_checkbox(value):
@@ -19,11 +21,13 @@ def is_checkbox(value):
         return False
     return isinstance(value.field.widget, CheckboxInput)
 
+
 @register.filter
 def is_radio(value):
     if not isinstance(value, BoundField):
         return False
     return isinstance(value.field.widget, RadioSelect)
+
 
 @register.filter
 def dividir_columnas(lista, cantidad_columnas):
@@ -40,10 +44,11 @@ def dividir_columnas(lista, cantidad_columnas):
         result.append(lista[i*tamano:(i+1)*tamano])
     return result
 
+
 @register.filter
 def partition_horizontal(thelist, n):
     """
-    Break a list into ``n`` peices, but "horizontally." That is, 
+    Break a list into ``n`` peices, but "horizontally." That is,
     ``partition_horizontal(range(10), 3)`` gives::
 
         [[1, 2, 3],

@@ -31,5 +31,6 @@ def poi(request, slug=None):
         }
     )
 
+
 def zona(request, slug=None):
     return HttpResponse(status=504)
