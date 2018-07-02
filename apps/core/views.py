@@ -146,7 +146,7 @@ def ver_linea(request, nombre_ciudad, nombre_linea):
         Linea.objects
             .only('nombre', 'slug', 'img_cuadrada', 'info_empresa', 'info_terminal', 'img_panorama'),
         slug=slug_linea,
-        ciudad=ciudad_actual
+        ciudades=ciudad_actual
     )
     recorridos = natural_sort_qs(linea_actual.recorridos.all().defer('ruta'), 'slug')
 
@@ -205,7 +205,7 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     linea_actual = get_object_or_404(
         Linea.objects.defer('envolvente'),
         slug=slug_linea,
-        ciudad=ciudad_actual
+        ciudades=ciudad_actual
     )
     """ TODO: Buscar solo recorridos activos """
     recorrido_actual = get_object_or_404(
@@ -308,6 +308,9 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     # Zonas por las que pasa el recorrido
     zonas = Zona.objects.filter(geo__intersects=recorrido_actual_simplified).values('name')
 
+    # Horarios + paradas que tiene este recorrido
+    horarios = recorrido_actual.horario_set.all().prefetch_related('parada')
+
     template = "core/ver_recorrido.html"
     if ( request.GET.get("dynamic_map") ):
         template = "core/ver_obj_map.html"
@@ -324,6 +327,7 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
             'calles': calles_fin,
             'pois': pois,
             'zonas': zonas,
+            'horarios': horarios,
             'recorridos_similares': recorridos_similares
         }
     )
