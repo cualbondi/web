@@ -20,15 +20,18 @@ from django.contrib.flatpages.models import FlatPage
 
 register = template.Library()
 
+
 class FlatpagesList(template.Node):
     def __init__(self, varname):
         if varname is None:
             self.varname = "flatpages_list"
         else:
             self.varname = varname
+
     def render(self, context):
         context[self.varname] = FlatPage.objects.order_by("title")
         return ''
+
 
 @register.tag(name="flatpages_list")
 def do_flatpages_list(parser, token): 
@@ -37,6 +40,7 @@ def do_flatpages_list(parser, token):
         raise template.TemplateSyntaxError("flatpages_list tag had invalid arguments")
     tagname, varname = m.groups()
     return FlatpagesList(varname)
+
 
 @register.filter
 def divide(lista, num):

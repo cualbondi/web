@@ -5,7 +5,7 @@ from apps.catastro.models import Ciudad
 
 
 def lista_ciudades(request):
-    ciudades = Ciudad.objects.filter(activa=True).order_by('nombre')
+    ciudades = Ciudad.objects.only('nombre', 'slug').filter(activa=True).order_by('nombre')
     return {'ciudades': ciudades}
 
 
@@ -15,14 +15,11 @@ def get_ciudad_actual(request):
         slug_ciudad = path_info.split('/')[1]
         if slug_ciudad == 'mapa':
             slug_ciudad = path_info.split('/')[2]
-        ciudad_actual = Ciudad.objects.get(slug=slug_ciudad)
-        anuncios = ciudad_actual.anuncios.all().filter(activo=True)
+        ciudad_actual = Ciudad.objects.only('nombre', 'slug').get(slug=slug_ciudad)
     except Exception:
         ciudad_actual = None
-        anuncios = []
     return {
-        'ciudad_actual': ciudad_actual,
-        'anuncios': anuncios,
+        'ciudad_actual': ciudad_actual
     }
 
 

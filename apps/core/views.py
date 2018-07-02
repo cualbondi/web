@@ -15,6 +15,7 @@ from apps.editor.models import LogModeracion
 
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.db.models import Prefetch
 
 
 @csrf_exempt
@@ -80,7 +81,12 @@ def index(request):
 @require_GET
 def ver_ciudad(request, nombre_ciudad):
     slug_ciudad = slugify(nombre_ciudad)
-    ciudad_actual = get_object_or_404(Ciudad, slug=slug_ciudad, activa=True)
+    ciudad_actual = get_object_or_404(
+        Ciudad.objects
+            .only('nombre', 'slug', 'img_panorama', 'descripcion')
+            .prefetch_related(Prefetch('lineas', queryset=Linea.objects.all().only('nombre', 'slug'))),
+        slug=slug_ciudad,
+        activa=True)
 
     lineas = natural_sort_qs(ciudad_actual.lineas.all(), 'slug')
     tarifas = Tarifa.objects.filter(ciudad=ciudad_actual)
@@ -134,12 +140,15 @@ def ver_linea(request, nombre_ciudad, nombre_linea):
     slug_ciudad = slugify(nombre_ciudad)
     slug_linea = slugify(nombre_linea)
 
-    ciudad_actual = get_object_or_404(Ciudad, slug=slug_ciudad, activa=True)
+    ciudad_actual = get_object_or_404(Ciudad.objects.only('nombre', 'slug'), slug=slug_ciudad, activa=True)
     """ TODO: Buscar solo lineas activas """
-    linea_actual = get_object_or_404(Linea,
-                                     slug=slug_linea,
-                                     ciudad=ciudad_actual)
-    recorridos = natural_sort_qs(Recorrido.objects.filter(linea=linea_actual), 'slug')
+    linea_actual = get_object_or_404(
+        Linea.objects
+            .only('nombre', 'slug', 'img_cuadrada', 'info_empresa', 'info_terminal', 'img_panorama'),
+        slug=slug_linea,
+        ciudad=ciudad_actual
+    )
+    recorridos = natural_sort_qs(linea_actual.recorridos.all().defer('ruta'), 'slug')
 
     template = "core/ver_linea.html"
     if ( request.GET.get("dynamic_map") ):
@@ -153,6 +162,33 @@ def ver_linea(request, nombre_ciudad, nombre_linea):
                                })
 
 
+import threading
+
+class PararellThread(threading.Thread):
+    def __init__(self, qs):
+        threading.Thread.__init__(self)
+        self.qs = qs
+        self.result = []
+
+    def run(self):
+        self.result = list(self.qs)
+
+def get_objects_in_pararell(querysets):
+    threads = []
+    result = []
+    for qs in querysets:
+        t = PararellThread(qs)
+        t.start()
+        threads.append(t)
+
+    for thread in threads:
+        thread.join()
+        for obj in thread.result:
+            result.append(obj)
+
+    return result
+
+
 @csrf_exempt
 @require_GET
 def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
@@ -160,15 +196,25 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     slug_linea = slugify(nombre_linea)
     slug_recorrido = slugify(nombre_recorrido)
 
-    ciudad_actual = get_object_or_404(Ciudad, slug=slug_ciudad, activa=True)
+    ciudad_actual = get_object_or_404(
+        Ciudad.objects.only('nombre', 'slug'),
+        slug=slug_ciudad,
+        activa=True
+    )
     """ TODO: Buscar solo lineas activas """
-    linea_actual = get_object_or_404(Linea,
-                                     slug=slug_linea,
-                                     ciudad=ciudad_actual)
+    linea_actual = get_object_or_404(
+        Linea.objects.defer('envolvente'),
+        slug=slug_linea,
+        ciudad=ciudad_actual
+    )
     """ TODO: Buscar solo recorridos activos """
-    recorrido_actual = get_object_or_404(Recorrido,
-                                         slug=slug_recorrido,
-                                         linea=linea_actual)
+    recorrido_actual = get_object_or_404(
+        Recorrido.objects.select_related('linea').defer('linea__envolvente'),
+        slug=slug_recorrido,
+        linea=linea_actual
+    )
+
+    recorrido_actual_simplified = recorrido_actual.ruta.simplify(0.00005)
 
     # Calles por las que pasa el recorrido
     """
@@ -222,12 +268,12 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
                     (dp).path[1] as idp,
                     cc.nom       as nom
                 FROM
-                    (SELECT ST_DumpPoints(ST_Simplify(%s, 0.00005)) as dp ) as dpa
+                    (SELECT ST_DumpPoints(%s) as dp ) as dpa
                     JOIN catastro_calle as cc
                     ON ST_DWithin(cc.way, (dp).geom, 20)
             ''',
             (
-                recorrido_actual.ruta.ewkb,
+                recorrido_actual_simplified.ewkb,
             )
         )
         from collections import OrderedDict
@@ -257,21 +303,16 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
         calles_fin = None
 
     # POI por los que pasa el recorrido
-    pois = Poi.objects.filter(latlng__dwithin=(recorrido_actual.ruta, D(m=400)))
+    pois = Poi.objects.filter(latlng__dwithin=(recorrido_actual_simplified, D(m=400)))
 
     # Zonas por las que pasa el recorrido
-    zonas = Zona.objects.filter(geo__intersects=recorrido_actual.ruta).values('name')
-
-    # Horarios + paradas que tiene este recorrido
-    horarios = recorrido_actual.horario_set.all().prefetch_related('parada')
-
-    favorito = False
-    if request.user.is_authenticated:
-        favorito = recorrido_actual.es_favorito(request.user)
+    zonas = Zona.objects.filter(geo__intersects=recorrido_actual_simplified).values('name')
 
     template = "core/ver_recorrido.html"
     if ( request.GET.get("dynamic_map") ):
         template = "core/ver_obj_map.html"
+
+    recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_actual_simplified)
 
     return render(request,
         template,
@@ -280,12 +321,10 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
             'ciudad_actual': ciudad_actual,
             'linea_actual': linea_actual,
             'recorrido_actual': recorrido_actual,
-            'favorito': favorito,
             'calles': calles_fin,
             'pois': pois,
             'zonas': zonas,
-            'horarios': horarios,
-            'recorridos_similares': Recorrido.objects.similar_hausdorff(recorrido_actual)
+            'recorridos_similares': recorridos_similares
         }
     )
 

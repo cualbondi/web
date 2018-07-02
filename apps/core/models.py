@@ -40,7 +40,7 @@ class Linea(models.Model):
         # chequear si la linea está en esta ciudad, sino tirar excepcion
         if ciudad_slug is None:
             try:
-                ciudad_slug = Ciudad.objects.filter(lineas=self)[0].slug
+                ciudad_slug = Ciudad.objects.only('slug').filter(lineas=self)[0].slug
             except:
                 print(self)
                 return ""
@@ -58,7 +58,7 @@ class Recorrido(models.Model):
     nombre = models.CharField(max_length=100)
     img_panorama = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
-    linea = models.ForeignKey(Linea, on_delete=models.CASCADE)
+    linea = models.ForeignKey(Linea, related_name='recorridos', on_delete=models.CASCADE)
     ruta = models.LineStringField()
     sentido = models.CharField(max_length=100, blank=True, null=False)
     slug = models.SlugField(max_length=200, blank=True, null=False)
@@ -116,7 +116,7 @@ class Recorrido(models.Model):
                 ciudad_slug = self.ciudad_slug
             except:
                 try:
-                    ciudad_slug = Ciudad.objects.filter(lineas=self.linea)[0].slug
+                    ciudad_slug = self.linea.ciudad_set[0].slug
                 except:
                     print(self)
                     return ""

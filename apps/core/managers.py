@@ -579,8 +579,8 @@ FROM
         query_set = self.raw(query, params)
         return list(query_set)
 
-    def similar_hausdorff(self, rec):
-        params = {"r2ruta": rec.ruta.ewkb}
+    def similar_hausdorff(self, ruta):
+        params = {"r2ruta": ruta.ewkb}
         query = """
             SELECT
                 set_limit(0.01);

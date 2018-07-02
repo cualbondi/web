@@ -218,7 +218,7 @@ ROOT_URLCONF = 'urls'
 
 GOOGLE_API = "//maps.google.com/maps/api/js?v=3.6&sensor=false"
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     #'social.apps.django_app.default',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -242,7 +242,7 @@ INSTALLED_APPS = (
     'apps.core.apps.CoreConfig',
     'apps.editor.apps.EditorConfig',
     'apps.usuarios.apps.UsuariosConfig',
-)
+]
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
@@ -289,7 +289,7 @@ LOGGING = {
 }
 
 
-HOME_URL = os.environ.get('HOME_URL')
+HOME_URL = os.environ.get('HOME_URL', 'http://cualbondi.com.ar')
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -319,13 +319,16 @@ DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 
 if CUALBONDI_ENV == 'development':
-    #INSTALLED_APPS += ('debug_toolbar', 'django_extensions',)
-    VUE_STATIC_URL = 'http://localhost:8083/mapa_nuevo'
-    # MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
     DEBUG = True
+    VUE_STATIC_URL = 'http://localhost:8083/mapa_nuevo'
+    HOME_URL = 'http://localhost:8080'
+    # django debug toolbar
+    INSTALLED_APPS += ['debug_toolbar', ]  # 'django_extensions',)
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda request: True
     }
+
 
 if CUALBONDI_ENV == 'production':
     from settings_local import *

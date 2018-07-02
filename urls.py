@@ -8,7 +8,7 @@ from apps.core.models import Recorrido, Linea, Parada
 from apps.catastro.models import Poi
 
 from django.views.static import serve
-from apps.core.urls import urlpatterns as urlpatternscore
+from apps.core.urls import urlpatterns as urlpatternsCore
 from apps.editor.urls import urlpatterns as editorUrls
 from apps.usuarios.urls import urlpatterns as usuariosUrls
 from apps.editor.views import revision
@@ -50,6 +50,15 @@ urlpatterns = [
     url(r'^agradecimientos/$', agradecimientos, name='agradecimientos'),
 
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+]
 
-    url(r'^', include(urlpatternscore)),
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
+
+urlpatterns += [
+    url(r'^', include(urlpatternsCore)),
 ]
