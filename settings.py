@@ -328,6 +328,11 @@ if CUALBONDI_ENV == 'development':
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda request: True
     }
+    TEMPLATES[0]['OPTIONS']['loaders'] =[
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    ]
+
 
 
 if CUALBONDI_ENV == 'production':
