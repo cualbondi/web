@@ -73,7 +73,15 @@
         <h2>Puntos de interés cercanos</h2>
         <ul>
             {% for p in pois %}
-            <li><a href="{{p.get_absolute_url}}">{{ p.nom }}</a></li>
+            <li itemscope itemtype="http://schema.org/Place">
+                <a itemprop="url" href="https://cualbondi.com.ar{{p.get_absolute_url}}">
+                    <span itemprop="name">{{ p.nom }}</span>
+                </a>
+                <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
+                    <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:" f "}}" />
+                    <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:" f "}}" />
+                </div>
+            </li>
             {% endfor %}
         </ul>
     {% endif %}
