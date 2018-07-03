@@ -25,10 +25,6 @@ class Linea(models.Model):
     telefono = models.CharField(max_length=200, blank=True, null=True)
     envolvente = models.PolygonField(blank=True, null=True)
 
-    @property
-    def ciudades(self):
-        return Ciudad.objects.filter(lineas=self)
-
     def __str__(self):
         return self.nombre
 
@@ -40,8 +36,9 @@ class Linea(models.Model):
         # chequear si la linea está en esta ciudad, sino tirar excepcion
         if ciudad_slug is None:
             try:
-                ciudad_slug = Ciudad.objects.only('slug').filter(lineas=self)[0].slug
-            except:
+                ciudad_slug = self.ciudades.all().only('slug')[0].slug
+            except Exception as e:
+                print(e)
                 print(self)
                 return ""
         else:
@@ -119,6 +116,7 @@ class Recorrido(models.Model):
                     ciudad_slug = self.ciudades.all()[0].slug
                 except Exception as e:
                     print(e)
+                    print(self)
                     return ""
                     # raise
         else:

@@ -5,7 +5,7 @@ import settings
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps import GenericSitemap#, FlatPageSitemap
 from apps.core.models import Recorrido, Linea, Parada
-from apps.catastro.models import Poi
+from apps.catastro.models import Poi, Ciudad
 
 from django.views.static import serve
 from apps.core.urls import urlpatterns as urlpatternsCore
@@ -14,24 +14,26 @@ from apps.usuarios.urls import urlpatterns as usuariosUrls
 from apps.editor.views import revision
 from apps.catastro.urls import urlpatterns as catastroUrls
 from apps.core.views import agradecimientos
+from django.db.models import Prefetch
+
 
 # Uncomment the next two lines to enable the admin:
 admin.autodiscover()
 
 sitemaps = {
-    #'flatpages': FlatPageSitemap,
+    # 'flatpages': FlatPageSitemap,
     'lineas': GenericSitemap({
-        'queryset': Linea.objects.all(),
-        }, priority=0.6),
+        'queryset': Linea.objects.all().prefetch_related(Prefetch('ciudades', queryset=Ciudad.objects.filter(activa=True).only('slug'))).defer('envolvente'),
+    }, priority=0.6),
     'recorridos': GenericSitemap({
-        'queryset': Recorrido.objects.all(),
-        }, priority=0.6),
-    'pois': GenericSitemap({
-        'queryset': Poi.objects.all(),
-        }, priority=0.6),
+        'queryset': Recorrido.objects.select_related('linea').prefetch_related(Prefetch('ciudades', queryset=Ciudad.objects.all().only('slug'))).only('slug', 'nombre', 'linea__slug', 'linea__nombre').all(),
+    }, priority=0.6),
     'paradas': GenericSitemap({
-        'queryset': Parada.objects.all(),
-        }, priority=0.4),
+        'queryset': Parada.objects.all().defer('latlng'),
+    }, priority=0.4),
+    'pois': GenericSitemap({
+        'queryset': Poi.objects.all().exclude(slug=''),
+    }, priority=0.6),
 }
 
 urlpatterns = [
