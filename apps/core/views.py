@@ -337,8 +337,19 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
 @require_GET
 def ver_parada(request, id=None):
     p = get_object_or_404(Parada, id=id)
-    recorridosn = Recorrido.objects.filter(ruta__dwithin=(p.latlng, 0.00111)).select_related('linea').order_by('linea__nombre', 'nombre')
-    recorridosp = [h.recorrido for h in p.horario_set.all().select_related('recorrido', 'recorrido__linea').order_by('recorrido__linea__nombre', 'recorrido__nombre')]
+    recorridosn = Recorrido.objects \
+        .filter(ruta__dwithin=(p.latlng, 0.00111)) \
+        .select_related('linea') \
+        .prefetch_related(Prefetch('ciudades', queryset=Ciudad.objects.all().only('slug'))) \
+        .order_by('linea__nombre', 'nombre') \
+        .defer('linea__envolvente', 'ruta')
+    recorridosp = [h.recorrido for h in
+                   p.horario_set
+                    .all()
+                    .select_related('recorrido', 'recorrido__linea')
+                    .prefetch_related(Prefetch('recorrido__ciudades', queryset=Ciudad.objects.all().only('slug')))
+                    .order_by('recorrido__linea__nombre', 'recorrido__nombre')
+    ]
     #Recorrido.objects.filter(horarios_set__parada=p).select_related('linea').order_by('linea__nombre', 'nombre')
     pois = Poi.objects.filter(latlng__dwithin=(p.latlng, 300)) # este esta en metros en vez de degrees... no se por que, pero esta genial!
     ps = Parada.objects.filter(latlng__dwithin=(p.latlng, 0.004)).exclude(id=p.id)

@@ -116,9 +116,9 @@ class Recorrido(models.Model):
                 ciudad_slug = self.ciudad_slug
             except:
                 try:
-                    ciudad_slug = self.ciudades.first().slug
-                except:
-                    print(self)
+                    ciudad_slug = self.ciudades.all()[0].slug
+                except Exception as e:
+                    print(e)
                     return ""
                     # raise
         else:
