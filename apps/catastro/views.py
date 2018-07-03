@@ -17,7 +17,7 @@ def poi(request, slug=None):
     # TODO: resolver estas queries en 4 threads
     #       ver https://stackoverflow.com/a/12542927/912450
     recorridos = Recorrido.objects \
-        .filter(ruta__dwithin=(poi.latlng, 0.00111)) \
+        .filter(ruta__dwithin=(poi.latlng, 0.002)) \
         .select_related('linea') \
         .prefetch_related(Prefetch('ciudades', queryset=Ciudad.objects.all().only('slug'))) \
         .order_by('linea__nombre', 'nombre') \
