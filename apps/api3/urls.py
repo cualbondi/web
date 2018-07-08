@@ -14,5 +14,8 @@ router.register(r'geocoder/reverse', views.ReverseGeocoderView, "geocoder/revers
 
 urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^recorridos-por-ciudad/(?P<ciudad_id>\d+)/$', views.RecorridosPorCiudad.as_view({'get': 'list'})),
+    url(r'^match-recorridos/(?P<recorrido_id>\d+)/$', views.match_recorridos),
+    url(r'^display-recorridos/', views.display_recorridos),
     url(r'^', include((router.urls, 'v3'), namespace='v3')),
 ]
