@@ -77,8 +77,8 @@
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-                    <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:" f "}}" />
-                    <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:" f "}}" />
+                    <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:"f"}}" />
+                    <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:"f"}}" />
                 </div>
             </li>
             {% endfor %}
