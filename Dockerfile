@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     osmctools \
     libgeos-dev \
     gdal-bin \
+    libjpeg-dev \
+    libtiff5-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev \
   && rm -rf /var/lib/apt/lists/* \
   && pip install uwsgi
 
