@@ -38,12 +38,11 @@ sitemaps = {
 }
 
 urlpatterns = [
-
     url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 
     # APPS de CualBondi
-    url(r'^admin/', admin.site.urls),
+    url(settings.ADMIN_URL, admin.site.urls),
     url(r'^editor/', include(editorUrls)),
     url(r'^usuarios/', include(usuariosUrls)),
     url(r'^revision/(?P<id_revision>\d+)/$', revision, name='revision_externa'),
@@ -57,6 +56,7 @@ urlpatterns = [
 
     url(r'^api/v3/', include(api3Urls)),
     url(r'^v3/', include(api3Urls)),
+    url(r'^auth/', include('rest_framework_social_oauth2.urls'))
 ]
 
 if settings.DEBUG:
