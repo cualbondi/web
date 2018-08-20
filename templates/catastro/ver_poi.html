@@ -1,8 +1,8 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Cómo llegar a {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.0.nombre|title}}{% endif %} - Cualbondi{% endblock %}
-{% block meta_description %}Cómo llegar a {{poi.nom|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.0.nombre|title}}{% endif %}.{% endblock %}
+{% block title %}Cómo llegar a {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %} - Cualbondi{% endblock %}
+{% block meta_description %}Cómo llegar a {{poi.nom|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}.{% endblock %}
 
 {% block head-attrs %}{% endblock %}
 
@@ -23,6 +23,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.js"></script>
     <div class="thumbnail">
+        <a href="/mapa/{{ciudad_actual.slug}}/geolocation|{{poi.latlng.0|stringformat:"f"}},{{poi.latlng.1|stringformat:"f"}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
         <div id="map" style="background:lightblue; height:300px; width:100%"></div>
     </div>
     <script>
@@ -33,6 +34,7 @@
         map.addLayer(new L.TileLayer(osmUrl, {maxZoom: 17, fadeAnimation: false}));
         L.marker([{{poi.latlng.1|stringformat:"f"}},{{poi.latlng.0|stringformat:"f"}}]).addTo(map);
         map.setView([{{poi.latlng.1|stringformat:"f"}},{{poi.latlng.0|stringformat:"f"}}], 15);
+        map.on('click', function() { window.location.href = '/mapa/{{ciudad_actual.slug}}/geolocation|{{poi.latlng.0|stringformat:"f"}},{{poi.latlng.1|stringformat:"f"}},{{poi.nom}}' });
     </script>
 
     {% include "ad_contenido.html"%}

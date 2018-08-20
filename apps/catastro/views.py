@@ -8,6 +8,7 @@ from apps.core.models import Recorrido, Parada
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 from django.db.models import Prefetch
+from django.contrib.gis.db.models.functions import Distance
 
 
 @csrf_exempt
@@ -24,7 +25,7 @@ def poi(request, slug=None):
         .defer('linea__envolvente', 'ruta')
     pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
-    ciudad_actual = Ciudad.objects.defer('poligono', 'envolvente', 'centro').filter(poligono__intersects=poi.latlng)
+    ciudad_actual = Ciudad.objects.annotate(distance=Distance('centro', poi.latlng)).order_by('distance').first()
     return render(
         request,
         'catastro/ver_poi.html',
