@@ -133,8 +133,11 @@
             })
             var geojson = new L.polyline(points, {opacity:1})
             var geojsonc = geojson;
-            {% else %}
+            {% elif obj.envolvente %}
             var geojson = L.geoJson({{ obj.envolvente.geojson|safe }});
+            var geojsonc = geojson;
+            {% elif obj.latlng %}
+            var geojson = L.geoJson({{ obj.latlng.geojson | safe }});
             var geojsonc = geojson;
             {% endif %}
             map.fitBounds(geojsonc);
@@ -143,6 +146,7 @@
             var osm = new L.TileLayer(osmUrl, {maxZoom: 17, fadeAnimation: false});
             map.attributionControl.setPrefix('Leaflet').addAttribution( osmAttrib );
             map.addLayer(osm);
+            map.fitBounds(geojsonc);
 
             //map.setView(L.latLng({{ ciudad_actual.centro.get_y|stringformat:"f" }},{{ ciudad_actual.centro.get_x|stringformat:"f" }}), {{ ciudad_actual.zoom }});
             geojson.addTo(map);
@@ -151,7 +155,7 @@
             //{% if obj.ruta %} geojson.setText('    >    ', {repeat: true, offset: 9, attributes: {fill: 'blue', 'font-size': '28'}}){% endif %}
 
             // asegurarse que cargó
-            osm.on('load', function(){ setTimeout( function(){alert('loaded')}, 1000)   } )
+            osm.on('load', function(){ setTimeout( function(){document.title = 'loaded'}, 100)   } )
         </script>
     </body>
 </html>

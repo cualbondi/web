@@ -124,6 +124,8 @@ class Poi(models.Model):
     nom = models.TextField()
     slug = models.SlugField(max_length=150)
     latlng = models.GeometryField(srid=4326, geography=True)
+    img_panorama = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
+    img_cuadrada = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     objects = GeoManager()
 
     def save(self, *args, **kwargs):
@@ -137,6 +139,28 @@ class Poi(models.Model):
 
     def get_absolute_url(self):
         return reverse('poi', kwargs={'slug': self.slug})
+
+
+class Interseccion(models.Model):
+    """ Una "Interseccion" es entre 2 calles de osm
+    """
+    nom_normal = models.TextField()
+    nom = models.TextField()
+    slug = models.SlugField(max_length=150)
+    latlng = models.GeometryField(srid=4326, geography=True)
+    objects = GeoManager()
+
+    def save(self, *args, **kwargs):
+        slug = slugify(self.nom)
+        self.slug = slug
+        suffix = 2
+        while Interseccion.objects.filter(slug=self.slug).exists():
+            self.slug = "%s-%d" % (slug, suffix)
+            suffix = suffix + 1
+        super(Interseccion, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('interseccion', kwargs={'slug': self.slug})
 
 
 # de http://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string/517974#517974

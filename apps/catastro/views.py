@@ -2,7 +2,7 @@
 from django.shortcuts import (get_object_or_404, render)
 from django.http import HttpResponse
 
-from apps.catastro.models import Poi, Ciudad
+from apps.catastro.models import Poi, Ciudad, Interseccion
 from apps.core.models import Recorrido, Parada
 
 from django.views.decorators.csrf import csrf_exempt
@@ -13,8 +13,13 @@ from django.contrib.gis.db.models.functions import Distance
 
 @csrf_exempt
 @require_GET
-def poi(request, slug=None):
-    poi = get_object_or_404(Poi, slug=slug)
+def poiORint(request, slug=None):
+    poi = None
+    pois = Poi.objects.filter(slug=slug)
+    if pois:
+        poi = pois[0]
+    else:
+        poi = get_object_or_404(Interseccion, slug=slug)
     # TODO: resolver estas queries en 4 threads
     #       ver https://stackoverflow.com/a/12542927/912450
     recorridos = Recorrido.objects \
@@ -26,10 +31,16 @@ def poi(request, slug=None):
     pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
     ciudad_actual = Ciudad.objects.annotate(distance=Distance('centro', poi.latlng)).order_by('distance').first()
+
+    template = 'catastro/ver_poi.html'
+    if (request.GET.get("dynamic_map")):
+        template = 'core/ver_obj_map.html'
+
     return render(
         request,
-        'catastro/ver_poi.html',
+        template,
         {
+            'obj': poi,
             'ciudad_actual': ciudad_actual,
             'paradas': ps,
             'poi': poi,
