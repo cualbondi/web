@@ -8,5 +8,5 @@ urlpatterns = [
     url(r'^confirmar-email/(\w+)/$', views.confirmar_email),
     url(r'^editar-perfil/$', views.editar_perfil),
     #url(r'^login_ajax/(?P<backend>[^/]+)/$', views.ajax_auth, name='ajax_auth'),
-    url(r'^(?P<username>[^/]+)/$', views.ver_perfil),
+    url(r'^(?P<username>[^/]+)/$', views.ver_perfil, name="ver_perfil"),
 ]

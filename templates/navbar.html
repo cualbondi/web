@@ -31,7 +31,7 @@
     </ul>
     <ul class="nav pull-right">
         {% if request.user.is_authenticated %}
-            <li><a href="{% url "apps.usuarios.views.ver_perfil" username=user.username %}"><i class="icon-user icon-white"></i> {{ request.user }}</a></li>
+            <li><a href="{% url "ver_perfil" username=user.username %}"><i class="icon-user icon-white"></i> {{ request.user }}</a></li>
         {% else %}
             <li><a href="/login/facebook/"><i class="icon-user icon-white"></i> Login</a></li>
         {% endif %}
