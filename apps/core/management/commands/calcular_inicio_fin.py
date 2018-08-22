@@ -1,5 +1,5 @@
 import json
-import requests
+from urllib.request import urlopen
 
 from django.db.models import Q, F
 from django.core.management.base import BaseCommand
@@ -18,8 +18,8 @@ class Command(BaseCommand):
     @staticmethod
     def geocode(point):
         """Returns the address corresponding to given geographical point"""
-        response = requests.get(BASE_URL.format(lng=point[0], lat=point[1]))
-        data = json.loads(response.content)
+        req = urlopen(BASE_URL.format(lng=point[0], lat=point[1]))
+        data = json.loads(req.read())
         address = data['results'][0]['formatted_address']
         return ','.join(address.split(',')[:2])
 
@@ -34,17 +34,17 @@ class Command(BaseCommand):
             if recorrido.inicio == recorrido.fin:
                 # rondin, tomar punto medio como fin
                 fin = (
-                    recorrido.ruta.x[len(recorrido.ruta.x) / 2],
-                    recorrido.ruta.y[len(recorrido.ruta.y) / 2]
+                    recorrido.ruta.x[len(recorrido.ruta.x) // 2],
+                    recorrido.ruta.y[len(recorrido.ruta.y) // 2]
                 )
                 recorrido.fin = self.geocode(fin)
 
             try:
                 recorrido.save()
-            except Exception as e:
-                self.stats['failed'] += 1
-                print "Skipped: {0}".format(e)
-            else:
+                print('OK: {}: {} -> {}'.format(recorrido.id, recorrido.inicio, recorrido.fin))
                 self.stats['succeed'] += 1
+            except Exception as e:
+                print("Skipped: {0}".format(e))
+                self.stats['failed'] += 1
 
-        print "Done!", self.stats
+        print("Done!", self.stats)
