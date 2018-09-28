@@ -1,0 +1,22 @@
+version: '3.2'
+
+services:
+
+    web:
+        build:
+          context: .
+          dockerfile: docker/local/Dockerfile
+        depends_on:
+            - db
+            - cache
+        env_file: .env.local.travis
+        volumes:
+            - .:/app
+        command: /start.sh
+
+    db:
+        image: cualbondi/postgres
+        env_file: .env.local.travis
+
+    cache:
+        image: memcached:alpine

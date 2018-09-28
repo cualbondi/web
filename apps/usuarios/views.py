@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import settings
+from django.conf import settings
 from random import random
 from datetime import datetime, timedelta
 from django.contrib.auth import logout

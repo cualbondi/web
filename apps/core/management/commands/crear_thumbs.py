@@ -211,8 +211,8 @@ class Command(BaseCommand):
 
     def foto_de_linea(self, l, recursiva=False, skip=False):
         try:
-            c = l.ciudad_set.all()[0]
-        except l.ciudad_set.DoesNotExist:
+            c = l.ciudades.all()[0]
+        except l.ciudades.DoesNotExist:
             print("ERROR: Salteando linea {0}. No se pudo encontrar la url porque la linea no tiene ninguna ciudad asociada [linea_id={1}]".format(
                 l.slug, l.id))
         else:
@@ -280,7 +280,7 @@ class Command(BaseCommand):
 
         for r in rs:
             try:
-                c = r.linea.ciudad_set.all()[0]
+                c = r.linea.ciudades.all()[0]
             except DoesNotExist:
                 print("ERROR: Salteando recorrido {0}. No se pudo encontrar la url porque el recorrido no tiene ninguna ciudad asociada [recorrido_id={1}]".format(r.slug, r.id))
             else:

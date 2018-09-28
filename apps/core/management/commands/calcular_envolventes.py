@@ -91,4 +91,4 @@ class Command(BaseCommand):
             try:
                 linea.save()
             except TypeError:
-                print("No se pudo asignar envolvente:", linea.nombre, linea.ciudad_set.all())
+                print("No se pudo asignar envolvente:", linea.nombre, linea.ciudades.all())

@@ -1,15 +1,14 @@
+# TODO: rename this module back to admin.py and migrate it
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.gis import admin
+from django.utils import six
+from django.utils.html import conditional_escape
+from django.utils.safestring import mark_safe
 from leaflet.admin import LeafletGeoAdmin
 
 from apps.core.models import (Linea, Recorrido, Tarifa, Parada,
-                              Horario, Posicion, FacebookPage)
-from apps.editor.models import RecorridoProposed
+                              Horario, Posicion)
 
-from django.utils.safestring import mark_safe
-from django.utils.html import conditional_escape
-from django.utils import six
-
-from django.contrib.auth.admin import UserAdmin
 UserAdmin.list_display += ('date_joined',)
 UserAdmin.list_filter += ('date_joined',)
 UserAdmin.list_display += ('last_login',)
@@ -23,10 +22,11 @@ def format_html(format_string, *args, **kwargs):
     and calls 'mark_safe' on the result. This function should be used instead
     of str.format or % interpolation to build up small HTML fragments.
     """
-    args_safe = map(conditional_escape, args)
+    args_safe = list(map(conditional_escape, args))
     kwargs_safe = dict((k, conditional_escape(v)) for (k, v) in
-                        six.iteritems(kwargs))
+                       six.iteritems(kwargs))
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
+
 
 def format_html_join(sep, format_string, args_generator):
     """
@@ -44,8 +44,8 @@ def format_html_join(sep, format_string, args_generator):
 
     """
     return mark_safe(conditional_escape(sep).join(
-            format_html(format_string, *tuple(args))
-            for args in args_generator))
+        format_html(format_string, *tuple(args))
+        for args in args_generator))
 
 
 class CustomAdmin(admin.OSMGeoAdmin):
@@ -54,8 +54,10 @@ class CustomAdmin(admin.OSMGeoAdmin):
     search_fields = ['nombre', 'recorrido__nombre']
     exclude = ()
 
+
 class HorarioAdminInline(admin.TabularInline):
     model = Horario
+
 
 class RecorridoCustomAdmin(LeafletGeoAdmin):
     display_raw = True
@@ -63,15 +65,11 @@ class RecorridoCustomAdmin(LeafletGeoAdmin):
     inlines = (HorarioAdminInline,)
     exclude = ('horarios',)
 
-class RecorridoProposedCustomAdmin(LeafletGeoAdmin):
-    display_raw = True
-    search_fields = ['nombre', 'linea__nombre']
-    exclude = ('horarios',)
 
 class ParadaCustomAdmin(admin.OSMGeoAdmin):
     display_raw = True
     search_fields = ['nombre', 'codigo']
-    #inlines = (HorarioAdminInline,)
+    # inlines = (HorarioAdminInline,)
     readonly_fields = ('horarios',)
 
     def horarios(self, instance):
@@ -84,10 +82,9 @@ class ParadaCustomAdmin(admin.OSMGeoAdmin):
     horarios.short_description = "Horarios"
     horarios.allow_tags = True
 
+
 admin.site.register(Linea, CustomAdmin)
 admin.site.register(Recorrido, RecorridoCustomAdmin)
-admin.site.register(RecorridoProposed, RecorridoProposedCustomAdmin)
 admin.site.register(Parada, ParadaCustomAdmin)
 admin.site.register(Tarifa)
 admin.site.register(Posicion)
-admin.site.register(FacebookPage)

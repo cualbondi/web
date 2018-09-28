@@ -79,7 +79,7 @@ class Recorrido(models.Model):
         return Ciudad.objects.filter(lineas=self.linea)
 
     def __str__(self):
-        # return str(self.ciudad_set.all()[0]) + " - " + str(self.linea) + " - " + self.nombre
+        # return str(self.ciudades.all()[0]) + " - " + str(self.linea) + " - " + self.nombre
         return str(self.linea) + " - " + self.nombre
 
     def save(self, *args, **kwargs):

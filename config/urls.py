@@ -1,9 +1,9 @@
 from django.conf.urls import include, url
 from django.contrib.gis import admin
-import settings
+from django.conf import settings
 
 from django.contrib.sitemaps.views import sitemap
-from django.contrib.sitemaps import GenericSitemap#, FlatPageSitemap
+from django.contrib.sitemaps import GenericSitemap  # , FlatPageSitemap
 from apps.core.models import Recorrido, Linea, Parada
 from apps.catastro.models import Poi, Ciudad
 
@@ -13,6 +13,7 @@ from apps.editor.urls import urlpatterns as editorUrls
 from apps.usuarios.urls import urlpatterns as usuariosUrls
 from apps.editor.views import revision
 from apps.catastro.urls import urlpatterns as catastroUrls
+from apps.api3.urls import urlpatterns as api3Urls
 from apps.core.views import agradecimientos
 from django.db.models import Prefetch
 
@@ -39,6 +40,7 @@ sitemaps = {
 urlpatterns = [
 
     url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 
     # APPS de CualBondi
     url(r'^admin/', admin.site.urls),
@@ -52,6 +54,8 @@ urlpatterns = [
     url(r'^agradecimientos/$', agradecimientos, name='agradecimientos'),
 
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
+    url(r'^api/v3/', include(api3Urls)),
 ]
 
 if settings.DEBUG:
