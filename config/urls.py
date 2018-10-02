@@ -56,6 +56,7 @@ urlpatterns = [
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
     url(r'^api/v3/', include(api3Urls)),
+    url(r'^v3/', include(api3Urls)),
 ]
 
 if settings.DEBUG:
