@@ -2,6 +2,7 @@
 
 import django.contrib.postgres.fields.hstore
 from django.db import migrations
+from django.contrib.postgres.operations import CreateExtension
 
 
 class Migration(migrations.Migration):
@@ -11,6 +12,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        CreateExtension('hstore'),
         migrations.AddField(
             model_name='poi',
             name='tags',
