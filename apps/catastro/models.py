@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import HStoreField
 from django.db.models import Manager as GeoManager
 from django.template.defaultfilters import slugify
 from django.urls import reverse
@@ -165,6 +166,7 @@ class Calle(models.Model):
     way = models.GeometryField(srid=4326, geography=True)
     nom_normal = models.TextField()
     nom = models.TextField()
+    osm_id = models.BigIntegerField(blank=True, null=True)
     objects = GeoManager()
 
 
@@ -174,10 +176,12 @@ class Poi(models.Model):
     """
     nom_normal = models.TextField()
     nom = models.TextField()
-    slug = models.SlugField(max_length=150)
+    slug = models.SlugField(max_length=150, null=True)
     latlng = models.GeometryField(srid=4326, geography=True)
     img_panorama = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
+    osm_id = models.BigIntegerField(blank=True, null=True)
+    tags = HStoreField(null=True)
     objects = GeoManager()
 
     def save(self, *args, **kwargs):
@@ -198,8 +202,10 @@ class Interseccion(models.Model):
     """
     nom_normal = models.TextField()
     nom = models.TextField()
-    slug = models.SlugField(max_length=150)
+    slug = models.SlugField(max_length=150, null=True)
     latlng = models.GeometryField(srid=4326, geography=True)
+    osm_id1 = models.BigIntegerField(blank=True, null=True)
+    osm_id2 = models.BigIntegerField(blank=True, null=True)
     objects = GeoManager()
 
     def save(self, *args, **kwargs):

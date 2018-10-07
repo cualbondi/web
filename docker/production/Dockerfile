@@ -7,6 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     osmctools \
     libgeos-dev \
     gdal-bin \
+    libspatialindex-dev \
+    postgresql-client \
   && rm -rf /var/lib/apt/lists/* \
   && pip install uwsgi
 

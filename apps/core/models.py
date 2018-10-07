@@ -66,8 +66,7 @@ class Recorrido(models.Model):
     horarios = models.TextField(blank=True, null=True)
     pois = models.TextField(blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
-    osm_id = models.TextField(blank=True, null=True)
-    osm_sync = models.BooleanField(default=False)
+    osm_id = models.BigIntegerField(blank=True, null=True)
 
     # Si tiene las paradas completas es porque tiene todas las paradas de
     # este recorrido en la tabla paradas+horarios (horarios puede ser null),
