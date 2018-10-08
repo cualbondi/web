@@ -316,10 +316,11 @@ class Command(BaseCommand):
                         left outer join catastro_zona zo on (ST_Intersects(pop.way, zo.geo))
                     WHERE
                         pop.name is not null and
-                        highway is not null and
+                        highway is null and
                         route is null and
+                        char_length(pop.name) > 2 and
                         osm_id > 0 and
-                        amenity is not null and
+                        not (landuse = 'residential' and char_length(pop.name)<7) and
                         not EXISTS (
                             SELECT osm_id FROM catastro_poi as cp2 WHERE cp2.osm_id = pop.osm_id
                         )
@@ -365,11 +366,11 @@ class Command(BaseCommand):
                     print('      {}/{} ({:2.0f}%)'.format(i, total, i * 100.0 / total))
 
             # unir catastro_poicb (13 y 60, 13 y 66, 13 y 44) con catastro_poi (osm_pois)
-            print('    - Mergeando POIs propios de cualbondi')
-            for poicb in Poicb.objects.all():
-                Poi.objects.create(nom_normal = poicb.nom_normal.upper(), nom = poicb.nom, latlng = poicb.latlng)
-            print('    - Purgando nombres repetidos')
-            cu.execute('delete from catastro_poi where id not in (select min(id) from catastro_poi group by nom_normal)')
+            # print('    - Mergeando POIs propios de cualbondi')
+            # for poicb in Poicb.objects.all():
+            #     Poi.objects.create(nom_normal = poicb.nom_normal.upper(), nom = poicb.nom, latlng = poicb.latlng)
+            # print('    - Purgando nombres repetidos')
+            # cu.execute('delete from catastro_poi where id not in (select min(id) from catastro_poi group by nom_normal)')
 
             print(' => Regenerando indices')
             print('    - Eliminando viejos')

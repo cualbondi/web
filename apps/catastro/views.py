@@ -92,11 +92,11 @@ def poiORint(request, slug=None):
     if (request.GET.get("dynamic_map")):
         template = 'core/ver_obj_map.html'
 
-    amenity = poi.tags['amenity']
+    amenity = None
     try:
-        amenity = amenities[amenity]
+        amenity = amenities[poi.tags['amenity']]
     except KeyError:
-        amenity = None
+        pass
 
     return render(
         request,
