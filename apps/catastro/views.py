@@ -33,6 +33,35 @@ def fuzzy_like_query(q):
     return list(query_set)
 
 
+amenities = {
+    'restaurant': 'Restaurant',
+    'school': 'Escuela',
+    'pharmacy': 'Farmacia',
+    'Kindergarten': 'Jardin',
+    'cafe': 'Cafe',
+    'fast_food': 'Comida rapida',
+    'bar': 'Bar',
+    'place_of_worship': 'Templo',
+    'college': 'Secundario',
+    'ice_cream': 'Heladeria',
+    'police': 'Policia',
+    'hospital': 'Hospital',
+    'clinic': 'Clinica',
+    'community_centre': 'Centro comunitario',
+    'veterinary': 'Veterinaria',
+    'doctors': 'Doctor',
+    'bicycle_rental': 'Alquiler de bicicletas',
+    'taxi': 'Taxi',
+    'library': 'Biblioteca',
+    'dentist': 'Dentista',
+    'bank': 'Banco',
+    'theatre': 'Teatro',
+    'car_wash': 'Lavadero de autos',
+    'pub': 'Bar',
+    'university': 'Universidad',
+}
+
+
 @csrf_exempt
 @require_GET
 def poiORint(request, slug=None):
@@ -63,11 +92,18 @@ def poiORint(request, slug=None):
     if (request.GET.get("dynamic_map")):
         template = 'core/ver_obj_map.html'
 
+    amenity = poi.tags['amenity']
+    try:
+        amenity = amenities[amenity]
+    except KeyError:
+        amenity = None
+
     return render(
         request,
         template,
         {
             'obj': poi,
+            'amenity': amenity,
             'ciudad_actual': ciudad_actual,
             'paradas': ps,
             'poi': poi,
