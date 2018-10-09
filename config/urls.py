@@ -1,8 +1,9 @@
 from django.conf.urls import include, url
+from django.urls import path
 from django.contrib.gis import admin
 from django.conf import settings
 
-from django.contrib.sitemaps.views import sitemap
+from django.contrib.sitemaps import views as sitemaps_views
 from django.contrib.sitemaps import GenericSitemap  # , FlatPageSitemap
 from apps.core.models import Recorrido, Linea, Parada
 from apps.catastro.models import Poi, Ciudad
@@ -52,7 +53,8 @@ urlpatterns = [
     # Ranking aka agradecimientos
     url(r'^agradecimientos/$', agradecimientos, name='agradecimientos'),
 
-    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+    path(r'sitemap.xml', sitemaps_views.index, {'sitemaps': sitemaps}),
+    path('sitemap-<section>.xml', sitemaps_views.sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
     url(r'^api/v3/', include(api3Urls)),
     url(r'^v3/', include(api3Urls)),
@@ -69,3 +71,4 @@ if settings.DEBUG:
 urlpatterns += [
     url(r'^', include(urlpatternsCore)),
 ]
+
