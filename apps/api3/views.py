@@ -8,6 +8,7 @@ from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.mixins import UpdateModelMixin
 
 from apps.catastro.models import Ciudad
 from apps.catastro.models import PuntoBusqueda
@@ -42,7 +43,7 @@ class CBPagination(pagination.PageNumberPagination):
         })
 
 
-class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet):
+class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin):
     """
         Parametros querystring
 
@@ -261,8 +262,9 @@ class RecorridosPorCiudad(viewsets.ModelViewSet):
     serializer_class = serializers.RecorridoModelSerializer
     # pagination_class = pagination.PageNumberPagination
     depth = 1
+
     def get_queryset(self):
-        return Recorrido.objects.select_related('linea').filter(ciudad=self.kwargs.get('ciudad_id'))
+        return Recorrido.objects.select_related('linea').filter(ciudades=self.kwargs.get('ciudad_id'))
 
 
 @api_view(['GET'])
@@ -273,7 +275,7 @@ def match_recorridos(request, recorrido_id):
             select
             *
             from
-            (select * from crossed2_table where recorrido_id = %(recorrido_id)s) as c
+            (select * from crossed_areas where recorrido_id = %(recorrido_id)s) as c
             order by area asc;
         """
         opts = {"recorrido_id": recorrido_id}
