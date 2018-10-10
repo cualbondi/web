@@ -4,10 +4,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from rest_framework import exceptions
 from rest_framework import pagination
-from rest_framework import viewsets, views
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.mixins import UpdateModelMixin
 
 from apps.catastro.models import Ciudad
@@ -43,6 +43,19 @@ class CBPagination(pagination.PageNumberPagination):
         })
 
 
+class IsStaffOrReadOnly(BasePermission):
+    """
+    The request is authenticated as a user, or is a read-only request.
+    """
+
+    def has_permission(self, request, view):
+        return (
+            request.method in SAFE_METHODS or
+            request.user and
+            request.user.is_staff
+        )
+
+
 class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin):
     """
         Parametros querystring
@@ -62,6 +75,7 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
     serializer_class = serializers.RecorridoPureModelSerializer
     queryset = Recorrido.objects.all()
     pagination_class = CBPagination
+    permission_classes = [IsStaffOrReadOnly]
 
     def list(self, request):
         q = request.query_params.get('q', None)
