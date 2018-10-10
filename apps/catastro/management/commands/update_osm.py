@@ -221,11 +221,11 @@ class Command(BaseCommand):
                 geom_col='way',
                 crs=crs
             )
-            bus_routes.set_index('osm_id')
+            bus_routes.set_index('osm_id', inplace=True)
 
             self.out2('Creando geodataframe')
             bus_routes_buffer = gpd.GeoDataFrame({
-                'osm_id': bus_routes.osm_id,
+                'osm_id': bus_routes.index,
                 'way': bus_routes.way,
                 'way_buffer_40': bus_routes.way.buffer(0.0004),
                 'way_buffer_40_simplify': bus_routes.way.simplify(0.0001).buffer(0.0004),
@@ -253,11 +253,11 @@ class Command(BaseCommand):
                 geom_col='ruta',
                 crs=crs
             )
-            core_recorrido.set_index('id')
+            core_recorrido.set_index('id', inplace=True)
 
             self.out2('Creando geodataframe')
             core_recorrido_buffer = gpd.GeoDataFrame({
-                'id': core_recorrido.id,
+                'id': core_recorrido.index,
                 'ruta': core_recorrido.ruta.simplify(0.0001),
                 'ruta_buffer_40_simplify': core_recorrido.ruta.simplify(0.0001).buffer(0.0004),
                 'nombre': core_recorrido.nombre,
