@@ -29,6 +29,8 @@ class Command(BaseCommand):
         self.chrome_options = webdriver.ChromeOptions()
         self.chrome_options.add_argument('--headless')
         self.chrome_options.add_argument('--no-sandbox')
+        self.chrome_options.add_argument('--user-data-dir=/tmp/chromecache')
+        self.chrome_options.add_argument('--disk-cache-size=2147483648')
         self.driver = None
 
     def add_arguments(self, parser):
