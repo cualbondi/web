@@ -244,7 +244,7 @@ class Command(BaseCommand):
                     FROM
                         core_recorrido cr
                         JOIN core_linea cl ON (cr.linea_id = cl.id)
-                        JOIN catastro_ciudad_recorridos ccr ON (ccr.recorrido_id = cr.id)
+                    --  JOIN catastro_ciudad_recorridos ccr ON (ccr.recorrido_id = cr.id)
                     --WHERE
                     --    ccr.ciudad_id = 1
                     ;
