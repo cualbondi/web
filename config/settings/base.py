@@ -78,6 +78,7 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'leaflet',
     'imagekit',
+    'django_extensions',
 
     # social auth
     'oauth2_provider',
