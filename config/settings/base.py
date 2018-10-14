@@ -262,3 +262,5 @@ LONGITUD_PAGINA = 5
 HOME_URL = env.get_value('HOME_URL', default='https://cualbondi.com.ar')
 FACEBOOK_APP_ID = env.get_value('FACEBOOK_APP_ID', default='')
 API_URL = env.get_value('API_URL', default='')
+
+SHELL_PLUS_PRINT_SQL = True
