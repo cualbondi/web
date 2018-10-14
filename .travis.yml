@@ -11,4 +11,4 @@ before_install:
 
 script:
   - docker-compose -f docker-compose-travis.yml exec web coverage run manage.py test
-  - docker-compose -f docker-compose-travis.yml exec web codecov --token=b6277d39-a20a-4fb3-aca7-dc9107309651
+  - docker-compose -f docker-compose-travis.yml exec web codecov --token=6f872807-235f-4dda-b70e-700e23ca2225
