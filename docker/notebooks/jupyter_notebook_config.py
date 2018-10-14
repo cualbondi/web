@@ -90,7 +90,7 @@
 ## The base URL for the notebook server.
 #
 #  Leading and trailing slashes can be omitted, and will automatically be added.
-c.NotebookApp.base_url = '/notebooks/'
+# c.NotebookApp.base_url = '/'
 
 ## Specify what command to use to invoke a web browser when opening the notebook.
 #  If not specified, the default browser will be determined by the `webbrowser`
