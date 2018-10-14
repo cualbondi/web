@@ -3,8 +3,11 @@ from urllib import request
 import subprocess
 import os
 import sys
-from apps.catastro.models import Poi, Poicb, Interseccion, Calle
+from apps.catastro.models import Poi, Interseccion, Calle
+from apps.core.models import Recorrido
 from django.db import connection
+from django.db.models import F
+from django.contrib.gis.geos import GEOSGeometry
 from datetime import datetime
 import time
 
@@ -18,44 +21,44 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             '-f',
-            action  = 'store',
-            dest    = 'inputFile',
-            default = '',
-            help    = 'Use an input file instead of trying to download osm data'
+            action='store',
+            dest='inputFile',
+            default='',
+            help='Use an input file instead of trying to download osm data'
         )
         parser.add_argument(
             '--use-cache',
-            action  = 'store_true',
-            dest    = 'use_cache',
-            default = False,
-            help    = 'Use the cache of downloaded osm'
+            action='store_true',
+            dest='use_cache',
+            default=False,
+            help='Use the cache of downloaded osm'
         )
         parser.add_argument(
             '-s',
-            action  = 'store_true',
-            dest    = 'slim',
-            default = False,
-            help    = 'Set osm2pgsql slim mode (create raw tables: nodes, rels, ways)'
+            action='store_true',
+            dest='slim',
+            default=False,
+            help='Set osm2pgsql slim mode (create raw tables: nodes, rels, ways)'
         )
         parser.add_argument(
             '--no-o2p',
-            action  = 'store_true',
-            dest    = 'no-o2p',
-            default = False,
-            help    = 'Ignore osm2pgsql execution (debug purposes only)'
+            action='store_true',
+            dest='no-o2p',
+            default=False,
+            help='Ignore osm2pgsql execution (debug purposes only)'
         )
         parser.add_argument(
             '--no-tmp',
-            action  = 'store_true',
-            dest    = 'no-tmp',
-            default = False,
-            help    = 'Don\'t use /tmp folder, instead use apps/catastro/management/commands folder to save the downloaded argentina.osm.pbf file'
+            action='store_true',
+            dest='no-tmp',
+            default=False,
+            help='Don\'t use /tmp folder, instead use apps/catastro/management/commands folder to save the downloaded argentina.osm.pbf file'
         )
         parser.add_argument(
             '--ciudad',
-            action  = 'store',
-            dest    = 'ciudad',
-            help    = 'Only import this ciudad slug'
+            action='store',
+            dest='ciudad',
+            help='Only import this ciudad slug'
         )
         parser.add_argument(
             '--pois',
@@ -84,6 +87,13 @@ class Command(BaseCommand):
             dest='intersections',
             default=False,
             help='Run intersections routine'
+        )
+        parser.add_argument(
+            '--update_routes',
+            action='store_true',
+            dest='update_routes',
+            default=False,
+            help='Update routes'
         )
 
     def reporthook(self, numblocks, blocksize, filesize, url=None):
@@ -118,7 +128,7 @@ class Command(BaseCommand):
                 self.out1('Descargando mapa de Argentina de geofabrik')
                 url = 'http://download.geofabrik.de/south-america/argentina-latest.osm.pbf'
                 self.out2(url)
-                f, d = request.urlretrieve(url, inputfile, lambda nb, bs, fs, url=url: self.reporthook(nb,bs,fs,url))
+                f, d = request.urlretrieve(url, inputfile, lambda nb, bs, fs, url=url: self.reporthook(nb, bs, fs, url))
 
             dbname = connection.settings_dict['NAME']
             dbuser = connection.settings_dict['USER']
@@ -163,7 +173,7 @@ class Command(BaseCommand):
             prog = [
                 'osm2pgsql',
                 '--latlong',
-                '--style={}'.format(os.path.join(os.path.abspath(os.path.dirname(__file__)),'update-osm.style')),
+                '--style={}'.format(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'update-osm.style')),
                 '--database={}'.format(dbname),
                 '--username={}'.format(dbuser),
                 '--host={}'.format(dbhost),
@@ -283,10 +293,12 @@ class Command(BaseCommand):
             intersections.index = range(len(intersections))
 
             self.out2('Generando way_buffer_40_simplify')
-            way_buffer_40_simplify = gpd.GeoSeries(bus_routes_buffer.loc[intersections.osm_id].way_buffer_40_simplify.values, crs=crs)
+            way_buffer_40_simplify = gpd.GeoSeries(
+                bus_routes_buffer.loc[intersections.osm_id].way_buffer_40_simplify.values, crs=crs)
 
             self.out2('Generando ruta_buffer_40_simplify')
-            ruta_buffer_40_simplify = gpd.GeoSeries(core_recorrido_buffer.loc[intersections.id].ruta_buffer_40_simplify.values, crs=crs)
+            ruta_buffer_40_simplify = gpd.GeoSeries(
+                core_recorrido_buffer.loc[intersections.id].ruta_buffer_40_simplify.values, crs=crs)
 
             self.out2('Generando symmetric_difference')
             diffs = ruta_buffer_40_simplify.symmetric_difference(way_buffer_40_simplify).area.values
@@ -360,6 +372,59 @@ class Command(BaseCommand):
 
             self.out2('LISTO!')
 
+        if options['update_routes']:
+            cu.execute("""
+            SELECT
+                @pl.osm_id as osm_id,
+                cr.id as cb_id,
+                max((tags->'osm_timestamp')::timestamptz) as last_updated_osm,
+                cr.last_updated as last_updated_cb,
+                st_linemerge(st_union(way)) as way
+            FROM
+                public.planet_osm_line pl
+                join core_recorrido cr on (cr.osm_id = @pl.osm_id)
+            where
+                pl.route='bus'
+                and cr.osm_id is not null
+            group by
+                pl.osm_id,
+                cr.last_updated,
+                cr.id;
+            """)
+
+            def check_date(last_updated_cb, last_updated_osm):
+                print(last_updated_cb, last_updated_osm)
+                return last_updated_osm > last_updated_cb
+
+            def fix_way(way):
+                way = GEOSGeometry(way)
+                if way.geom_type == 'LineString':
+                    return way
+                if way.geom_type == 'MultiLineString':
+                    # fix
+                    self.out2('asd')
+                    pass
+
+                self.out2('could not import way: {}'.format(way.geom_type))
+                return None
+
+            recorridos = cu.fetchall()
+            to_update = {}
+            for rec in recorridos:
+                osm_id, cb_id, last_updated_osm, last_updated_cb, way = rec
+                way = fix_way(way)
+                if (check_date(last_updated_cb, last_updated_osm) and way is not None):
+                    to_update[cb_id] = {
+                        'last_updated': last_updated_osm,
+                        'ruta': way
+                    }
+
+            to_update_qs = Recorrido.objects.filter(id__in=to_update.keys())
+            if to_update_qs:
+                to_update_qs.update(
+                    ruta=to_update[F('id')]['ruta'],
+                    last_updated=to_update[F('id')]['last_updated']
+                )
 
         #######################
         #  POIs de osm        #
@@ -401,7 +466,6 @@ class Command(BaseCommand):
             cu.execute("update catastro_calle set nom_normal = replace(nom_normal, 'CALLE ', '');")
             cu.execute("update catastro_calle set nom_normal = replace(nom_normal, 'DIAGONAL ', '');")
             cu.execute("update catastro_calle set nom_normal = replace(nom_normal, 'BOULEVARD ', '');")
-
 
             self.out1('POIs')
             self.out2('Borrando POIs sin osm_id')
@@ -515,11 +579,10 @@ class Command(BaseCommand):
                 if (i * 100.0 / total) % 1 == 0:
                     self.out2('{:2.0f}%'.format(i * 100.0 / total))
 
-
         #self.out1('Eliminando tablas no usadas')
         #cu.execute('drop table planet_osm_roads;')
         #cu.execute('drop table planet_osm_polygon;')
-        #cx.commit()
-        #cx.close()
+        # cx.commit()
+        # cx.close()
 
         self.out1('LISTO!')
