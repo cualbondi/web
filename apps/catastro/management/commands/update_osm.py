@@ -5,9 +5,9 @@ import os
 import sys
 from apps.catastro.models import Poi, Interseccion, Calle
 from apps.core.models import Recorrido
+from apps.utils.fix_way import fix_way
 from django.db import connection
 from django.db.models import F
-from django.contrib.gis.geos import GEOSGeometry
 from datetime import datetime
 import time
 
@@ -377,6 +377,7 @@ class Command(BaseCommand):
             SELECT
                 @pl.osm_id as osm_id,
                 cr.id as cb_id,
+                cr.nombre as name,
                 max((tags->'osm_timestamp')::timestamptz) as last_updated_osm,
                 cr.last_updated as last_updated_cb,
                 st_linemerge(st_union(way)) as way
@@ -389,42 +390,21 @@ class Command(BaseCommand):
             group by
                 pl.osm_id,
                 cr.last_updated,
-                cr.id;
+                cr.id,
+                cr.nombre;
             """)
 
             def check_date(last_updated_cb, last_updated_osm):
                 print(last_updated_cb, last_updated_osm)
                 return last_updated_osm > last_updated_cb
 
-            def fix_way(way):
-                way = GEOSGeometry(way)
-                if way.geom_type == 'LineString':
-                    return way
-                if way.geom_type == 'MultiLineString':
-                    # fix
-                    self.out2('asd')
-                    pass
-
-                self.out2('could not import way: {}'.format(way.geom_type))
-                return None
-
             recorridos = cu.fetchall()
-            to_update = {}
             for rec in recorridos:
-                osm_id, cb_id, last_updated_osm, last_updated_cb, way = rec
+                osm_id, cb_id, name, last_updated_osm, last_updated_cb, way = rec
+                self.out2('updating {} {} {}'.format(cb_id, osm_id, name))
                 way = fix_way(way)
                 if (check_date(last_updated_cb, last_updated_osm) and way is not None):
-                    to_update[cb_id] = {
-                        'last_updated': last_updated_osm,
-                        'ruta': way
-                    }
-
-            to_update_qs = Recorrido.objects.filter(id__in=to_update.keys())
-            if to_update_qs:
-                to_update_qs.update(
-                    ruta=to_update[F('id')]['ruta'],
-                    last_updated=to_update[F('id')]['last_updated']
-                )
+                    recorrido = Recorrido.objects.filter(id=cb_id).update(ruta=way, last_updated=last_updated_osm)
 
         #######################
         #  POIs de osm        #
