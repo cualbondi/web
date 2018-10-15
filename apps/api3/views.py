@@ -290,10 +290,22 @@ def match_recorridos(request, recorrido_id):
     with connection.cursor() as cursor:
         query = """
             select
-            *
+                *
             from
-            (select * from crossed_areas where recorrido_id = %(recorrido_id)s) as c
-            order by area asc;
+                (
+                    select
+                        *
+                    from
+                        crossed_areas
+                    where
+                        recorrido_id = %(recorrido_id)s
+                ) as c
+            where
+                osm_id not in (
+                    select osm_id from core_recorrido where osm_id is not null
+                )
+            order by
+                area asc;
         """
         opts = {"recorrido_id": recorrido_id}
         cursor.execute(query, opts)
