@@ -278,7 +278,10 @@ class RecorridosPorCiudad(viewsets.ModelViewSet):
     depth = 1
 
     def get_queryset(self):
-        return Recorrido.objects.select_related('linea').filter(ciudades=self.kwargs.get('ciudad_id'))
+        return Recorrido.objects \
+            .select_related('linea') \
+            .filter(ciudades=self.kwargs.get('ciudad_id')) \
+            .filter(osm_id__isnull=True)
 
 
 @api_view(['GET'])
