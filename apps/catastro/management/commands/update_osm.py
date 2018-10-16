@@ -95,6 +95,13 @@ class Command(BaseCommand):
             default=False,
             help='Update routes'
         )
+        parser.add_argument(
+            '--all_arg',
+            action='store_true',
+            dest='all_arg',
+            default=False,
+            help='Use all arg (do not import ONLY cities)'
+        )
 
     def reporthook(self, numblocks, blocksize, filesize, url=None):
         base = os.path.basename(url)
@@ -142,32 +149,38 @@ class Command(BaseCommand):
 
             self.out1('Cargando data de osm en la base de cualbondi')
 
-            ciudades = cu.fetchall()
-            for c in ciudades:
+            filetoimport = inputfile
 
-                # if options.ciudad is defined, and this is not it, skip it
-                if options['ciudad'] and options['ciudad'] != c[0]:
-                    continue
+            if not options['all_arg']:
+                self.out2('only-cities')
+                ciudades = cu.fetchall()
+                for c in ciudades:
 
-                l = c[1][1:-1].replace(')', '').replace('(', '').split(',')
-                box = ','.join([l[2], l[3], l[0], l[1]])
-                self.out2('{} ({})'.format(c[0], box))
+                    # if options.ciudad is defined, and this is not it, skip it
+                    if options['ciudad'] and options['ciudad'] != c[0]:
+                        continue
+
+                    l = c[1][1:-1].replace(')', '').replace('(', '').split(',')
+                    box = ','.join([l[2], l[3], l[0], l[1]])
+                    self.out2('{} ({})'.format(c[0], box))
+                    prog = [
+                        'osmconvert',
+                        inputfile,
+                        '-b={}'.format(box),
+                        '-o=/tmp/part-{}.osm'.format(c[0])
+                    ]
+                    filetoimport = '/tmp/part-all.pbf'
+                    subprocess.Popen(prog).wait()
+
+                self.out2('Uniendo partes')
+                partfiles = ['/tmp/part-{}.osm'.format(c[0]) for c in ciudades]
                 prog = [
                     'osmconvert',
-                    inputfile,
-                    '-b={}'.format(box),
-                    '-o=/tmp/part-{}.osm'.format(c[0])
-                ]
-
+                    '-o={}'.format(filetoimport)
+                ] + partfiles
                 subprocess.Popen(prog).wait()
-
-            self.out2('Uniendo partes')
-            partfiles = ['/tmp/part-{}.osm'.format(c[0]) for c in ciudades]
-            prog = [
-                'osmconvert',
-                '-o=/tmp/part-all.pbf'
-            ] + partfiles
-            subprocess.Popen(prog).wait()
+            else:
+                self.out2('all Argentina')
 
             self.out2('Cargando en la base de datos')
             prog = [
@@ -181,7 +194,7 @@ class Command(BaseCommand):
                 '--number-processes=4',
                 '--hstore-all',
                 '--extra-attributes',
-                '/tmp/part-all.pbf'
+                filetoimport
             ]
             if options['slim']:
                 prog.append('-s')
