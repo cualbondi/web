@@ -7,6 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('core', '0006_recorrido_osm_id'),
+        ('editor', '0003_auto_20180802_0105'),
     ]
 
     operations = [

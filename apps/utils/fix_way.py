@@ -32,7 +32,7 @@ def sort_ways(ways):
     return ways
 
 
-def fix_way(way):
+def fix_way(way, tolerance):
     """ tries to sort and fix the way into a linestring """
     way = GEOSGeometry(way)
     if way.geom_type == 'LineString':
