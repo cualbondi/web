@@ -42,6 +42,7 @@ def fix_way(way, tolerance):
         if way.geom_type == 'LineString':
             return way
         way = sort_ways(way)
-        return way
+        if way.geom_type == 'LineString':
+            return way
 
     return None
