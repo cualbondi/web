@@ -20,7 +20,7 @@
             "POSTGRES_DB": "geocualbondidb",
             "DB_HOST": "localhost",
             "DATABASE_URL": "postgres://geocualbondiuser@localhost:5433/cualbondidb",
-            "SOCIAL_AUTH_FACEBOOK_SECRET": "f90d27d49f50939996db0f299dec129d"
+            "SOCIAL_AUTH_FACEBOOK_SECRET": "123123123"
         },
         "debugOptions": [
             "RedirectOutput",

@@ -403,8 +403,10 @@ class Command(BaseCommand):
                 osm_id, cb_id, name, last_updated_osm, last_updated_cb, way = rec
                 self.out2('updating {} {} {}'.format(cb_id, osm_id, name))
                 way = fix_way(way)
-                if (check_date(last_updated_cb, last_updated_osm) and way is not None):
-                    recorrido = Recorrido.objects.filter(id=cb_id).update(ruta=way, last_updated=last_updated_osm)
+                if way is None or way.geom_type != 'LineString':
+                    continue
+                if (check_date(last_updated_cb, last_updated_osm)):
+                    Recorrido.objects.filter(id=cb_id).update(ruta=way, last_updated=last_updated_osm)
 
         #######################
         #  POIs de osm        #
