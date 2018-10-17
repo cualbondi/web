@@ -62,7 +62,7 @@ def sort_ways(ways):
     sorted_ways = [ws[0]]
     ws = ws[1:]
     while len(ws) > 0:
-        sorted(ws, key=lambda w: w.distance(sorted_ways[-1]))
+        ws = sorted(ws, key=lambda w: w.distance(sorted_ways[-1]))
         sorted_ways.append(ws[0])
         ws = ws[1:]
     ret_ways = first_pass(sorted_ways)
