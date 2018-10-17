@@ -14,6 +14,7 @@ def first_pass(ways):
         if ordered_ways[-1] == prev_way:
             if way[0] == prev_way[0] or way[-1] == prev_way[0]:
                 ordered_ways[-1] == LineString(prev_way[::-1])
+                prev_way = ordered_ways[-1]
         # concat the second segment with the first one
         if prev_way[-1] == way[0]:
             ordered_ways[-1] += way[1:]
