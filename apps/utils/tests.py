@@ -80,7 +80,7 @@ PASS_CASES = [
         )
     """,
 
-    # 4 GAP 100 meters
+    # 4 GAP 100 meters (1 2 3 4 5 - 6 7 8)
     """
         MULTILINESTRING(
             (
@@ -98,7 +98,7 @@ PASS_CASES = [
         )
     """,
 
-    # 5 GAP 100 meters reversed
+    # 5 GAP 100 meters reversed (1 2 3 4 5 - 8 7 6)
     """
         MULTILINESTRING(
             (
@@ -118,7 +118,7 @@ PASS_CASES = [
 ]
 
 NOT_PASS_CASES = [
-    # GAP 1000 meters
+    # GAP 1000 meters (6 7 8 - 1 2 3 4)
     """
         MULTILINESTRING(
             (
@@ -135,7 +135,7 @@ NOT_PASS_CASES = [
         )
     """,
 
-    # GAP 1000 meters reversed
+    # GAP 1000 meters reversed (1 2 3 4 - 6 7 8)
     """
         MULTILINESTRING(
             (
@@ -174,6 +174,8 @@ point_names = {
 
 
 def stringify(mls):
+    if mls is None:
+        return None
     if isinstance(mls, str):
         mls = GEOSGeometry(mls)
     ans = ''
