@@ -20,7 +20,7 @@ POSITIVE = ' '.join(POSITIVE.split())
 
 PASS_CASES = [
 
-    # 1 JOINED
+    # 1 JOINED (1 2 3 4 - 4 5 6 7 8)
     """
         MULTILINESTRING(
             (
@@ -39,7 +39,7 @@ PASS_CASES = [
         )
     """,
 
-    # 2 JOINED REVERSED
+    # 2 JOINED REVERSED (1 2 3 4 - 8 7 6 5 4)
     """
         MULTILINESTRING(
             (
@@ -58,7 +58,7 @@ PASS_CASES = [
         )
     """,
 
-    # 3 JOINED ALL REVERSED
+    # 3 JOINED ALL REVERSED (4 3 2 1 - 6 5 4 - 8 7 6)
     """
         MULTILINESTRING(
             (
@@ -161,6 +161,32 @@ for i, case in enumerate(NOT_PASS_CASES):
 
 TOLERANCE = 150
 
+point_names = {
+    (-57.93176591794997, -34.92797747797999): "1",
+    (-57.93880403440505, -34.92248841780390): "2",
+    (-57.94996202390700, -34.91474681147465): "3",
+    (-57.96180665891677, -34.90587825610113): "4",
+    (-57.97056138914138, -34.89968377625544): "5",
+    (-57.97141969602614, -34.89901502605655): "6",
+    (-57.97828971360718, -34.89309542071704): "7",
+    (-57.98961936448609, -34.88549185620056): "8"
+}
+
+
+def stringify(mls):
+    if isinstance(mls, str):
+        mls = GEOSGeometry(mls)
+    ans = ''
+    if mls.geom_type == 'MultiLineString':
+        for ls in mls:
+            for point in ls:
+                ans += point_names[point] + ' '
+            ans += '- '
+        ans = ans[:-2]
+    if mls.geom_type == 'LineString':
+        for point in mls:
+            ans += point_names[point] + ' '
+    return ans
 
 class FixWayTestCase(TestCase):
 
@@ -170,7 +196,11 @@ class FixWayTestCase(TestCase):
         i = 0
         for case in PASS_CASES:
             i += 1
-            self.assertSequenceEqual(fix_way(case, TOLERANCE), positive, msg='[#{}] {}'.format(i, case))
+            fixed = fix_way(case, TOLERANCE)
+            print('case # ', i)
+            print('before fix: ', stringify(case))
+            print('after fix: ', stringify(fixed))
+            self.assertSequenceEqual(fixed, positive, msg='[#{}] {}'.format(i, case))
 
     def test_not_fix_ways(self):
         """Won't fix negative ways"""
