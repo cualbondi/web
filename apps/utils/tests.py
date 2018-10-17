@@ -114,6 +114,28 @@ PASS_CASES = [
                 -57.97141969602614 -34.89901502605655
             )
         )
+    """,
+
+    # 6 GAP 100 meters unsorted (1 2 3 - 3 4 5 - 8 7 6)
+    # double gap unsorted would be nice to test
+    """
+        MULTILINESTRING(
+            (
+                -57.93176591794997 -34.92797747797999,
+                -57.93880403440505 -34.92248841780390,
+                -57.94996202390700 -34.91474681147465
+            ),
+            (
+                -57.98961936448609 -34.88549185620056,
+                -57.97828971360718 -34.89309542071704,
+                -57.97141969602614 -34.89901502605655
+            ),
+            (
+                -57.94996202390700 -34.91474681147465,
+                -57.96180665891677 -34.90587825610113,
+                -57.97056138914138 -34.89968377625544
+            )
+        )
     """
 ]
 
@@ -199,9 +221,9 @@ class FixWayTestCase(TestCase):
         for case in PASS_CASES:
             i += 1
             fixed = fix_way(case, TOLERANCE)
-            print('case # ', i)
-            print('before fix: ', stringify(case))
-            print('after fix: ', stringify(fixed))
+            # print('case # ', i)
+            # print('before fix: ', stringify(case))
+            # print('after fix: ', stringify(fixed))
             self.assertSequenceEqual(fixed, positive, msg='[#{}] {}'.format(i, case))
 
     def test_not_fix_ways(self):

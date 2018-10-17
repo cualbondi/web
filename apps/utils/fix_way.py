@@ -86,7 +86,7 @@ def dist(P1, P2):
 def join_ways(ways, tolerance):
     """join adjacent ways that are closer than <tolerance> meters"""
     joined = [ways[0]]
-    for w in ways:
+    for w in ways[1:]:
         if dist(joined[-1][-1], w[0]) < tolerance:
             joined[-1] += w
         else:
@@ -110,11 +110,11 @@ def fix_way(way, tolerance):
             return way
         way = sort_ways(way)
         if way.geom_type == 'LineString':
-            print('SAFE sorted!')
+            # print('SAFE sorted!')
             return way
         way = join_ways(way, tolerance)
         if way.geom_type == 'LineString':
-            print('SAFE tolerance!')
+            # print('SAFE tolerance!')
             return way
 
     return None
