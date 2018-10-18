@@ -1,42 +1,23 @@
 from django.contrib.gis.geos import GEOSGeometry, MultiLineString, LineString
 import math
 
-point_names = {
-    (-57.93176591794997, -34.92797747797999): "1",
-    (-57.93880403440505, -34.92248841780390): "2",
-    (-57.94996202390700, -34.91474681147465): "3",
-    (-57.96180665891677, -34.90587825610113): "4",
-    (-57.97056138914138, -34.89968377625544): "5",
-    (-57.97141969602614, -34.89901502605655): "6",
-    (-57.97828971360718, -34.89309542071704): "7",
-    (-57.98961936448609, -34.88549185620056): "8"
-}
-
-
-def stringify(mls):
-    if isinstance(mls, str):
-        mls = GEOSGeometry(mls)
-    ans = ''
-    if mls.geom_type == 'MultiLineString':
-        for ls in mls:
-            for point in ls:
-                ans += point_names[point] + ' '
-            ans += '- '
-        ans = ans[:-2]
-    if mls.geom_type == 'LineString':
-        for point in mls:
-            ans += point_names[point] + ' '
-    return ans
 
 def first_pass(ways):
-    """ try to reverse directions in linestrings to join segments into a single linestring """
+    """
+        try to reverse directions in linestrings
+        to join segments into a single linestring
+
+        - This is normal in openstreetmap format
+        - Also ST_LineMerge() should do this already
+    """
     n = len(ways)
     assert n > 1
     ordered_ways = [ways[0]]
     for i in range(1, n):
         way = ways[i]
         prev_way = ordered_ways[-1]
-        # if its the first segment on the linestring, try reversing it if it matches with the second
+        # if its the first segment on the linestring,
+        # try reversing it if it matches with the second
         if ordered_ways[-1] == ways[i-1]:
             if way[0] == prev_way[0] or way[-1] == prev_way[0]:
                 ordered_ways[-1] = LineString(prev_way[::-1])
@@ -57,7 +38,14 @@ def first_pass(ways):
 
 
 def sort_ways(ways):
-    """move ways from one place to another to get the closest ones together"""
+    """
+        move ways from one place to another to get the closest ones together
+        the first one is taken as important (the one that sets the direction)
+        Also joins the way if extreme points are the same
+
+        - This is not "expected" by osm. We are trying to fix the way now
+        - Nevertheless I think this is also done by ST_LineMerge()
+    """
     ws = ways[:]
     sorted_ways = [ws[0]]
     ws = ws[1:]
@@ -66,10 +54,11 @@ def sort_ways(ways):
         sorted_ways.append(ws[0])
         ws = ws[1:]
     ret_ways = first_pass(sorted_ways)
+    # print('SORTED {} -> {}'.format(len(ways), len(ret_ways)))
     return ret_ways
 
 
-def dist(P1, P2):
+def dist_haversine(P1, P2):
     lon1, lat1 = P1
     lon2, lat2 = P2
     radius = 6371000  # meters
@@ -84,16 +73,41 @@ def dist(P1, P2):
 
 
 def join_ways(ways, tolerance):
-    """join adjacent ways that are closer than <tolerance> meters"""
+    """
+        Join adjacent ways that have their extreme points
+        closer than <tolerance> in meters
+
+        - This is not "expected". We are trying to fix the way now
+        - This is not done by ST_LineMerge()
+        - I'm not sure if this conserves the direction from first to last
+    """
     joined = [ways[0]]
+    # print([[p for p in l] for l in ways[1:]])
     for w in ways[1:]:
-        if dist(joined[-1][-1], w[0]) < tolerance:
+        # print(joined[-1][-1], w[0])
+        # print(dist_haversine(joined[-1][-1], w[0]))
+        # print(joined[-1][-1], w[-1])
+        # print(dist_haversine(joined[-1][-1], w[-1]))
+        if dist_haversine(joined[-1][-1], w[0]) < tolerance:
+            # print('1.last + 2.first')
             joined[-1] += w
         else:
-            if dist(joined[-1][-1], w[-1]) < tolerance:
+            if dist_haversine(joined[-1][-1], w[-1]) < tolerance:
+                # print('1.last + 2.last')
                 joined[-1] += LineString(w[::-1])
             else:
-                joined.append(w)
+                if dist_haversine(joined[-1][0], w[0]) < tolerance:
+                    # print('1.first + 2.first')
+                    joined[-1] = LineString(joined[-1][::-1])
+                    joined[-1] += w
+                else:
+                    if dist_haversine(joined[-1][0], w[-1]) < tolerance:
+                        # print('1.first + 2.last')
+                        joined[-1] = LineString(joined[-1][::-1])
+                        joined[-1] += LineString(w[::-1])
+                    else:
+                        # print('1.split.2')
+                        joined.append(w)
     if len(joined) == 1:
         return joined[0]
     return sort_ways(joined)
@@ -107,6 +121,7 @@ def fix_way(way, tolerance):
     if way.geom_type == 'MultiLineString':
         way = first_pass(way)
         if way.geom_type == 'LineString':
+            # print('SAFE first_pass!')
             return way
         way = sort_ways(way)
         if way.geom_type == 'LineString':
@@ -116,5 +131,7 @@ def fix_way(way, tolerance):
         if way.geom_type == 'LineString':
             # print('SAFE tolerance!')
             return way
+        # print(len(way))
+        # print(way.ewkt)
 
     return None
