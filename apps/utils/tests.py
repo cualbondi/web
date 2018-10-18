@@ -26,6 +26,26 @@ POSITIVE = ' '.join(POSITIVE.split())
 
 PASS_CASES = [
 
+    # 0 same linestring
+    """
+        LINESTRING(
+            -57.94253110905379 -34.92025019346214,
+            -57.94656515141219 -34.91708317458055,
+            -57.95085668583601 -34.91370488641156,
+
+            -57.95126438160628 -34.91344151465948,
+            -57.95448303242415 -34.91115404576736,
+            -57.95903841604024 -34.90798275551346,
+            -57.96418825734884 -34.90446331221241,
+            -57.96805063833028 -34.90101411142836,
+
+            -57.96861672351383 -34.90035341073901,
+            -57.97273013995749 -34.89627304611792,
+            -57.97787998126608 -34.89317550236659,
+            -57.98337314532858 -34.88993703629123
+        )
+    """,
+
     # 1 JOINED (1 2 3 - 4 5 6 7 8 9 10 11 12)
     """
         MULTILINESTRING(
@@ -308,12 +328,12 @@ class FixWayTestCase(TestCase):
         positive = GEOSGeometry(POSITIVE)
         i = 0
         for case in PASS_CASES:
-            i += 1
             fixed = fix_way(case, TOLERANCE)
             # print('case # ', i)
             # print('before fix: ', stringify(case))
             # print('after fix: ', stringify(fixed))
             self.assertSequenceEqual(fixed, positive, msg='[#{}] {}'.format(i, case))
+            i += 1
 
     def test_not_fix_ways(self):
         """Won't fix negative ways"""
