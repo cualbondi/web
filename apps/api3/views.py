@@ -24,7 +24,7 @@ class CiudadesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class LineasViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.LineaSerializer
+    serializer_class = serializers.LineaSerializerFull
     queryset = Linea.objects.all()
 
 

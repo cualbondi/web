@@ -24,7 +24,7 @@ class CiudadSerializer(serializers.ModelSerializer):
         )
 
 
-class LineaSerializer(serializers.ModelSerializer):
+class LineaSerializerFull(serializers.ModelSerializer):
     class Meta:
         model = Linea
         fields = (
@@ -133,6 +133,7 @@ class RecorridoPureModelSerializer(serializers.ModelSerializer):
 #             # 'url': obj.get_absolute_url(None, None, obj.slug),
 #         }
 
+
 class RecorridoCustomSerializer(serializers.Serializer):
 
     def to_representation(self, obj):
@@ -148,11 +149,13 @@ class RecorridoCustomSerializer(serializers.Serializer):
             'ruta': obj.ruta,
         }
 
+
 class LineaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Linea
         fields = ('id', 'nombre')
+
 
 class RecorridoModelSerializer(serializers.ModelSerializer):
     linea = LineaSerializer()

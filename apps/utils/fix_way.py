@@ -113,7 +113,7 @@ def join_ways(ways, tolerance):
     return sort_ways(joined)
 
 
-def fix_way(way, tolerance):
+def fix_way(way, tolerance=0):
     """ tries to sort and fix the way into a linestring """
     way = GEOSGeometry(way)
     if way.geom_type == 'LineString':
@@ -127,10 +127,11 @@ def fix_way(way, tolerance):
         if way.geom_type == 'LineString':
             # print('SAFE sorted!')
             return way
-        way = join_ways(way, tolerance)
-        if way.geom_type == 'LineString':
-            # print('SAFE tolerance!')
-            return way
+        if tolerance > 0:
+            way = join_ways(way, tolerance)
+            if way.geom_type == 'LineString':
+                # print('SAFE tolerance!')
+                return way
         # print(len(way))
         # print(way.ewkt)
 

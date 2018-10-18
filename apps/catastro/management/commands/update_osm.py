@@ -415,7 +415,7 @@ class Command(BaseCommand):
             for rec in recorridos:
                 osm_id, cb_id, name, last_updated_osm, last_updated_cb, way = rec
                 self.out2('updating {} {} {}'.format(cb_id, osm_id, name))
-                way = fix_way(way)
+                way = fix_way(way, 150)
                 if way is None or way.geom_type != 'LineString':
                     continue
                 if (check_date(last_updated_cb, last_updated_osm)):
