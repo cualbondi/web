@@ -5,9 +5,10 @@ import os
 import sys
 from apps.catastro.models import Poi, Interseccion, Calle
 from apps.core.models import Recorrido
+from apps.editor.models import RecorridoProposed
 from apps.utils.fix_way import fix_way
+from django.contrib.auth import get_user_model
 from django.db import connection
-from django.db.models import F
 from datetime import datetime
 import time
 
@@ -386,40 +387,48 @@ class Command(BaseCommand):
             self.out2('LISTO!')
 
         if options['update_routes']:
-            cu.execute("""
-            SELECT
-                @pl.osm_id as osm_id,
-                cr.id as cb_id,
-                cr.nombre as name,
-                max((tags->'osm_timestamp')::timestamptz) as last_updated_osm,
-                cr.last_updated as last_updated_cb,
-                st_linemerge(st_union(way)) as way
-            FROM
-                public.planet_osm_line pl
-                join core_recorrido cr on (cr.osm_id = @pl.osm_id)
-            where
-                pl.route='bus'
-                and cr.osm_id is not null
-            group by
-                pl.osm_id,
-                cr.last_updated,
-                cr.id,
-                cr.nombre;
-            """)
+            self.out1('Update linked routes from osm to cualbondi')
+            colnames = ','.join(['cr.{}'.format(f.column) for f in Recorrido._meta.get_fields() if hasattr(f, 'column') and f.column != 'ruta'])
+            recorridos = Recorrido.objects.raw("""
+                SELECT
+                    {},
+                    cr.ruta::bytea as ruta,
+                    st_linemerge(st_union(pl.way))::bytea as osm_way,
+                    max((pl.tags->'osm_timestamp')::timestamptz) as osm_last_updated,
+                    max((pl.tags->'osm_version')::int) as osm_osm_version
+                FROM
+                    core_recorrido cr
+                    join public.planet_osm_line pl on (cr.osm_id = @pl.osm_id)
+                where
+                    cr.osm_id is not null
+                    and pl.route='bus'
+                group by
+                    cr.id,
+                    pl.osm_id;
+            """.format(colnames))
+            recorridos.prefetch_related('lineas')
 
-            def check_date(last_updated_cb, last_updated_osm):
-                print(last_updated_cb, last_updated_osm)
-                return last_updated_osm > last_updated_cb
+            # run migrations to have this user in the db
+            user_bot_osm = get_user_model().objects.get(username='osmbot')
 
-            recorridos = cu.fetchall()
             for rec in recorridos:
-                osm_id, cb_id, name, last_updated_osm, last_updated_cb, way = rec
-                self.out2('updating {} {} {}'.format(cb_id, osm_id, name))
-                way = fix_way(way, 150)
-                if way is None or way.geom_type != 'LineString':
-                    continue
-                if (check_date(last_updated_cb, last_updated_osm)):
-                    Recorrido.objects.filter(id=cb_id).update(ruta=way, last_updated=last_updated_osm)
+                way = fix_way(rec.osm_way, 150)
+                if way is not None:
+                    if way.geom_type == 'LineString' and rec.last_updated < rec.osm_last_updated:
+                        self.out2('id: {} | osmid: {} | {} / {} : OK +creating recorridoproposed'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                        rp = RecorridoProposed.from_recorrido(rec)
+                        rp.ruta = way
+                        rp.osm_version = rec.osm_osm_version
+                        rp.save(user=user_bot_osm)
+                        continue
+                        # TODO: remove the 'continue' and get this last part working
+                        # TODO: maybe check if there is a user edit with the same parent uuid before auto accepting this one.
+                        rp.accept()
+                        Recorrido.objects.filter(id=cb_id).update(ruta=way, last_updated=last_updated_osm)
+                    else:
+                        self.out2('id: {} | osmid: {} | {} / {} : OK -not creating recorridoproposed'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                else:
+                    self.out2('id: {} | osmid: {} | {} / {} : BROKEN'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
 
         #######################
         #  POIs de osm        #

@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.db.models import Manager as GeoManager
+from django.apps import apps
 
 from apps.catastro.models import Ciudad
 
-import uuid
+from uuid import uuid4
 
 
 MODERATION_CHOICES = (
@@ -17,11 +18,12 @@ MODERATION_CHOICES = (
     ('R', 'Retirado'),
 )
 
+
 class RecorridoProposed(models.Model):
-    recorrido = models.ForeignKey('core.Recorrido', on_delete=models.CASCADE)
-    parent = models.UUIDField(default=uuid.uuid4)
-    uuid = models.UUIDField(default=uuid.uuid4)
+    uuid = models.UUIDField(default=uuid4)
     nombre = models.CharField(max_length=100)
+    img_panorama = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
+    img_cuadrada = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
     linea = models.ForeignKey('core.Linea', on_delete=models.CASCADE)
     ruta = models.LineStringField()
     sentido = models.CharField(max_length=100, blank=True, null=True)
@@ -33,15 +35,31 @@ class RecorridoProposed(models.Model):
     horarios = models.TextField(blank=True, null=True)
     pois = models.TextField(blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
+    paradas_completas = models.BooleanField(default=False)
+
+    osm_id = models.BigIntegerField(blank=True, null=True)
+    osm_version = models.BigIntegerField(blank=True, null=True)
+
+    recorrido = models.ForeignKey('core.Recorrido', on_delete=models.CASCADE)
+    parent = models.UUIDField(default=uuid4)
     current_status = models.CharField(max_length=1, choices=MODERATION_CHOICES, default='E')
 
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
 
-    # Si tiene las paradas completas es porque tiene todas las paradas de
-    # este recorrido en la tabla paradas+horarios (horarios puede ser null),
-    # y se puede utilizar en la busqueda usando solo las paradas.
-    paradas_completas = models.BooleanField(default=False)
+    @classmethod
+    def from_recorrido(cls, recorrido):
+        recorrido_model = apps.get_app_config('core').get_model("Recorrido")
+        fields = [f.column for f in recorrido_model._meta.get_fields() if hasattr(f, 'column')]
+        rp_dict = recorrido.__dict__
+        rp_dict.pop('_state')
+        rp_dict.pop('id')
+        rp_dict.pop('last_updated')
+        for (k, v) in list(rp_dict.items()):
+            if k not in fields:
+                rp_dict.pop(k)
+        rp_dict['parent'] = rp_dict.pop('uuid')
+        return cls(**rp_dict)
 
     @property
     def ciudades(self):
