@@ -395,7 +395,7 @@ class Command(BaseCommand):
                     cr.ruta::bytea as ruta,
                     st_linemerge(st_union(pl.way))::bytea as osm_way,
                     max((pl.tags->'osm_timestamp')::timestamptz) as osm_last_updated,
-                    max((pl.tags->'osm_version')::int) as osm_osm_version
+                    max((pl.tags->'osm_version')::int) as osm_osm_version --used this name so it doesnt collide with core_recorrido.osm_version
                 FROM
                     core_recorrido cr
                     join public.planet_osm_line pl on (cr.osm_id = @pl.osm_id)
@@ -418,11 +418,14 @@ class Command(BaseCommand):
                         self.out2('id: {} | osmid: {} | {} / {} : OK +creating recorridoproposed'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
                         rp = RecorridoProposed.from_recorrido(rec)
                         rp.ruta = way
-                        rp.osm_version = rec.osm_osm_version
+                        rp.osm_version = rec.osm_osm_version  # to not be confsed with Recorrido.osm_version
                         rp.save(user=user_bot_osm)
                         continue
-                        # TODO: remove the 'continue' and get this last part working
-                        # TODO: maybe check if there is a user edit with the same parent uuid before auto accepting this one.
+                        # TODO 1: remove the 'continue' and get this last part working
+                        # TODO 2: check if there is a user edit with the same parent uuid before auto accepting this one.
+                        #       that would be checking if there is another recorridoproposed.object.filter(parent=rec.uuid)
+                        #       in that case, do not auto accept, just leave the proposed edit
+                        # TODO 3: improve accept() function, do it more generic, use from_recorrido as an example
                         rp.accept()
                         Recorrido.objects.filter(id=cb_id).update(ruta=way, last_updated=last_updated_osm)
                     else:
