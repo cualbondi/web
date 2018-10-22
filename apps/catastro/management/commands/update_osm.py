@@ -398,7 +398,13 @@ class Command(BaseCommand):
                     max((pl.tags->'osm_version')::int) as osm_osm_version --used this name so it doesnt collide with core_recorrido.osm_version
                 FROM
                     core_recorrido cr
-                    join public.planet_osm_line pl on (cr.osm_id = @pl.osm_id)
+                    join public.planet_osm_line pl
+                        on (
+                            cr.osm_id = @pl.osm_id and (
+                                cr.osm_version is null or
+                                cr.osm_version <> (pl.tags->'osm_version')::int
+                            )
+                        )
                 where
                     cr.osm_id is not null
                     and pl.route='bus'
@@ -414,20 +420,23 @@ class Command(BaseCommand):
             for rec in recorridos:
                 way = fix_way(rec.osm_way, 150)
                 if way is not None:
-                    if way.geom_type == 'LineString' and rec.last_updated < rec.osm_last_updated:
+                    if way.geom_type == 'LineString' and \
+                       rec.last_updated < rec.osm_last_updated and \
+                       not RecorridoProposed.objects.filter(osm_version=rec.osm_osm_version, osm_id=rec.osm_id, parent=rec.uuid).exists():
                         self.out2('id: {} | osmid: {} | {} / {} : OK +creating recorridoproposed'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
                         rp = RecorridoProposed.from_recorrido(rec)
                         rp.ruta = way
                         rp.osm_version = rec.osm_osm_version  # to not be confsed with Recorrido.osm_version
                         rp.save(user=user_bot_osm)
-                        continue
-                        # TODO 1: remove the 'continue' and get this last part working
-                        # TODO 2: check if there is a user edit with the same parent uuid before auto accepting this one.
-                        #       that would be checking if there is another recorridoproposed.object.filter(parent=rec.uuid)
-                        #       in that case, do not auto accept, just leave the proposed edit
-                        # TODO 3: improve accept() function, do it more generic, use from_recorrido as an example
+                        # TODO save not accepted reason flag somewhere to accept manually post-mortem based on reason
+                        if rec.osm_version is None:
+                            self.out2('id: {} | osmid: {} | {} / {} : NOT auto accepted: previous recorrido does not come from osm'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                            continue
+                        if count(RecorridoProposed(parent=rec.uuid)) > 1:
+                            self.out2('id: {} | osmid: {} | {} / {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                            continue
+                        self.out2('id: {} | osmid: {} | {} / {} : AUTO ACCEPTED!'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
                         rp.accept()
-                        Recorrido.objects.filter(id=cb_id).update(ruta=way, last_updated=last_updated_osm)
                     else:
                         self.out2('id: {} | osmid: {} | {} / {} : OK -not creating recorridoproposed'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
                 else:

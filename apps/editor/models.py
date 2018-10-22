@@ -51,7 +51,7 @@ class RecorridoProposed(models.Model):
     def from_recorrido(cls, recorrido):
         recorrido_model = apps.get_app_config('core').get_model("Recorrido")
         fields = [f.column for f in recorrido_model._meta.get_fields() if hasattr(f, 'column')]
-        rp_dict = recorrido.__dict__
+        rp_dict = recorrido.__dict__.copy()
         rp_dict.pop('_state')
         rp_dict.pop('id')
         rp_dict.pop('last_updated')
@@ -59,6 +59,7 @@ class RecorridoProposed(models.Model):
             if k not in fields:
                 rp_dict.pop(k)
         rp_dict['parent'] = rp_dict.pop('uuid')
+        rp_dict['recorrido'] = recorrido
         return cls(**rp_dict)
 
     @property
@@ -75,17 +76,19 @@ class RecorridoProposed(models.Model):
             self.logmoderacion_set.create(created_by=user)
 
     def get_current_status_display(self):
-        status_list = self.logmoderacion_set.all().order_by('-date_create')
+        status_list = self.logmoderacion_set.all()
+        if not status_list.ordered:
+            status_list = status_list.order_by('-date_create')
         if status_list:
             return status_list[0].get_newStatus_display()
         else:
             return None
 
     def log(self):
-        return self.logmoderacion_set.all().order_by('-date_create')
+        return self.logmoderacion_set.order_by('-date_create')
 
     def get_moderacion_last(self):
-        loglist = self.logmoderacion_set.all().order_by('-date_create')
+        loglist = self.logmoderacion_set.order_by('-date_create')
         if loglist:
             return loglist[0]
         else:
@@ -123,35 +126,20 @@ class RecorridoProposed(models.Model):
         if not r.uuid:
             # todavia no existe una version de este recorrido real, que estoy por retirar
             # antes de retirarlo creo su version correspondiente
-            rp = RecorridoProposed(
-                recorrido       = r,
-                nombre          = r.nombre,
-                linea           = r.linea,
-                ruta            = r.ruta,
-                sentido         = r.sentido,
-                slug            = r.slug,
-                inicio          = r.inicio,
-                fin             = r.fin,
-                semirrapido     = r.semirrapido,
-                color_polilinea = r.color_polilinea,
-                pois            = r.pois,
-                descripcion     = r.descripcion
-            )
+            rp = RecorridoProposed.from_recorrido(r)
             rp.save(user=user)
-            self.parent=rp.uuid
+            self.parent = rp.uuid
             self.save()
 
-        r.recorrido       = self.recorrido
-        r.nombre          = self.nombre
-        r.linea           = self.linea
-        r.ruta            = self.ruta
-        r.sentido         = self.sentido
-        r.inicio          = self.inicio
-        r.fin             = self.fin
-        r.semirrapido     = self.semirrapido
-        r.color_polilinea = self.color_polilinea
-        r.pois            = self.pois
-        r.descripcion     = self.descripcion
+        recorrido_model = apps.get_app_config('core').get_model("Recorrido")
+        fields = [f.column for f in recorrido_model._meta.get_fields() if hasattr(f, 'column')]
+        rp_dict = r.__dict__.copy()
+        rp_dict.pop('_state')
+        rp_dict.pop('id')
+        rp_dict.pop('last_updated')
+        for (k, v) in list(rp_dict.items()):
+            if k in fields:
+                setattr(r, k, getattr(self, k))
         r.save()
 
         try:
@@ -160,7 +148,7 @@ class RecorridoProposed(models.Model):
                 parent.logmoderacion_set.create(created_by=user,newStatus='R')
         except RecorridoProposed.DoesNotExist:
             pass
-        for rp in RecorridoProposed.objects.filter(current_status='S', recorrido=r.recorrido).exclude(uuid=self.uuid):
+        for rp in RecorridoProposed.objects.filter(current_status='S', recorrido=r).exclude(uuid=self.uuid):
             rp.logmoderacion_set.create(created_by=user, newStatus='R')
         self.logmoderacion_set.create(created_by=user, newStatus='S')
 
