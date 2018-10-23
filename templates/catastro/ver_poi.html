@@ -1,7 +1,7 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Cómo llegar a {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %} - Cualbondi{% endblock %}
+{% block title %}Cómo llegar a {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %} - Cualbondi{% endblock %}
 {% block meta_description %}Cómo llegar a {{poi.nom|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
@@ -18,11 +18,33 @@
 {% block bloque_izquierda %}
     <div itemscope itemtype="http://schema.org/Place">
         <h1>¿Cómo llegar a <span itemprop="name">{{poi.nom}}</span>?</h1>
-        <link itemprop="url" content="https://cualbondi.com.ar{{poi.get_absolute_url}}" />
+        <link itemprop="url" content="{{HOME_URL}}{{poi.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
             <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:"f"}}" />
             <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:"f"}}" />
         </div>
+        <div>
+            {% if amenity %}
+                <span style="float:right" class="label label-default">{{amenity}}</span>
+            {% endif %}
+            {% if poi.tags.website %}
+                <a href="{{poi.tags.website}}" target="_blank">Ir al sitio web</a>
+            {% endif %}
+        </div>
+        <div>
+            {% if poi.tags.phone %}
+                <span>Telefono: <a href="tel:{{poi.tags.phone}}">{{poi.tags.phone}}</a></span>
+            {% endif %}
+            {% if poi.tags.email %}
+                <a href="mailto:{{poi.tags.email}}">{{poi.tags.email}}</div>
+            {% endif %}
+        </div>
+        {% if poi.tags.operator %}
+            <div>{{poi.tags.operator}}</div>
+        {% endif %}
+        {% if poi.tags.description %}
+            <div>{{poi.tags.description}}</div>
+        {% endif %}
     </div>
 
     <div class="thumbnail">

@@ -1,10 +1,14 @@
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import connection
 from rest_framework import exceptions
 from rest_framework import pagination
-from rest_framework import viewsets, views
+from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
+from rest_framework.mixins import UpdateModelMixin
 
 from apps.catastro.models import Ciudad
 from apps.catastro.models import PuntoBusqueda
@@ -20,7 +24,7 @@ class CiudadesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class LineasViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = serializers.LineaSerializer
+    serializer_class = serializers.LineaSerializerFull
     queryset = Linea.objects.all()
 
 
@@ -39,7 +43,20 @@ class CBPagination(pagination.PageNumberPagination):
         })
 
 
-class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet):
+class IsStaffOrReadOnly(BasePermission):
+    """
+    The request is authenticated as a user, or is a read-only request.
+    """
+
+    def has_permission(self, request, view):
+        return (
+            request.method in SAFE_METHODS or
+            request.user and
+            request.user.is_staff
+        )
+
+
+class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin):
     """
         Parametros querystring
 
@@ -55,9 +72,10 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet):
          - `c` string: ciudad-slug, requerido cuando se usa `q`
     """
 
-    serializer_class = serializers.RecorridoSerializer
+    serializer_class = serializers.RecorridoPureModelSerializer
     queryset = Recorrido.objects.all()
     pagination_class = CBPagination
+    permission_classes = [IsStaffOrReadOnly]
 
     def list(self, request):
         q = request.query_params.get('q', None)
@@ -243,3 +261,81 @@ class ReverseGeocoderView(viewsets.GenericViewSet):
             )
         res = PuntoBusqueda.objects.reverse_geocode(q, c)
         return Response(res)
+
+
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
+
+class RecorridosPorCiudad(viewsets.ModelViewSet):
+    serializer_class = serializers.RecorridoModelSerializer
+    # pagination_class = pagination.PageNumberPagination
+    depth = 1
+
+    def get_queryset(self):
+        return Recorrido.objects \
+            .select_related('linea') \
+            .filter(ciudades=self.kwargs.get('ciudad_id')) \
+            .filter(osm_id__isnull=True)
+
+
+@api_view(['GET'])
+def match_recorridos(request, recorrido_id):
+    # return Response(recorrido_id)
+    with connection.cursor() as cursor:
+        query = """
+            select
+                *
+            from
+                (
+                    select
+                        *
+                    from
+                        crossed_areas
+                    where
+                        recorrido_id = %(recorrido_id)s
+                ) as c
+            where
+                osm_id not in (
+                    select osm_id from core_recorrido where osm_id is not null
+                )
+            order by
+                area asc;
+        """
+        opts = {"recorrido_id": recorrido_id}
+        cursor.execute(query, opts)
+        # return Response(recorrido_id)
+
+        response = dictfetchall(cursor)
+    return Response(response)
+
+
+@api_view(['POST'])
+def set_osm_pair(request):
+    pass
+
+
+@api_view(['GET'])
+def display_recorridos(request):
+    pass
+
+
+class UserViewSet(viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request):
+        permissions = []
+        if request.user.is_staff:
+            permissions.append('staff')
+        return Response({
+            'username': request.user.username,
+            'firstName': request.user.first_name,
+            'lastName': request.user.last_name,
+            'email': request.user.email,
+            'permissions': permissions
+        })

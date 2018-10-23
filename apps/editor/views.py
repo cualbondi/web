@@ -1,11 +1,13 @@
 from django.shortcuts import get_object_or_404, render
 from apps.core.models import Recorrido
-from apps.editor.models import RecorridoProposed
+from apps.editor.models import RecorridoProposed, LogModeracion
 from django.contrib.gis.geos import GEOSGeometry
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Prefetch
+
 import json
 
 from django.views.decorators.http import require_http_methods, require_GET
@@ -47,19 +49,21 @@ def editor_recorrido(request, id_recorrido):
         r.descripcion     = recorrido.descripcion
         r.ruta            = GEOSGeometry(request.POST.get("geojson"))
         r.parent          = recorrido.uuid
+        r.osm_id          = recorrido.osm_id
+        r.osm_version     = None  # set to none because this is not created from osm
         # save anyway, but respond as forbidden if not auth ;)
         r.save(user=user)
-        
+
         ciudad = None
         if len(r.ciudades) > 0:
             ciudad = r.ciudades[0].nombre
-        
+
         data = {
             "id"    : r.id,
             "uuid"  : str(r.uuid),
             "nombre": r.nombre,
             "linea" : r.linea.nombre,
-            "ciudad": ciudad 
+            "ciudad": ciudad
         }
         if request.user.is_authenticated:
             return HttpResponse(json.dumps(data), content_type="application/json")
@@ -75,6 +79,9 @@ def mostrar_ediciones(request):
     if estado != 'all':
         ediciones = ediciones.filter(current_status='E')
     ediciones = ediciones.order_by('-date_update')
+    ediciones = ediciones.select_related('linea')
+    ediciones = ediciones.defer('ruta', 'linea__envolvente')
+    ediciones = ediciones.prefetch_related(Prefetch('logmoderacion_set', LogModeracion.objects.order_by('-date_create')))
     ediciones = ediciones[:500]
     return render(
         request,

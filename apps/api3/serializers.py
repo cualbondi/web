@@ -7,7 +7,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from rest_framework import serializers
 
 from apps.catastro.models import Ciudad
-from apps.core.models import Linea, Parada
+from apps.core.models import Linea, Parada, Recorrido
 
 
 class CiudadSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class CiudadSerializer(serializers.ModelSerializer):
         )
 
 
-class LineaSerializer(serializers.ModelSerializer):
+class LineaSerializerFull(serializers.ModelSerializer):
     class Meta:
         model = Linea
         fields = (
@@ -106,26 +106,63 @@ def getParada(parada_id):
         }
 
 
-class RecorridoSerializer(serializers.Serializer):
+class RecorridoPureModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Recorrido
+        fields = '__all__'
+
+# class RecorridoSerializer(serializers.Serializer):
+
+#     def to_representation(self, obj):
+#         ruta = copy(obj.ruta)
+#         ruta.transform(3857)
+#         length = ruta.length
+#         return {
+#             'id': obj.id,
+#             'nombre': obj.nombre,
+#             'nombre_linea': obj.linea.nombre,
+#             'color_polilinea': obj.color_polilinea,
+#             'sentido': obj.sentido,
+#             'descripcion': obj.descripcion,
+#             'inicio': obj.inicio,
+#             'fin': obj.fin,
+#             'ruta': obj.ruta.wkt,
+#             'long_ruta': length,
+#             'foto': obj.foto if hasattr(obj, 'foto') else '',
+#             # 'url': obj.get_absolute_url(None, None, obj.slug),
+#         }
+
+
+class RecorridoCustomSerializer(serializers.Serializer):
 
     def to_representation(self, obj):
-        ruta = copy(obj.ruta)
-        ruta.transform(3857)
-        length = ruta.length
+        print(obj.__dict__)
         return {
             'id': obj.id,
-            'nombre': obj.nombre,
-            'nombre_linea': obj.linea.nombre,
-            'color_polilinea': obj.color_polilinea,
-            'sentido': obj.sentido,
-            'descripcion': obj.descripcion,
-            'inicio': obj.inicio,
-            'fin': obj.fin,
-            'ruta': obj.ruta.wkt,
-            'long_ruta': length,
-            'foto': obj.foto,
-            # 'url': obj.get_absolute_url(None, None, obj.slug),
+            'linea_nombre': obj.linea_nombre,
+            'recorrido_nombre': obj.recorrido_nombre,
+            'osm_name': obj.osm_name,
+            'linea_id': obj.linea_id,
+            'recorrido_id': obj.recorrido_id,
+            'osm_id': obj.osm_id,
+            'ruta': obj.ruta,
         }
+
+
+class LineaSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Linea
+        fields = ('id', 'nombre')
+
+
+class RecorridoModelSerializer(serializers.ModelSerializer):
+    linea = LineaSerializer()
+
+    class Meta:
+        model = Recorrido
+        fields = ('id', 'nombre', 'linea', 'ruta')
 
 
 class GeocoderSerializer(serializers.Serializer):

@@ -71,12 +71,19 @@ DJANGO_APPS = [
     'django.contrib.gis',
     'django.contrib.flatpages',
     'django.contrib.sitemaps',
+    'django.contrib.postgres',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
     'corsheaders',
     'leaflet',
     'imagekit',
+    'django_extensions',
+
+    # social auth
+    'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
 ]
 LOCAL_APPS = [
     'apps.usuarios.apps.UsuariosConfig',
@@ -214,6 +221,10 @@ TEMPLATES = [
                 'apps.core.context_processors.get_ciudad_actual',
                 'apps.core.context_processors.home_url',
                 'apps.core.context_processors.facebook_app_id',
+
+                # TODO: revisar si necesitamos estos dos https://github.com/RealmTeam/django-rest-framework-social-oauth2
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -262,5 +273,77 @@ LONGITUD_PAGINA = 5
 HOME_URL = env.get_value('HOME_URL', default='https://cualbondi.com.ar')
 FACEBOOK_APP_ID = env.get_value('FACEBOOK_APP_ID', default='')
 API_URL = env.get_value('API_URL', default='')
+
+# SOCIAL AUTH
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
+    ],
+}
+DRFSO2_PROPRIETARY_BACKEND_NAME = 'Facebook'
+AUTHENTICATION_BACKENDS = [
+    # Facebook OAuth2
+    'social_core.backends.facebook.FacebookAppOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    # django-rest-framework-social-oauth2
+    'rest_framework_social_oauth2.backends.DjangoOAuth2',
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+SOCIAL_AUTH_PIPELINE = [
+    # Get the information we can about the user and return it in a simple
+    # format to create the user instance later. On some cases the details are
+    # already part of the auth response from the provider, but sometimes this
+    # could hit a provider API.
+    'social_core.pipeline.social_auth.social_details',
+
+    # Get the social uid from whichever service we're authing thru. The uid is
+    # the unique identifier of the given user in the provider.
+    'social_core.pipeline.social_auth.social_uid',
+
+    # Verifies that the current auth process is valid within the current
+    # project, this is where emails and domains whitelists are applied (if
+    # defined).
+    'social_core.pipeline.social_auth.auth_allowed',
+
+    # Checks if the current social-account is already associated in the site.
+    'social_core.pipeline.social_auth.social_user',
+
+    # Make up a username for this person, appends a random string at the end if
+    # there's any collision.
+    'social_core.pipeline.user.get_username',
+
+    # Send a validation email to the user to verify its email address.
+    # Disabled by default.
+    # 'social_core.pipeline.mail.mail_validation',
+
+    # Associates the current social details with another user account with
+    # a similar email address. Disabled by default.
+    'social_core.pipeline.social_auth.associate_by_email',
+
+    # Create a user account if we haven't found one yet.
+    'social_core.pipeline.user.create_user',
+
+    # Create the record that associates the social account with the user.
+    'social_core.pipeline.social_auth.associate_user',
+
+    # Populate the extra_data field in the social record with the values
+    # specified by settings (and the default ones like access_token, etc).
+    'social_core.pipeline.social_auth.load_extra_data',
+
+    # Update the user record with any changed info from the auth service.
+    'social_core.pipeline.user.user_details',
+]
+
+# Facebook configuration
+SOCIAL_AUTH_FACEBOOK_KEY = '516530425068934'
+SOCIAL_AUTH_FACEBOOK_SECRET = env.get_value("SOCIAL_AUTH_FACEBOOK_SECRET", default='add the secret please')
+# Define SOCIAL_AUTH_FACEBOOK_SCOPE to get extra permissions from facebook. Email is not sent by default, to get it, you must request the email permission:
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id, name, email'
+}
 
 SHELL_PLUS_PRINT_SQL = True

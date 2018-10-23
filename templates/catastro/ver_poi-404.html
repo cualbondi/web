@@ -1,0 +1,32 @@
+{% extends "contenido.html" %}
+
+{% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
+
+{% block bloque_izquierda %}
+    <h1>No pudimos encontrar {{ slug }}</h1>
+
+    {% include "ad_contenido.html"%}
+
+    {% if pois %}
+        <h2>Pero hicimos todo lo posible por encontrar lugares similares</h2>
+        <ul>
+            {% for p in pois %}
+            <li itemscope itemtype="http://schema.org/Place">
+                <a itemprop="url" href="https://cualbondi.com.ar{{p.get_absolute_url}}">
+                    <span itemprop="name">{{ p.nom }}</span>
+                </a>
+                <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
+                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:"f"}}" />
+                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:"f"}}" />
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h1>Volver al <a href="/">inicio</a></h1>
+        <br />
+        <br />
+        <br />
+    {% endif %}
+
+{% endblock %}
