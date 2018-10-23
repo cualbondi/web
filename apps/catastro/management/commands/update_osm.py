@@ -432,7 +432,7 @@ class Command(BaseCommand):
                         if rec.osm_version is None:
                             self.out2('id: {} | osmid: {} | {} / {} : NOT auto accepted: previous recorrido does not come from osm'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
                             continue
-                        if count(RecorridoProposed(parent=rec.uuid)) > 1:
+                        if RecorridoProposed.objects.filter(parent=rec.uuid).count() > 1:
                             self.out2('id: {} | osmid: {} | {} / {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
                             continue
                         self.out2('id: {} | osmid: {} | {} / {} : AUTO ACCEPTED!'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
