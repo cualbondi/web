@@ -10,5 +10,5 @@ python-memcached==1.59  # https://github.com/linsomniac/python-memcached
 raven==6.9.0
 
 selenium==3.14.1
-chromedriver-binary==2.42.0
+chromedriver-binary==2.43.0
 
