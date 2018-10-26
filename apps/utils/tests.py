@@ -329,7 +329,7 @@ class FixWayTestCase(TestCase):
         positive = GEOSGeometry(POSITIVE)
         i = 0
         for case in PASS_CASES:
-            fixed = fix_way(case, TOLERANCE)
+            fixed, status = fix_way(case, TOLERANCE)
             # print('case # ', i)
             # print('before fix: ', stringify(case))
             # print('after fix: ', stringify(fixed))
@@ -339,4 +339,5 @@ class FixWayTestCase(TestCase):
     def test_not_fix_ways(self):
         """Won't fix negative ways"""
         for case in NOT_PASS_CASES:
-            self.assertIsNone(fix_way(case, TOLERANCE))
+            fixed, status = fix_way(case, TOLERANCE)
+            self.assertIsNone(fixed)
