@@ -426,24 +426,39 @@ class Command(BaseCommand):
             user_bot_osm = get_user_model().objects.get(username='osmbot')
 
             for rec in recorridos:
+                # try to fix way, returns None if it can't
                 way, status = fix_way(rec.osm_way, 150)
                 if way is not None:
                     if way.geom_type == 'LineString' and \
-                       rec.ruta_last_updated < rec.osm_last_updated and \
-                       not RecorridoProposed.objects.filter(osm_id=rec.osm_id, parent=rec.uuid, ruta_last_updated__gte=rec.osm_last_updated).exists():
+                       rec.ruta_last_updated < rec.osm_last_updated:
+                       # check if there is another proposal already submitted (with same timestamp or greater)
+                        if RecorridoProposed.objects.filter(
+                            osm_id=rec.osm_id,
+                            parent=rec.uuid,
+                            ruta_last_updated__gte=rec.osm_last_updated
+                        ).exists():
+                            continue
+                        # update previous proposal if any
                         previous_proposals = RecorridoProposed.objects.filter(
-                            osm_id=rec.osm_id, parent=rec.uuid, ruta_last_updated__lt=rec.osm_last_updated, logmoderacion__newStatus='E').order_by('-ruta_last_updated')
+                            osm_id=rec.osm_id,
+                            parent=rec.uuid,
+                            ruta_last_updated__lt=rec.osm_last_updated,
+                            logmoderacion__newStatus='E'
+                        ).order_by('-ruta_last_updated')
+
                         if len(previous_proposals) > 0:
                             self.out2('{} | {} | {} / {} : {} OVERWRITE'.format(rec.id,
-                                                                      rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                                                                                rec.osm_id, rec.linea.nombre, rec.nombre, status))
                             rp = previous_proposals[0]
+                        # else create a new proposal
                         else:
                             self.out2('{} | {} | {} / {} : {} NEW PROPOSAL'.format(rec.id,
-                                                                      rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                                                                                   rec.osm_id, rec.linea.nombre, rec.nombre, status))
                             rp = RecorridoProposed.from_recorrido(rec)
+                        # set proposal fields
                         rp.ruta = way
                         rp.ruta_last_updated = rec.osm_last_updated
-                        rp.osm_version = rec.osm_osm_version  # to not be confsed with Recorrido.osm_version
+                        rp.osm_version = rec.osm_osm_version
                         if not options['dry-run']:
                             rp.save(user=user_bot_osm)
                         # TODO save not accepted reason flag somewhere to accept manually post-mortem based on reason
