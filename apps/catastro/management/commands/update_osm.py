@@ -426,24 +426,25 @@ class Command(BaseCommand):
             user_bot_osm = get_user_model().objects.get(username='osmbot')
 
             for rec in recorridos:
-
+                # try to fix way, returns None if it can't
                 way, status = fix_way(rec.osm_way, 150)
 
                 # recorrido proposed creation checks
                 if way is None:
                     self.out2('{} | {} | {} / {} : {}'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
                     continue
-
+                # not a LineString means disconnected
                 if way.geom_type != 'LineString':
                     continue
 
                 if rec.ruta_last_updated < rec.osm_last_updated:
                     continue
 
+                # check if there is another proposal already submitted (with same timestamp or greater)
                 if RecorridoProposed.objects.filter(osm_id=rec.osm_id, parent=rec.uuid, ruta_last_updated__gte=rec.osm_last_updated).exists():
                     continue
 
-                # create or update recorridoproposed
+                # update previous proposal if any
                 previous_proposals = RecorridoProposed.objects.filter(
                     osm_id=rec.osm_id,
                     parent=rec.uuid,
@@ -453,10 +454,12 @@ class Command(BaseCommand):
                 if len(previous_proposals) > 0:
                     self.out2('{} | {} | {} / {} : {} UPDATE'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
                     rp = previous_proposals[0]
+                # else create a new proposal
                 else:
                     self.out2('{} | {} | {} / {} : {} NEW PROPOSAL'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
                     rp = RecorridoProposed.from_recorrido(rec)
 
+                # set proposal fields
                 rp.ruta = way
                 rp.ruta_last_updated = rec.osm_last_updated
                 rp.osm_version = rec.osm_osm_version  # to not be confsed with Recorrido.osm_version
