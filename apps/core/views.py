@@ -15,29 +15,17 @@ from apps.editor.models import LogModeracion
 
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
+
 
 
 @csrf_exempt
 @require_GET
 def agradecimientos(request):
-    # TODO: Refactor for better performance (too many database hits)
-    us1 = User.objects.filter(is_staff=False)
-    us2 = []
-    for u in us1:
-        # Obtener los logmoderacion de este usuario
-        lms = LogModeracion.objects.filter(created_by=u)
-        # Obtener todos los recorridosproposed que son de esos logmoderacion
-        rps = [x.recorridoProposed for x in lms]
-        # de esos solo tomar aquellos que alguna vez fueron aceptados (que tienen un logmoderacion aceptado)
-        count = len([1 for x in rps if x.logmoderacion_set.filter(newStatus='S')])
-        # devolver el contador de eso
-        u.count_ediciones_aceptadas = count
-        # eliminar los usuarios que tienen count = 0
-        if count > 0:
-            us2.append(u)
-    # ordenar us2 (in-place)
-    us2.sort(key=lambda x: x.count_ediciones_aceptadas, reverse=True)
+    us = User.objects.filter(is_staff=False)
+    us = us.filter(logmoderacion__recorridoProposed__logmoderacion__newStatus='S')
+    us = us.annotate(count_ediciones_aceptadas=Count('logmoderacion__recorridoProposed', distinct=True))
+    us = us.order_by('-count_ediciones_aceptadas')
 
     try:
         flatpage_edicion = FlatPage.objects.get(url__contains='contribuir')
@@ -48,7 +36,7 @@ def agradecimientos(request):
         request,
         'core/agradecimientos.html',
         {
-            'usuarios': us2,
+            'usuarios': us,
             'flatpage_edicion': flatpage_edicion,
         }
     )

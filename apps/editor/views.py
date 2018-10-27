@@ -129,7 +129,7 @@ def moderar_ediciones_uuid(request, uuid=None):
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def revision(request, id_revision=None):
-    revision = RecorridoProposed.objects.get(id=id_revision)
+    revision = RecorridoProposed.objects.get(uuid=id_revision)
     #print revision.parent
     original = RecorridoProposed.objects.filter(uuid=revision.parent)
     if original:

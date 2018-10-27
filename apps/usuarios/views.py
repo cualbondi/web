@@ -3,6 +3,7 @@ from django.conf import settings
 from random import random
 from datetime import datetime, timedelta
 from django.contrib.auth import logout
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404, render,  redirect
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
@@ -17,12 +18,13 @@ from hashlib import sha1 as sha_constructor
 from django.contrib.auth.decorators import login_required
 
 from apps.usuarios.models import PerfilUsuario
+from apps.editor.models import LogModeracion, RecorridoProposed
+from apps.core.models import Linea
 from apps.usuarios.forms import RegistracionForm
 from apps.usuarios.forms import PerfilUsuarioForm
 
 #from social.apps.django_app.utils import strategy
 
-from apps.editor.models import RecorridoProposed
 
 # @strategy('social:complete')
 # def ajax_auth(request, backend):
@@ -217,11 +219,10 @@ def confirmar_email(request, confirmacion_key=None):
 def ver_perfil(request, username):
     usuario = get_object_or_404(User, username=username)
     # perfil = PerfilUsuario.objects.get(usuario=usuario)
-    ediciones = []
-    for r in RecorridoProposed.objects.order_by('-date_update'):
-        if r.get_moderacion_last_user() == usuario:
-            ediciones.append(r)
-    # ediciones = [ r if r.get_moderacion_last_user() == usuario for r in RecorridoProposed.objects.order_by('-date_update') ]
+    ediciones = RecorridoProposed.objects.order_by('-date_update').defer('ruta')
+    ediciones = ediciones.prefetch_related(Prefetch('linea', Linea.objects.defer('envolvente')))
+    ediciones = ediciones.prefetch_related(Prefetch('logmoderacion_set', LogModeracion.objects.order_by('-date_create')))
+    ediciones = ediciones.filter(logmoderacion__created_by=usuario)
     return render(
         request,
         'usuarios/perfil.html',
