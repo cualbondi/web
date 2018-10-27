@@ -428,57 +428,57 @@ class Command(BaseCommand):
             for rec in recorridos:
                 # try to fix way, returns None if it can't
                 way, status = fix_way(rec.osm_way, 150)
-                if way is not None:
-                    if way.geom_type == 'LineString' and \
-                       rec.ruta_last_updated < rec.osm_last_updated:
-                       # check if there is another proposal already submitted (with same timestamp or greater)
-                        if RecorridoProposed.objects.filter(
-                            osm_id=rec.osm_id,
-                            parent=rec.uuid,
-                            ruta_last_updated__gte=rec.osm_last_updated
-                        ).exists():
-                            continue
-                        # update previous proposal if any
-                        previous_proposals = RecorridoProposed.objects.filter(
-                            osm_id=rec.osm_id,
-                            parent=rec.uuid,
-                            ruta_last_updated__lt=rec.osm_last_updated,
-                            logmoderacion__newStatus='E'
-                        ).order_by('-ruta_last_updated')
 
-                        if len(previous_proposals) > 0:
-                            self.out2('{} | {} | {} / {} : {} OVERWRITE'.format(rec.id,
-                                                                                rec.osm_id, rec.linea.nombre, rec.nombre, status))
-                            rp = previous_proposals[0]
-                        # else create a new proposal
-                        else:
-                            self.out2('{} | {} | {} / {} : {} NEW PROPOSAL'.format(rec.id,
-                                                                                   rec.osm_id, rec.linea.nombre, rec.nombre, status))
-                            rp = RecorridoProposed.from_recorrido(rec)
-                        # set proposal fields
-                        rp.ruta = way
-                        rp.ruta_last_updated = rec.osm_last_updated
-                        rp.osm_version = rec.osm_osm_version
-                        if not options['dry-run']:
-                            rp.save(user=user_bot_osm)
-                        # TODO save not accepted reason flag somewhere to accept manually post-mortem based on reason
-                        if rec.osm_version is None:
-                            self.out2('{} | {} | {} / {} : NOT auto accepted: previous recorrido does not come from osm'.format(
-                                rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
-                            continue
-                        if RecorridoProposed.objects.filter(parent=rec.uuid).count() > 1:
-                            self.out2('{} | {} | {} / {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(
-                                rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
-                            continue
-                        self.out2('{} | {} | {} / {} : AUTO ACCEPTED!'.format(rec.id,
-                                                                              rec.osm_id, rec.linea.nombre, rec.nombre))
-                        if not options['dry-run']:
-                            rp.aprobar()
-                    else:
-                        self.out2('{} | {} | {} / {} : {}'.format(rec.id,
-                                                                  rec.osm_id, rec.linea.nombre, rec.nombre, status))
-                else:
+                # recorrido proposed creation checks
+                if way is None:
                     self.out2('{} | {} | {} / {} : {}'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                    continue
+                # not a LineString means disconnected
+                if way.geom_type != 'LineString':
+                    continue
+
+                if rec.ruta_last_updated < rec.osm_last_updated:
+                    continue
+
+                # check if there is another proposal already submitted (with same timestamp or greater)
+                if RecorridoProposed.objects.filter(osm_id=rec.osm_id, parent=rec.uuid, ruta_last_updated__gte=rec.osm_last_updated).exists():
+                    continue
+
+                # update previous proposal if any
+                previous_proposals = RecorridoProposed.objects.filter(
+                    osm_id=rec.osm_id,
+                    parent=rec.uuid,
+                    ruta_last_updated__lt=rec.osm_last_updated,
+                    logmoderacion__newStatus='E'
+                ).order_by('-ruta_last_updated')
+                if len(previous_proposals) > 0:
+                    self.out2('{} | {} | {} / {} : {} UPDATE'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                    rp = previous_proposals[0]
+                # else create a new proposal
+                else:
+                    self.out2('{} | {} | {} / {} : {} NEW PROPOSAL'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                    rp = RecorridoProposed.from_recorrido(rec)
+
+                # set proposal fields
+                rp.ruta = way
+                rp.ruta_last_updated = rec.osm_last_updated
+                rp.osm_version = rec.osm_osm_version  # to not be confsed with Recorrido.osm_version
+                if not options['dry-run']:
+                    rp.save(user=user_bot_osm)
+
+                # AUTO ACCEPT CHECKS
+                # TODO save not accepted reason flag somewhere to accept manually post-mortem based on reason
+                if rec.osm_version is None:
+                    self.out2('{} | {} | {} / {} : NOT auto accepted: previous recorrido does not come from osm'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                    continue
+
+                if RecorridoProposed.objects.filter(parent=rec.uuid).count() > 1:
+                    self.out2('{} | {} | {} / {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                    continue
+
+                self.out2('{} | {} | {} / {} : AUTO ACCEPTED!'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                if not options['dry-run']:
+                    rp.aprobar()
 
         #######################
         #  POIs de osm        #
