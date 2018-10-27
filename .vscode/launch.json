@@ -34,7 +34,8 @@
       "program": "${workspaceFolder}/manage.py",
       "args": [
         "update_osm",
-        "--update_routes"
+        "--update_routes",
+        "--dry-run"
       ],
       "env": {
         "POSTGRES_PASSWORD": "postgrespass",
