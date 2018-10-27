@@ -1,5 +1,5 @@
 import uuid
-
+from datetime import datetime
 from django.contrib.gis.db import models
 from django.db.models import Manager as GeoManager
 from django.shortcuts import get_object_or_404
@@ -68,8 +68,7 @@ class Recorrido(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     osm_id = models.BigIntegerField(blank=True, null=True)
     osm_version = models.BigIntegerField(blank=True, null=True)
-    last_updated = models.DateTimeField(auto_now=True, null=True)
-
+    ruta_last_updated = models.DateTimeField(default=datetime.now)
     # Si tiene las paradas completas es porque tiene todas las paradas de
     # este recorrido en la tabla paradas+horarios (horarios puede ser null),
     # y se puede utilizar en la busqueda usando solo las paradas.

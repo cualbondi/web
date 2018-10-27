@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from datetime import datetime
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AnonymousUser
@@ -36,6 +37,7 @@ class RecorridoProposed(models.Model):
     pois = models.TextField(blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
     paradas_completas = models.BooleanField(default=False)
+    ruta_last_updated = models.DateTimeField(default=datetime.now)
 
     osm_id = models.BigIntegerField(blank=True, null=True)
     osm_version = models.BigIntegerField(blank=True, null=True)
@@ -54,7 +56,6 @@ class RecorridoProposed(models.Model):
         rp_dict = recorrido.__dict__.copy()
         rp_dict.pop('_state')
         rp_dict.pop('id')
-        rp_dict.pop('last_updated')
         for (k, v) in list(rp_dict.items()):
             if k not in fields:
                 rp_dict.pop(k)
@@ -95,7 +96,9 @@ class RecorridoProposed(models.Model):
             return None
 
     def get_moderacion_last_user(self):
-        loglist = self.logmoderacion_set.filter(created_by__is_staff=False).order_by('-date_create')
+        loglist = self.logmoderacion_set.filter(created_by__is_staff=False)
+        if not loglist.ordered:
+            loglist = loglist.order_by('-date_create')
         if loglist:
             return loglist[0].created_by
         else:
@@ -136,18 +139,15 @@ class RecorridoProposed(models.Model):
         rp_dict = r.__dict__.copy()
         rp_dict.pop('_state')
         rp_dict.pop('id')
-        rp_dict.pop('last_updated')
         for (k, v) in list(rp_dict.items()):
             if k in fields:
                 setattr(r, k, getattr(self, k))
         r.save()
 
-        try:
-            parent = RecorridoProposed.objects.get(uuid=self.parent)
-            if parent:
-                parent.logmoderacion_set.create(created_by=user,newStatus='R')
-        except RecorridoProposed.DoesNotExist:
-            pass
+        parent = RecorridoProposed.objects.get(uuid=self.parent)
+        if parent:
+            parent.logmoderacion_set.create(created_by=user,newStatus='R')
+
         for rp in RecorridoProposed.objects.filter(current_status='S', recorrido=r).exclude(uuid=self.uuid):
             rp.logmoderacion_set.create(created_by=user, newStatus='R')
         self.logmoderacion_set.create(created_by=user, newStatus='S')
@@ -169,7 +169,7 @@ class RecorridoProposed(models.Model):
     def get_absolute_url(self):
         url = reverse('revision_externa',
             kwargs={
-                'id_revision': self.id,
+                'id_revision': self.uuid,
             })
         print("URL: " + url)
         return url

@@ -46,7 +46,7 @@ urlpatterns = [
     url(settings.ADMIN_URL, admin.site.urls),
     url(r'^editor/', include(editorUrls)),
     url(r'^usuarios/', include(usuariosUrls)),
-    url(r'^revision/(?P<id_revision>\d+)/$', revision, name='revision_externa'),
+    url(r'^revision/(?P<id_revision>[-\w]+)/$', revision, name='revision_externa'),
 
     url(r'^como-llegar/', include(catastroUrls)),
 

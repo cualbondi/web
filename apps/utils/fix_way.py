@@ -117,22 +117,22 @@ def fix_way(way, tolerance=0):
     """ tries to sort and fix the way into a linestring """
     way = GEOSGeometry(way)
     if way.geom_type == 'LineString':
-        return way
+        return way, '0: ok'
     if way.geom_type == 'MultiLineString':
         way = first_pass(way)
         if way.geom_type == 'LineString':
             # print('SAFE first_pass!')
-            return way
+            return way, '1: ok, first_pass'
         way = sort_ways(way)
         if way.geom_type == 'LineString':
             # print('SAFE sorted!')
-            return way
+            return way, '2: broken, sort'
         if tolerance > 0:
             way = join_ways(way, tolerance)
             if way.geom_type == 'LineString':
                 # print('SAFE tolerance!')
-                return way
+                return way, '3: broken, tolerance'
         # print(len(way))
         # print(way.ewkt)
 
-    return None
+    return None, '4: broken'
