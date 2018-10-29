@@ -26,7 +26,7 @@ COPY ./requirements /requirements
 RUN pip install --no-cache-dir -r /requirements/production.txt \
     && rm -rf /requirements
 
-RUN echo "54 2 * * * root /usr/local/bin/python /app/manage.py update_osm --update_routes --dry-run --import_osm --all_arg >> /var/log/osm-cualbondi-cron.log 2>&1" > /etc/cron.d/osm-cualbondi
+RUN echo "04 3 * * * root /usr/local/bin/python /app/manage.py update_osm --update_routes --dry-run --import_osm --all_arg >> /var/log/osm-cualbondi-cron.log 2>&1" > /etc/cron.d/osm-cualbondi
 RUN chmod 0644 /etc/cron.d/osm-cualbondi
 
 COPY ./docker/production/gunicorn.sh /gunicorn.sh
@@ -39,6 +39,11 @@ RUN sed -i 's/\r//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 RUN chown django /entrypoint.sh
 
+COPY ./docker/production/entrypoint+cron.sh /entrypoint+cron.sh
+RUN sed -i 's/\r//' /entrypoint+cron.sh
+RUN chmod +x /entrypoint+cron.sh
+RUN chown django /entrypoint+cron.sh
+
 COPY . /app
 
 RUN chown -R django /app
@@ -47,6 +52,6 @@ RUN chown -R django /app
 
 WORKDIR /app
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint+cron.sh"]
 
 EXPOSE 8000
