@@ -403,6 +403,7 @@ class Command(BaseCommand):
                 Recorrido._meta.get_fields()
                 if hasattr(f, 'column') and f.column != 'ruta' and f.column != 'osm_id'
             ])
+            cu.execute('SET STATEMENT_TIMEOUT=300000')
             recorridos = Recorrido.objects.raw("""
                 SELECT
                     {},
