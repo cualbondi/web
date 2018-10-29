@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     libjpeg-dev pngcrush \
     libtiff5-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev google-chrome-stable \
+    cron \
   && rm -rf /var/lib/apt/lists/* \
   && pip install uwsgi
 
@@ -24,6 +25,8 @@ RUN groupadd django \
 COPY ./requirements /requirements
 RUN pip install --no-cache-dir -r /requirements/production.txt \
     && rm -rf /requirements
+
+RUN echo "42 2 * * * root /usr/local/bin/python /app/manage.py update_osm --update_routes --dry-run --import_osm --all_arg > /tmp/osm-updater.log" >> /etc/crontab
 
 COPY ./docker/production/gunicorn.sh /gunicorn.sh
 RUN sed -i 's/\r//' /gunicorn.sh
