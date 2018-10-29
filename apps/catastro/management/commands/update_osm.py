@@ -422,7 +422,7 @@ class Command(BaseCommand):
                 where
                     pl.route='bus'
                     and pop.tags @> 'boundary=>administrative'
-                    and pop.tags->'admin_level' <= '7'
+                    and pop.tags->'admin_level' <= '5'
                 group by
                     cr.id,
                     cl.id,
