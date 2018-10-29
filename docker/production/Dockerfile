@@ -26,7 +26,8 @@ COPY ./requirements /requirements
 RUN pip install --no-cache-dir -r /requirements/production.txt \
     && rm -rf /requirements
 
-RUN echo "42 2 * * * root /usr/local/bin/python /app/manage.py update_osm --update_routes --dry-run --import_osm --all_arg > /tmp/osm-updater.log" >> /etc/crontab
+RUN echo "54 2 * * * root /usr/local/bin/python /app/manage.py update_osm --update_routes --dry-run --import_osm --all_arg >> /var/log/osm-cualbondi-cron.log 2>&1" > /etc/cron.d/osm-cualbondi
+RUN chmod 0644 /etc/cron.d/osm-cualbondi
 
 COPY ./docker/production/gunicorn.sh /gunicorn.sh
 RUN sed -i 's/\r//' /gunicorn.sh
