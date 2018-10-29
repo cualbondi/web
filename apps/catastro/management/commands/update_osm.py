@@ -4,7 +4,7 @@ import subprocess
 import os
 import sys
 from apps.catastro.models import Poi, Interseccion, Calle
-from apps.core.models import Recorrido
+from apps.core.models import Recorrido, ImporterLog
 from apps.editor.models import RecorridoProposed
 from apps.utils.fix_way import fix_way
 from django.contrib.auth import get_user_model
@@ -128,6 +128,8 @@ class Command(BaseCommand):
         print('[{}]    - {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s))
 
     def handle(self, *args, **options):
+
+        run_timestamp = datetime.now()
 
         cu = connection.cursor()
 
@@ -395,52 +397,88 @@ class Command(BaseCommand):
 
         if options['update_routes']:
             self.out1('Update linked routes from osm to cualbondi')
-            colnames = ','.join(['cr.{}'.format(f.column)
-                                 for f in Recorrido._meta.get_fields() if hasattr(f, 'column') and f.column != 'ruta'])
+            colnames = ','.join([
+                'cr.{}'.format(f.column)
+                for f in
+                Recorrido._meta.get_fields()
+                if hasattr(f, 'column') and f.column != 'ruta' and f.column != 'osm_id'
+            ])
             recorridos = Recorrido.objects.raw("""
                 SELECT
                     {},
                     cr.ruta::bytea as ruta,
                     st_linemerge(st_union(pl.way))::bytea as osm_way,
+                    max(@pl.osm_id) as osm_id,
                     max((pl.tags->'osm_timestamp')::timestamptz) as osm_last_updated,
-                    max((pl.tags->'osm_version')::int) as osm_osm_version --used this name so it doesnt collide with core_recorrido.osm_version
+                    max((pl.tags->'osm_version')::int) as osm_osm_version, --used this name so it doesnt collide with core_recorrido.osm_version
+                    array_to_string(array_distinct(array_agg(pop.name ORDER BY ((pop.tags->'admin_level')::int))), ', ') as osm_administrative,
+                    pl.name as osm_name,
+                    cl.nombre as linea_nombre
                 FROM
                     core_recorrido cr
-                    join public.planet_osm_line pl
-                        on (
-                            cr.osm_id = @pl.osm_id and (
-                                cr.osm_version is null or
-                                cr.osm_version <> (pl.tags->'osm_version')::int
-                            )
-                        )
+                    right outer join core_linea cl on (cr.linea_id = cl.id)
+                    right outer join public.planet_osm_line pl on (cr.osm_id = @pl.osm_id)
+                    right outer join planet_osm_polygon pop on (ST_Intersects(pl.way, pop.way))
                 where
-                    cr.osm_id is not null
-                    and pl.route='bus'
+                    pl.route='bus'
+                    and pop.tags @> 'boundary=>administrative'
+                    and pop.tags->'admin_level' <= '7'
                 group by
                     cr.id,
-                    pl.osm_id;
+                    cl.id,
+                    pl.osm_id,
+                    pl.name;
             """.format(colnames))
-            recorridos.prefetch_related('lineas')
 
-            # run migrations to have this user in the db
+            # HINT: run migrations in order to have osmbot in the db
             user_bot_osm = get_user_model().objects.get(username='osmbot')
 
             for rec in recorridos:
 
                 way, status = fix_way(rec.osm_way, 150)
 
+                ilog = ImporterLog(
+                    osm_id=rec.osm_id,
+                    osm_version=rec.osm_osm_version,
+                    osm_timestamp=rec.osm_last_updated,
+                    run_timestamp=run_timestamp,
+                    proposed=False,
+                    accepted=False,
+                    status=status,
+                    proposed_reason='',
+                    accepted_reason='',
+                    osm_administrative=rec.osm_administrative,
+                    osm_name=rec.osm_name
+                )
+                ilog.save()
+
+                if rec.id is None:
+                    self.out2('{} | {} : SKIP not linked {}'.format(rec.id, rec.osm_id, status))
+                    continue
+
                 # recorrido proposed creation checks
                 if way is None:
-                    self.out2('{} | {} | {} / {} : {}'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                    self.out2('{} | {} | {} / {} : SKIP {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    ilog.proposed_reason = 'broken'
+                    ilog.save()
                     continue
 
                 if way.geom_type != 'LineString':
+                    self.out2('{} | {} | {} / {} : SKIP (not linestring) {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    ilog.proposed_reason = 'broken 2'
+                    ilog.save()
                     continue
 
                 if rec.ruta_last_updated < rec.osm_last_updated:
+                    self.out2('{} | {} | {} / {} : SKIP, older than current recorrido {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    ilog.proposed_reason = 'older than current recorrido'
+                    ilog.save()
                     continue
 
                 if RecorridoProposed.objects.filter(osm_id=rec.osm_id, parent=rec.uuid, ruta_last_updated__gte=rec.osm_last_updated).exists():
+                    self.out2('{} | {} | {} / {} : SKIP, older than prev proposal {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    ilog.proposed_reason = 'older than previous proposal'
+                    ilog.save()
                     continue
 
                 # create or update recorridoproposed
@@ -451,10 +489,10 @@ class Command(BaseCommand):
                     logmoderacion__newStatus='E'
                 ).order_by('-ruta_last_updated')
                 if len(previous_proposals) > 0:
-                    self.out2('{} | {} | {} / {} : {} UPDATE'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                    self.out2('{} | {} | {} / {} : {} UPDATE prev proposal'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
                     rp = previous_proposals[0]
                 else:
-                    self.out2('{} | {} | {} / {} : {} NEW PROPOSAL'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre, status))
+                    self.out2('{} | {} | {} / {} : {} NEW proposal'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
                     rp = RecorridoProposed.from_recorrido(rec)
 
                 rp.ruta = way
@@ -463,19 +501,34 @@ class Command(BaseCommand):
                 if not options['dry-run']:
                     rp.save(user=user_bot_osm)
 
+                ilog.proposed = True
+                ilog.save()
+
                 # AUTO ACCEPT CHECKS
-                # TODO save not accepted reason flag somewhere to accept manually post-mortem based on reason
                 if rec.osm_version is None:
-                    self.out2('{} | {} | {} / {} : NOT auto accepted: previous recorrido does not come from osm'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                    self.out2('{} | {} | {} / {} : NOT auto accepted: previous accepted proposal does not come from osm'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre))
+                    ilog.accepted_reason = 'previous accepted proposal does not come from osm'
+                    ilog.save()
                     continue
 
                 if RecorridoProposed.objects.filter(parent=rec.uuid).count() > 1:
-                    self.out2('{} | {} | {} / {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                    self.out2('{} | {} | {} / {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre))
+                    ilog.accepted_reason = 'another not accepted proposal exists for this recorrido'
+                    ilog.save()
                     continue
 
-                self.out2('{} | {} | {} / {} : AUTO ACCEPTED!'.format(rec.id, rec.osm_id, rec.linea.nombre, rec.nombre))
+                self.out2('{} | {} | {} / {} : AUTO ACCEPTED!'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre))
                 if not options['dry-run']:
                     rp.aprobar()
+
+                ilog.accepted = True
+                ilog.save()
+
+                #
+                # TODO: think how to do "stops" change proposals
+                # el recorrido podria tener una lista de paradas, una lista de latlongs nada mas
+                # cambiar una parada es cambiar el recorrido tambien. El problema es que las paradas se comparten
+                #
 
         #######################
         #  POIs de osm        #

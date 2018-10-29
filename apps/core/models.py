@@ -217,3 +217,28 @@ class Tarifa(models.Model):
 class FacebookPage(models.Model):
     id_fb = models.CharField(max_length=50)
     linea = models.ForeignKey(Linea, on_delete=models.CASCADE)
+
+
+class ImporterLog(models.Model):
+    osm_id = models.BigIntegerField(blank=True, null=True, db_index=True)
+    osm_version = models.BigIntegerField(blank=True, null=True)
+    osm_timestamp = models.DateTimeField(blank=True, null=True)
+    run_timestamp = models.DateTimeField(blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+    status = models.TextField(blank=True, null=True, db_index=True)
+    proposed = models.BooleanField()
+    accepted = models.BooleanField()
+    proposed_reason = models.TextField(blank=True, null=True)
+    accepted_reason = models.TextField(blank=True, null=True)
+
+    # additional info to show log context and be able to search on something
+    osm_administrative = models.TextField(blank=True, null=True)
+    osm_name = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return "[{}] {} {} {}".format(
+            self.run_timestamp,
+            self.osm_id,
+            self.osm_timestamp,
+            self.reason
+        )

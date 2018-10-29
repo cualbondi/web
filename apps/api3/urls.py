@@ -12,6 +12,7 @@ router.register(r'geocoder', views.GeocoderViewSet, "geocoder")
 router.register(r'geocoder/suggest', views.GeocoderSuggestViewSet, "geocoder/suggest"),
 router.register(r'geocoder/reverse', views.ReverseGeocoderView, "geocoder/reverse")
 router.register(r'me', views.UserViewSet, base_name='me')
+router.register(r'importerlog', views.ImporterLogViewSet, base_name='importerlog')
 
 urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),

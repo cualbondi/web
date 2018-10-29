@@ -1,13 +1,12 @@
 import base64
 import json
-from copy import copy
 
 import geobuf
 from django.contrib.gis.geos import GEOSGeometry
 from rest_framework import serializers
 
 from apps.catastro.models import Ciudad
-from apps.core.models import Linea, Parada, Recorrido
+from apps.core.models import Linea, Parada, Recorrido, ImporterLog
 
 
 class CiudadSerializer(serializers.ModelSerializer):
@@ -137,7 +136,6 @@ class RecorridoPureModelSerializer(serializers.ModelSerializer):
 class RecorridoCustomSerializer(serializers.Serializer):
 
     def to_representation(self, obj):
-        print(obj.__dict__)
         return {
             'id': obj.id,
             'linea_nombre': obj.linea_nombre,
@@ -178,3 +176,10 @@ class GeocoderSerializer(serializers.Serializer):
 class GeocoderSuggestSerializer(serializers.Serializer):
     nombre = serializers.ReadOnlyField()
     magickey = serializers.ReadOnlyField()
+
+
+class ImporterLogSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ImporterLog
+        fields = ('__all__',)

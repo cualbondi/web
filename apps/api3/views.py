@@ -10,10 +10,8 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, BasePermission, SAFE_METHODS
 from rest_framework.mixins import UpdateModelMixin
 
-from apps.catastro.models import Ciudad
-from apps.catastro.models import PuntoBusqueda
-from apps.core.models import Linea
-from apps.core.models import Recorrido
+from apps.catastro.models import Ciudad, PuntoBusqueda
+from apps.core.models import Linea, Recorrido, ImporterLog
 from . import serializers
 from .mixins import LoggingMixin
 
@@ -339,3 +337,25 @@ class UserViewSet(viewsets.GenericViewSet):
             'email': request.user.email,
             'permissions': permissions
         })
+
+
+class ImporterLogViewSet(viewsets.ModelViewSet):
+    # pagination_class = pagination.PageNumberPagination
+    serializer_class = serializers.ImporterLogSerializer
+
+    def get_queryset(self):
+        return ImporterLog.objects.raw("""
+            SELECT
+                *
+            FROM
+                core_importerlog
+            WHERE
+                run_timestamp = (
+                    SELECT
+                        max(run_timestamp)
+                    FROM
+                        core_importerlog
+                )
+            ORDER BY
+                status desc
+        """)
