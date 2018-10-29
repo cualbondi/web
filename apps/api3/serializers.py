@@ -182,4 +182,4 @@ class ImporterLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ImporterLog
-        fields = ('__all__',)
+        fields = '__all__'
