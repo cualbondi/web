@@ -129,7 +129,7 @@ node,way   place        text         polygon
 node,way   population   text         linear
 node,way   power        text         polygon
 node,way   power_source text         linear
-node,way   public_transport text     polygon
+node,way   public_transport text     linear
 node,way   railway      text         linear
 node,way   ref          text         linear
 node,way   religion     text         linear

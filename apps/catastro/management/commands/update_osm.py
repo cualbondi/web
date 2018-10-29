@@ -403,7 +403,7 @@ class Command(BaseCommand):
                 Recorrido._meta.get_fields()
                 if hasattr(f, 'column') and f.column != 'ruta' and f.column != 'osm_id'
             ])
-            cu.execute('SET STATEMENT_TIMEOUT=300000')
+            cu.execute('SET STATEMENT_TIMEOUT=1000000')
             recorridos = Recorrido.objects.raw("""
                 SELECT
                     {},
@@ -424,6 +424,15 @@ class Command(BaseCommand):
                     pl.route='bus'
                     and pop.tags @> 'boundary=>administrative'
                     and pop.tags->'admin_level' <= '5'
+                    and pl.way not in (
+                        -- way must not be a public_transport platform/stop
+                        select
+                            pl_inner.way
+                        from
+                            planet_osm_line pl_inner
+                        where
+                            pl_inner.public_transport is not null
+                    )
                 group by
                     cr.id,
                     cl.id,
