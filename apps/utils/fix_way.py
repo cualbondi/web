@@ -11,16 +11,15 @@ def first_pass(ways):
         - Also ST_LineMerge() should do this already
     """
     n = len(ways)
-    assert n > 1
-    ordered_ways = [ways[0]]
+    ordered_ways = [ways[0][:]]
     for i in range(1, n):
-        way = ways[i]
-        prev_way = ordered_ways[-1]
+        way = ways[i][:]
+        prev_way = ordered_ways[-1][:]
         # if its the first segment on the linestring,
         # try reversing it if it matches with the second
         if ordered_ways[-1] == ways[i-1]:
             if way[0] == prev_way[0] or way[-1] == prev_way[0]:
-                ordered_ways[-1] = LineString(prev_way[::-1])
+                ordered_ways[-1] = prev_way[::-1]
                 prev_way = ordered_ways[-1]
         # concat the second segment with the first one
         if prev_way[-1] == way[0]:
@@ -34,7 +33,7 @@ def first_pass(ways):
 
     if len(ordered_ways) == 1:
         return ordered_ways[0]
-    return MultiLineString(ordered_ways)
+    return ordered_ways
 
 
 def sort_ways(ways):
@@ -46,21 +45,50 @@ def sort_ways(ways):
         - This is not "expected" by osm. We are trying to fix the way now
         - Nevertheless I think this is also done by ST_LineMerge()
     """
-    ws = ways[:]
+
+    # def sort_function(first, w):
+    #     d = w.distance(first)
+    #     count_touches = 4
+    #     if (first[0] == w[0]):
+    #         count_touches -= 1
+    #     if (first[-1] == w[0]):
+    #         count_touches -= 1
+    #     if (first[0] == w[-1]):
+    #         count_touches -= 1
+    #     if (first[-1] == w[-1]):
+    #         count_touches -= 1
+    #     return d + count_touches
+
+    ws = [LineString(w) for w in ways[:]]
     sorted_ways = [ws[0]]
     ws = ws[1:]
     while len(ws) > 0:
+        # ws = sorted(ws, key=lambda w: sort_function(sorted_ways[-1], w))
         ws = sorted(ws, key=lambda w: w.distance(sorted_ways[-1]))
         sorted_ways.append(ws[0])
         ws = ws[1:]
-    ret_ways = first_pass(sorted_ways)
+
+    sorted_ways = [[list(n) for n in w] for w in sorted_ways]
+
+    if len(sorted_ways) == 1:
+        return sorted_ways[0]
+    return sorted_ways
     # print('SORTED {} -> {}'.format(len(ways), len(ret_ways)))
-    return ret_ways
 
 
 def dist_haversine(P1, P2):
-    lon1, lat1 = P1
-    lon2, lat2 = P2
+
+    # this is so the function can work with all following formats
+    # [-64.1941384, -31.4469149]
+    # [-641941384.0, -314469149.0]
+    # [-641941384, -314469149]
+    if (P1[0] % 1 == 0 and P2[1] % 1 == 0):
+        lon1, lat1 = (P1[0]/10000000, P1[1]/10000000)
+        lon2, lat2 = (P2[0]/10000000, P2[1]/10000000)
+    else:
+        lon1, lat1 = P1
+        lon2, lat2 = P2
+
     radius = 6371000  # meters
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
@@ -81,7 +109,7 @@ def join_ways(ways, tolerance):
         - This is not done by ST_LineMerge()
         - I'm not sure if this conserves the direction from first to last
     """
-    joined = [ways[0]]
+    joined = [ways[0][:]]
     # print([[p for p in l] for l in ways[1:]])
     for w in ways[1:]:
         # print(joined[-1][-1], w[0])
@@ -90,49 +118,73 @@ def join_ways(ways, tolerance):
         # print(dist_haversine(joined[-1][-1], w[-1]))
         if dist_haversine(joined[-1][-1], w[0]) < tolerance:
             # print('1.last + 2.first')
-            joined[-1] += w
+            joined[-1] += w[:]
         else:
             if dist_haversine(joined[-1][-1], w[-1]) < tolerance:
                 # print('1.last + 2.last')
-                joined[-1] += LineString(w[::-1])
+                joined[-1] += w[::-1]
             else:
                 if dist_haversine(joined[-1][0], w[0]) < tolerance:
                     # print('1.first + 2.first')
-                    joined[-1] = LineString(joined[-1][::-1])
-                    joined[-1] += w
+                    joined[-1] = joined[-1][::-1]
+                    joined[-1] += w[:]
                 else:
                     if dist_haversine(joined[-1][0], w[-1]) < tolerance:
                         # print('1.first + 2.last')
-                        joined[-1] = LineString(joined[-1][::-1])
-                        joined[-1] += LineString(w[::-1])
+                        joined[-1] = joined[-1][::-1]
+                        joined[-1] += w[::-1]
                     else:
                         # print('1.split.2')
-                        joined.append(w)
+                        joined.append(w[:])
     if len(joined) == 1:
         return joined[0]
-    return sort_ways(joined)
+    return joined
+
+
+def isLineString(way):
+    # print(way)
+    # print(way[0][0])
+    return isinstance(way[0][0], (int, float))
+
+
+def isMultiLineString(way):
+    return isinstance(way[0][0][0], (int, float))
 
 
 def fix_way(way, tolerance=0):
     """ tries to sort and fix the way into a linestring """
-    way = GEOSGeometry(way)
-    if way.geom_type == 'LineString':
-        return way, '0: ok'
-    if way.geom_type == 'MultiLineString':
-        way = first_pass(way)
-        if way.geom_type == 'LineString':
-            # print('SAFE first_pass!')
-            return way, '1: ok, first_pass'
-        way = sort_ways(way)
-        if way.geom_type == 'LineString':
-            # print('SAFE sorted!')
-            return way, '2: broken, sort'
-        if tolerance > 0:
-            way = join_ways(way, tolerance)
-            if way.geom_type == 'LineString':
-                # print('SAFE tolerance!')
-                return way, '3: broken, tolerance'
-        # print(len(way))
-        # print(way.ewkt)
 
-    return None, '4: broken'
+    try:
+
+        if len(way) == 0:
+            return None, '5: broken, empty'
+        if isLineString(way):
+            return way, '0: ok'
+        if isMultiLineString(way):
+            passed = first_pass(way[:])
+            if isLineString(passed):
+                # print('SAFE first_pass!')
+                return passed, '1: ok, first_pass'
+            sorted = sort_ways(way)
+            sorted_passed = first_pass(sorted)
+            if isLineString(sorted_passed):
+                # print('SAFE sorted!')
+                return sorted_passed, '2: broken, sort'
+            if tolerance > 0:
+                tolerated = join_ways(way, tolerance)
+                if isLineString(tolerated):
+                    # print('SAFE tolerance!')
+                    return tolerated, '3: broken, tolerance'
+            if tolerance > 0:
+                tolerated_sorted = join_ways(sorted, tolerance)
+                if isLineString(tolerated_sorted):
+                    # print('SAFE tolerance!')
+                    return tolerated_sorted, '3b: broken, sort + tolerance'
+
+            # print(len(way))
+            # print(way.ewkt)
+
+        return None, '4: broken'
+
+    except Exception as e:
+        return None, '9: ERROR PROCESSING: {}'.format(str(e))

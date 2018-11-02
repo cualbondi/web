@@ -12,8 +12,10 @@ from django.db import connection
 from datetime import datetime
 import time
 
+import osmium
 import geopandas as gpd
 from psycopg2.extras import execute_values
+from django.contrib.gis.geos import LineString, MultiLineString
 
 
 class Command(BaseCommand):
@@ -97,6 +99,13 @@ class Command(BaseCommand):
             help='Update routes'
         )
         parser.add_argument(
+            '--osm_id',
+            action='store',
+            dest='osm-id',
+            default='',
+            help='Update routes this osm id only'
+        )
+        parser.add_argument(
             '--all_arg',
             action='store_true',
             dest='all_arg',
@@ -124,14 +133,24 @@ class Command(BaseCommand):
     def out1(self, s):
         print('[{}] => {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s))
 
-    def out2(self, s):
-        print('[{}]    - {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s))
+    def out2(self, s, start=None, end='\n'):
+        if start is None:
+            print('[{}]    - {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s), end=end)
+        else:
+            print('{}'.format(s), end=end)
 
     def handle(self, *args, **options):
 
         run_timestamp = datetime.now()
 
         cu = connection.cursor()
+
+        inputfile = '/tmp/argentina.cache.osm-{}.pbf'.format(datetime.now().strftime('%Y%m%d%H%M%S'))
+        if options['no-tmp']:
+            inputfile = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'argentina.cache.osm.pbf')
+        if options['inputFile'] or options['use_cache']:
+            if options['inputFile']:
+                inputfile = options['inputFile']
 
         if options['import_osm']:
 
@@ -179,7 +198,7 @@ class Command(BaseCommand):
                         '-b={}'.format(box),
                         '-o=/tmp/part-{}.osm'.format(c[0])
                     ]
-                    filetoimport = '/tmp/part-all.pbf'
+                    filetoimport = '/tmp/part-all.o5m'
                     subprocess.Popen(prog).wait()
 
                 self.out2('Uniendo partes')
@@ -190,6 +209,13 @@ class Command(BaseCommand):
                 ] + partfiles
                 subprocess.Popen(prog).wait()
             else:
+                filetoimport = '/tmp/part-all.o5m'
+                prog = [
+                    'osmconvert',
+                    '-o={}'.format(filetoimport),
+                    inputfile
+                ]
+                subprocess.Popen(prog).wait()
                 self.out2('all Argentina')
 
             self.out2('Cargando en la base de datos')
@@ -396,6 +422,82 @@ class Command(BaseCommand):
             self.out2('LISTO!')
 
         if options['update_routes']:
+
+            self.out1('UPDATE ROUTES FROM OSM')
+            self.out1('Get routes from osm file')
+            inputfile = '/tmp/part-all.o5m'
+
+            # self.out2('filter out buses from o5m full')
+            # this might be useful for future performance
+            # but actually pyosmium uses the same libosmium as osmfilter
+            # prog = [
+            #     'osmfilter',
+            #     inputfile,
+            #     '--keep=',
+            #     '--keep-relations="route=bus"',
+            #     '-o=/tmp/buses.osm'
+            # ]
+            # subprocess.Popen(prog).wait()
+
+            self.out2('process .osm input file')
+
+            # we can see if all tags are ok and give hints to mappers according to spec:
+            # https://wiki.openstreetmap.org/w/index.php?oldid=625726
+            # https://wiki.openstreetmap.org/wiki/Buses
+
+            buses = {}  # pasar a self.buses { relation_id: { name: name, fixed_way: GEOSGeom, ways: { way_id: { name: name, nodes: { node_id: { lat: lat, lng: lng } } } } } }
+            ways = {}  # aux structure { way_id: [ relation_id ] }
+
+            route_id_only = int(options['osm-id']) if options['osm-id'] else ''
+
+            class RelsHandler(osmium.SimpleHandler):
+                def relation(self, r):
+                    if ((not route_id_only or r.id == route_id_only) and 'route' in r.tags and r.tags['route'] == 'bus' and 'name' in r.tags):
+                        bus = {
+                            'name': r.tags['name'].encode('utf-8').strip(),
+                            'ways': []
+                        }
+                        for m in r.members:
+                            # forward / backward / alternate are deprecated in PTv2, add warning
+                            if m.type == 'w' and m.role in ['', 'forward', 'backward', 'alternate']:
+                                bus['ways'].append(m.ref)
+                                ways.setdefault(m.ref, []).append(r.id)
+                        buses[r.id] = bus
+
+            class WaysHandler(osmium.SimpleHandler):
+                def way(self, w):
+                    if w.id in ways:
+                        linestring = []
+                        for node in w.nodes:
+                            linestring.append([node.x, node.y])
+
+                        for rel_id in ways[w.id]:
+                            for i, wid in enumerate(buses[rel_id]['ways']):
+                                if wid == w.id:
+                                    buses[rel_id]['ways'][i] = linestring
+
+            self.out2('relations')
+            h = RelsHandler()
+            h.apply_file(inputfile)
+            self.out2('ways')
+            h = WaysHandler()
+            h.apply_file(inputfile, locations=True)
+
+            self.out2('fixer routine')
+
+            counters = {}
+            for bus_id, bus in buses.items():
+                self.out2(bus_id, end=': ')
+                way, status = fix_way(bus['ways'], 150)
+                buses[bus_id]['way'] = LineString(way) if way else None
+                buses[bus_id]['status'] = status
+                counters.setdefault(status, 0)
+                counters[status] += 1
+                self.out2('{} > {}'.format(status, bus['name']), start='')
+
+            for key, counter in sorted(counters.items(), key=lambda e: e[1], reverse=True):
+                self.out2('{} | {}'.format(counter, key))
+
             self.out1('Update linked routes from osm to cualbondi')
             colnames = ','.join([
                 'cr.{}'.format(f.column)
@@ -408,7 +510,6 @@ class Command(BaseCommand):
                 SELECT
                     {},
                     cr.ruta::bytea as ruta,
-                    st_linemerge(st_union(pl.way))::bytea as osm_way,
                     max(@pl.osm_id) as osm_id,
                     max((pl.tags->'osm_timestamp')::timestamptz) as osm_last_updated,
                     max((pl.tags->'osm_version')::int) as osm_osm_version, --used this name so it doesnt collide with core_recorrido.osm_version
@@ -424,15 +525,6 @@ class Command(BaseCommand):
                     pl.route='bus'
                     and pop.tags @> 'boundary=>administrative'
                     and pop.tags->'admin_level' <= '5'
-                    and pl.way not in (
-                        -- way must not be a public_transport platform/stop
-                        select
-                            pl_inner.way
-                        from
-                            planet_osm_line pl_inner
-                        where
-                            pl_inner.public_transport is not null
-                    )
                 group by
                     cr.id,
                     cl.id,
@@ -443,9 +535,16 @@ class Command(BaseCommand):
             # HINT: run migrations in order to have osmbot in the db
             user_bot_osm = get_user_model().objects.get(username='osmbot')
 
+            self.out2('fixer routine')
+
             for rec in recorridos:
                 # try to fix way, returns None if it can't
-                way, status = fix_way(rec.osm_way, 150)
+                if rec.osm_id in buses:
+                    way = buses[rec.osm_id]['way']
+                    status = buses[rec.osm_id]['status']
+                else:
+                    way = None
+                    status = None
 
                 ilog = ImporterLog(
                     osm_id=rec.osm_id,
@@ -470,12 +569,6 @@ class Command(BaseCommand):
                 if way is None:
                     self.out2('{} | {} | {} / {} : SKIP {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
                     ilog.proposed_reason = 'broken'
-                    ilog.save()
-                    continue
-                # not a LineString means disconnected
-                if way.geom_type != 'LineString':
-                    self.out2('{} | {} | {} / {} : SKIP (not linestring) {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
-                    ilog.proposed_reason = 'broken 2'
                     ilog.save()
                     continue
 

@@ -7,6 +7,6 @@
 
 #Run tests locally and clean in one command
 
-    docker-compose -f docker-compose-travis.yml run --rm web python manage.py test --noinput; docker-compose -f docker-compose-travis.yml down; docker-compose -f docker-compose-travis.yml rm -f
+    docker-compose -f docker-compose-travis.yml run --rm web python3 manage.py test --noinput; docker-compose -f docker-compose-travis.yml down; docker-compose -f docker-compose-travis.yml rm -f
 
 more documentation coming soon

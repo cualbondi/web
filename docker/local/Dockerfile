@@ -1,20 +1,27 @@
-FROM python:3.6
+FROM ubuntu:bionic
 
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-setuptools \
+    python3-pip \
     osm2pgsql \
     osmctools \
     libgeos-dev \
     gdal-bin \
     libspatialindex-dev \
     postgresql-client \
+    libboost-all-dev \
+    libbz2-dev \
+    gcc \
+    g++ \
   && rm -rf /var/lib/apt/lists/* \
-  && pip install uwsgi
+  && pip3 install wheel
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
-RUN pip install -r /requirements/local.txt
+RUN pip3 install -r /requirements/local.txt
 
 COPY ./docker/production/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh
