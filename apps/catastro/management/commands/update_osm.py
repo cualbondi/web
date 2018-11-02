@@ -567,20 +567,20 @@ class Command(BaseCommand):
 
                 # recorrido proposed creation checks
                 if way is None:
-                    self.out2('{} | {} | {} / {} : SKIP {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    self.out2('{} / {} : SKIP {}'.format(rec.id, rec.osm_id, status))
                     ilog.proposed_reason = 'broken'
                     ilog.save()
                     continue
 
                 if rec.ruta_last_updated < rec.osm_last_updated:
-                    self.out2('{} | {} | {} / {} : SKIP, older than current recorrido {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    self.out2('{} / {} : SKIP, older than current recorrido {}'.format(rec.id, rec.osm_id, status))
                     ilog.proposed_reason = 'older than current recorrido'
                     ilog.save()
                     continue
 
                 # check if there is another proposal already submitted (with same timestamp or greater)
                 if RecorridoProposed.objects.filter(osm_id=rec.osm_id, parent=rec.uuid, ruta_last_updated__gte=rec.osm_last_updated).exists():
-                    self.out2('{} | {} | {} / {} : SKIP, older than prev proposal {}'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    self.out2('{} / {} : SKIP, older than prev proposal {}'.format(rec.id, rec.osm_id, status))
                     ilog.proposed_reason = 'older than previous proposal'
                     ilog.save()
                     continue
@@ -593,11 +593,11 @@ class Command(BaseCommand):
                     logmoderacion__newStatus='E'
                 ).order_by('-ruta_last_updated')
                 if len(previous_proposals) > 0:
-                    self.out2('{} | {} | {} / {} : {} UPDATE prev proposal'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    self.out2('{} / {} : {} UPDATE prev proposal'.format(rec.id, rec.osm_id, status))
                     rp = previous_proposals[0]
                 # else create a new proposal
                 else:
-                    self.out2('{} | {} | {} / {} : {} NEW proposal'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre, status))
+                    self.out2('{} / {} : {} NEW proposal'.format(rec.id, rec.osm_id, status))
                     rp = RecorridoProposed.from_recorrido(rec)
 
                 # set proposal fields
@@ -612,18 +612,18 @@ class Command(BaseCommand):
 
                 # AUTO ACCEPT CHECKS
                 if rec.osm_version is None:
-                    self.out2('{} | {} | {} / {} : NOT auto accepted: previous accepted proposal does not come from osm'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre))
+                    self.out2('{} | {} : NOT auto accepted: previous accepted proposal does not come from osm'.format(rec.id, rec.osm_id))
                     ilog.accepted_reason = 'previous accepted proposal does not come from osm'
                     ilog.save()
                     continue
 
                 if RecorridoProposed.objects.filter(parent=rec.uuid).count() > 1:
-                    self.out2('{} | {} | {} / {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre))
+                    self.out2('{} | {} : NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, rec.osm_id))
                     ilog.accepted_reason = 'another not accepted proposal exists for this recorrido'
                     ilog.save()
                     continue
 
-                self.out2('{} | {} | {} / {} : AUTO ACCEPTED!'.format(rec.id, rec.osm_id, rec.linea_nombre, rec.nombre))
+                self.out2('{} | {} : AUTO ACCEPTED!'.format(rec.id, rec.osm_id))
                 if not options['dry-run']:
                     rp.aprobar()
 

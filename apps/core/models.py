@@ -239,6 +239,5 @@ class ImporterLog(models.Model):
         return "[{}] {} {} {}".format(
             self.run_timestamp,
             self.osm_id,
-            self.osm_timestamp,
-            self.reason
+            self.osm_timestamp
         )
