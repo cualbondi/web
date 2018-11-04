@@ -276,35 +276,71 @@ class RecorridosPorCiudad(viewsets.ModelViewSet):
     depth = 1
 
     def get_queryset(self):
-        return Recorrido.objects \
+        show_linked = self.request.query_params.get('showall', False)
+
+        qs = Recorrido.objects \
             .select_related('linea') \
-            .filter(ciudades=self.kwargs.get('ciudad_id')) \
-            .filter(osm_id__isnull=True)
+            .filter(ciudades=self.kwargs.get('ciudad_id'))
+        if show_linked:
+            return qs
+        return qs.filter(osm_id__isnull=True)
+
+
+@api_view(['GET'])
+def best_matches(request, ciudad_id):
+    # return Response(recorrido_id)
+    with connection.cursor() as cursor:
+        query = """
+            select cr.id, cr.osm_id, cr.nombre, cl.nombre as linea_nombre, ST_AsEWKT(cr.ruta) as ruta, cr.linea_id, ca.area
+            from core_recorrido cr
+            join crossed_areas ca on cr.id = ca.recorrido_id
+            join core_linea cl on (cr.linea_id = cl.id)
+            join catastro_ciudad_recorridos ccr on (ccr.recorrido_id = cr.id)
+            where
+            ccr.ciudad_id = %(ciudad_id)s
+            and ca.area = (select min(area) from crossed_areas ca2 where ca2.recorrido_id = cr.id group by ca2.recorrido_id)
+            order by ca.area
+        """
+        opts = {"ciudad_id": ciudad_id}
+        cursor.execute(query, opts)
+
+        response = dictfetchall(cursor)
+        # adapt the response to client code
+        for r in response:
+            linea_id = r.pop('linea_id')
+            nombre = r.pop('linea_nombre')
+            r['linea'] = {'id': linea_id, 'nombre': nombre}
+    return Response(response)
 
 
 @api_view(['GET'])
 def match_recorridos(request, recorrido_id):
+    show_linked = request.query_params.get('showall', False)
     # return Response(recorrido_id)
     with connection.cursor() as cursor:
-        query = """
+        query1 = """
             select
-                *
+                ca.*, cr1.osm_id as linked_osm_id, cr2.id as linked_recorrido_id
             from
-                (
-                    select
-                        *
-                    from
-                        crossed_areas
-                    where
-                        recorrido_id = %(recorrido_id)s
-                ) as c
+                crossed_areas ca
+            left join core_recorrido cr1 on (ca.recorrido_id = cr1.id)
+            left join core_recorrido cr2 on (ca.osm_id = cr2.osm_id)
             where
-                osm_id not in (
-                    select osm_id from core_recorrido where osm_id is not null
-                )
+                recorrido_id = %(recorrido_id)s
+        """
+        query2 = """
+            and
+                ca.osm_id not in (select osm_id from core_recorrido where osm_id is not null)
+        """
+        query3 = """
             order by
                 area asc;
         """
+
+        if show_linked:
+            query = query1 + query3
+        else:
+            query = query1 + query2 + query3
         opts = {"recorrido_id": recorrido_id}
         cursor.execute(query, opts)
         # return Response(recorrido_id)

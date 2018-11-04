@@ -17,6 +17,7 @@ router.register(r'importerlog', views.ImporterLogViewSet, base_name='importerlog
 urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^recorridos-por-ciudad/(?P<ciudad_id>\d+)/$', views.RecorridosPorCiudad.as_view({'get': 'list'})),
+    url(r'^recorridos-best-matches/(?P<ciudad_id>\d+)/$', views.best_matches),
     url(r'^match-recorridos/(?P<recorrido_id>\d+)/$', views.match_recorridos),
     url(r'^display-recorridos/', views.display_recorridos),
     url(r'^', include((router.urls, 'v3'), namespace='v3')),
