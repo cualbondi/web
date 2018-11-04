@@ -162,7 +162,7 @@ class RecorridoModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recorrido
-        fields = ('id', 'nombre', 'linea', 'ruta')
+        fields = ('id', 'nombre', 'linea', 'ruta', 'osm_id')
 
 
 class GeocoderSerializer(serializers.Serializer):
