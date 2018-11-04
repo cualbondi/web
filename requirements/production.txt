@@ -9,6 +9,6 @@ Collectfast==0.6.2  # https://github.com/antonagestam/collectfast
 python-memcached==1.59  # https://github.com/linsomniac/python-memcached
 raven==6.9.0
 
-selenium==3.14.1
+selenium==3.141.0
 chromedriver-binary==2.43.0
 
