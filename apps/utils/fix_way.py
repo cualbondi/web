@@ -58,8 +58,7 @@ def sort_ways(ways):
     #     if (first[-1] == w[-1]):
     #         count_touches -= 1
     #     return d + count_touches
-
-    ws = [LineString(w) for w in ways[:]]
+    ws = [w if isinstance(w, LineString) else LineString(w) for w in ways[:]]
     sorted_ways = [ws[0]]
     ws = ws[1:]
     while len(ws) > 0:
