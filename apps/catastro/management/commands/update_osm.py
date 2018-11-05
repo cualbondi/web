@@ -383,6 +383,7 @@ class Command(BaseCommand):
             self.out2('DROP TABLE crossed_areas')
             cu.execute("DROP TABLE IF EXISTS crossed_areas;")
             cu.execute('DROP INDEX IF EXISTS crossed_areas_recorrido_id;')
+            cu.execute('DROP INDEX IF EXISTS crossed_areas_area;')
 
             self.out2('CREATE TABLE crossed_areas')
             cu.execute(
@@ -422,6 +423,7 @@ class Command(BaseCommand):
 
             self.out2('Generando indice crossed_areas_recorrido_id')
             cu.execute('CREATE INDEX crossed_areas_recorrido_id ON crossed_areas (recorrido_id);')
+            cu.execute('CREATE INDEX crossed_areas_area ON crossed_areas (area);')
 
             self.out2('LISTO!')
 
