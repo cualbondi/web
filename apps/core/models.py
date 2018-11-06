@@ -236,9 +236,8 @@ class ImporterLog(models.Model):
     osm_name = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return "[{}] {} {} {}".format(
+        return "[{}] {} {}".format(
             self.run_timestamp,
             self.osm_id,
-            self.osm_timestamp,
-            self.reason
+            self.osm_timestamp
         )

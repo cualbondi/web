@@ -304,36 +304,52 @@ point_names = {
 }
 
 
+def isLineString(way):
+    return isinstance(way[0][0], (int, float))
+
+
+def isMultiLineString(way):
+    return isinstance(way[0][0][0], (int, float))
+
+
 def stringify(mls):
     if mls is None:
         return None
     if isinstance(mls, str):
         mls = GEOSGeometry(mls)
     ans = ''
-    if mls.geom_type == 'MultiLineString':
+    if isLineString(mls):
+        for point in mls:
+            ans += point_names[tuple(point)] + ' '
+        return ans
+    if isMultiLineString(mls):
         for ls in mls:
             for point in ls:
-                ans += point_names[point] + ' '
+                ans += point_names[tuple(point)] + ' '
             ans += '- '
         ans = ans[:-2]
-    if mls.geom_type == 'LineString':
-        for point in mls:
-            ans += point_names[point] + ' '
     return ans
 
 
 class FixWayTestCase(TestCase):
+
+    def assertIterableEqual(self, it1, it2, **kwargs):
+        return self.assertSequenceEqual(
+            tuple([tuple(it) for it in it1]),
+            tuple([tuple(it) for it in it2]),
+            **kwargs
+        )
 
     def test_fix_ways(self):
         """Fix all positive ways"""
         positive = GEOSGeometry(POSITIVE)
         i = 0
         for case in PASS_CASES:
-            fixed, status = fix_way(case, TOLERANCE)
+            fixed, status = fix_way(GEOSGeometry(case), TOLERANCE)
             # print('case # ', i)
             # print('before fix: ', stringify(case))
             # print('after fix: ', stringify(fixed))
-            self.assertSequenceEqual(fixed, positive, msg='[#{}] {}'.format(i, case))
+            self.assertIterableEqual(fixed, positive, msg='[#{}] {}'.format(i, case))
             i += 1
 
     def test_not_fix_ways(self):
