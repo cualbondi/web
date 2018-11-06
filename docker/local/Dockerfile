@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libbz2-dev \
     gcc \
     g++ \
+    git \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install wheel
 
