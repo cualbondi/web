@@ -43,7 +43,7 @@ class RecorridoProposed(models.Model):
     osm_version = models.BigIntegerField(blank=True, null=True)
 
     recorrido = models.ForeignKey('core.Recorrido', on_delete=models.CASCADE)
-    parent = models.UUIDField(default=uuid4)
+    parent = models.UUIDField(null=True)
     current_status = models.CharField(max_length=1, choices=MODERATION_CHOICES, default='E')
 
     date_create = models.DateTimeField(auto_now_add=True)
@@ -71,10 +71,14 @@ class RecorridoProposed(models.Model):
 
     def save(self, *args, **kwargs):
         user = kwargs.pop('user', None)
+        logmoderacion__newStatus = kwargs.pop('logmoderacion__newStatus', None)
         super(RecorridoProposed, self).save(*args, **kwargs)
         mod = self.get_moderacion_last()
         if mod is None or ( user is not None and user != mod.created_by ):
-            self.logmoderacion_set.create(created_by=user)
+            if logmoderacion__newStatus:
+                self.logmoderacion_set.create(created_by=user, newStatus=logmoderacion__newStatus)
+            else:
+                self.logmoderacion_set.create(created_by=user)
 
     def get_current_status_display(self):
         status_list = self.logmoderacion_set.all()
@@ -126,13 +130,15 @@ class RecorridoProposed(models.Model):
 
     def aprobar(self, user):
         r = self.recorrido
-        if not r.uuid:
-            # todavia no existe una version de este recorrido real, que estoy por retirar
-            # antes de retirarlo creo su version correspondiente
-            rp = RecorridoProposed.from_recorrido(r)
-            rp.save(user=user)
-            self.parent = rp.uuid
-            self.save()
+        parent = list(RecorridoProposed.objects.filter(uuid=self.parent))
+        # Esto lo hago en una migration para todos y listo
+        # if not r.uuid or not parent.exists():
+        #     # todavia no existe una version de este recorrido real, que estoy por retirar
+        #     # antes de retirarlo creo su version correspondiente
+        #     parent = RecorridoProposed.from_recorrido(r)
+        #     parent.save(user=user)
+        #     self.parent = parent.uuid
+        #     self.save()
 
         recorrido_model = apps.get_app_config('core').get_model("Recorrido")
         fields = [f.column for f in recorrido_model._meta.get_fields() if hasattr(f, 'column')]
@@ -144,9 +150,8 @@ class RecorridoProposed(models.Model):
                 setattr(r, k, getattr(self, k))
         r.save()
 
-        parent = RecorridoProposed.objects.get(uuid=self.parent)
         if parent:
-            parent.logmoderacion_set.create(created_by=user,newStatus='R')
+            parent[0].logmoderacion_set.create(created_by=user, newStatus='R')
 
         for rp in RecorridoProposed.objects.filter(current_status='S', recorrido=r).exclude(uuid=self.uuid):
             rp.logmoderacion_set.create(created_by=user, newStatus='R')
@@ -171,7 +176,6 @@ class RecorridoProposed(models.Model):
             kwargs={
                 'id_revision': self.uuid,
             })
-        print("URL: " + url)
         return url
 
     class Meta:

@@ -78,7 +78,7 @@ def mostrar_ediciones(request):
     ediciones = RecorridoProposed.objects.all()
     if estado != 'all':
         ediciones = ediciones.filter(current_status='E')
-    ediciones = ediciones.order_by('-date_update')
+    ediciones = ediciones.order_by('-date_create')
     ediciones = ediciones.select_related('linea')
     ediciones = ediciones.defer('ruta', 'linea__envolvente')
     ediciones = ediciones.prefetch_related(Prefetch('logmoderacion_set', LogModeracion.objects.order_by('-date_create')))
@@ -94,7 +94,7 @@ def mostrar_ediciones(request):
 @permission_required('editor.moderate_recorridos', login_url="/usuarios/login/", raise_exception=True)
 @require_GET
 def moderar_ediciones_id(request, id=None):
-    ediciones = RecorridoProposed.objects.filter(recorrido__id=id).order_by('-date_update')[:50]
+    ediciones = RecorridoProposed.objects.filter(recorrido__id=id).order_by('-date_create')[:50]
     original = Recorrido.objects.get(id=id)
     #original = RecorridoProposed.objects.get(uuid=ediciones[0].parent)
     return render(
@@ -110,7 +110,7 @@ def moderar_ediciones_id(request, id=None):
 @permission_required('editor.moderate_recorridos', login_url="/usuarios/login/", raise_exception=True)
 @require_GET
 def moderar_ediciones_uuid(request, uuid=None):
-    ediciones = RecorridoProposed.objects.filter(uuid=uuid).order_by('-date_update')[:50]
+    ediciones = RecorridoProposed.objects.filter(uuid=uuid).order_by('-date_create')[:50]
     original = RecorridoProposed.objects.filter(uuid=ediciones[0].parent)
     if original:
         original = original[0]
@@ -130,12 +130,7 @@ def moderar_ediciones_uuid(request, uuid=None):
 @require_http_methods(["GET", "POST"])
 def revision(request, id_revision=None):
     revision = RecorridoProposed.objects.get(uuid=id_revision)
-    #print revision.parent
-    original = RecorridoProposed.objects.filter(uuid=revision.parent)
-    if original:
-        original = original[0]
-    else:
-        original = revision.recorrido
+    original = RecorridoProposed.objects.get(uuid=revision.parent)
     diffa = revision.ruta.difference(original.ruta)
     diffb = original.ruta.difference(revision.ruta)
     intersection = original.ruta.intersection(revision.ruta)

@@ -17,7 +17,7 @@
     <table>
         {% with original as e %}
         <tr>
-            <td><a href="{% url "moderar_ediciones_id" id=e.id %}">{{ e.linea.nombre }} - {{ e.nombre }}</a></td>
+            <td><a href="{% url "moderar_ediciones_id" id=e.id %}">{{e.uuid}} {{e.id}} {{ e.linea.nombre }} - {{ e.nombre }}</a></td>
         </tr>
         {% endwith %}
     </table>
@@ -28,6 +28,9 @@
         {% for e in ediciones %}
         <tr>
             <td><a href="{% url "moderar_ediciones_uuid" uuid=e.uuid %}">uuid</a></td>
+            <td><a href="{% url "moderar_ediciones_uuid" uuid=e.parent %}">parent</a></td>
+            <td>{{ e.date_create|date:"d/m/Y H:i" }}</td>
+            <td>{{ e.date_update|date:"d/m/Y H:i" }}</td>
             <td>
                 <table>
                     {% for m in e.log %}
