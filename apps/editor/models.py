@@ -56,6 +56,7 @@ class RecorridoProposed(models.Model):
         rp_dict = recorrido.__dict__.copy()
         rp_dict.pop('_state')
         rp_dict.pop('id')
+        rp_dict.pop('osm_version')
         for (k, v) in list(rp_dict.items()):
             if k not in fields:
                 rp_dict.pop(k)
