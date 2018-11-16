@@ -475,7 +475,7 @@ class Command(BaseCommand):
                     if w.id in ways:
                         linestring = []
                         for node in w.nodes:
-                            linestring.append([node.x, node.y])
+                            linestring.append([float(node.x)/10000000, float(node.y)/10000000])
 
                         for rel_id in ways[w.id]:
                             for i, wid in enumerate(buses[rel_id]['ways']):
