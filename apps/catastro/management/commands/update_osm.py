@@ -4,7 +4,7 @@ import subprocess
 import os
 import sys
 from apps.catastro.models import Poi, Interseccion, Calle
-from apps.core.models import Recorrido, ImporterLog
+from apps.core.models import Recorrido, ImporterLog, Linea
 from apps.editor.models import RecorridoProposed
 from apps.utils.fix_way import fix_way
 from django.contrib.auth import get_user_model
@@ -118,6 +118,12 @@ class Command(BaseCommand):
             dest='dry-run',
             default=False,
             help='Do not save fixes'
+        )
+        parser.add_argument(
+            '--administrative_area_filter',
+            action='store',
+            dest='administrative_area_filter',
+            help='Only import this admin_area id'
         )
 
     def reporthook(self, numblocks, blocksize, filesize, url=None):
@@ -452,12 +458,24 @@ class Command(BaseCommand):
             # https://wiki.openstreetmap.org/wiki/Buses
 
             buses = {}  # pasar a self.buses { relation_id: { name: name, fixed_way: GEOSGeom, ways: { way_id: { name: name, nodes: { node_id: { lat: lat, lng: lng } } } } } }
+            buses_master = {}  # { route_id: { id: id, name: name } }
             ways = {}  # aux structure { way_id: [ relation_id ] }
 
             route_id_only = int(options['osm-id']) if options['osm-id'] else ''
 
+            this = self
+
             class RelsHandler(osmium.SimpleHandler):
                 def relation(self, r):
+
+                    # route_master
+                    if ('type' in r.tags and r.tags['type'] == 'route_master' and 'name' in r.tags):
+                        for m in r.members:
+                            if m.ref in buses_master:
+                                this.out2(f'warning bus route id {m.ref} has multiple master relations')
+                            buses_master[m.ref] = {'id': r.id, 'name': r.tags['name'].encode('utf-8').strip()}
+
+                    # route (variant)
                     if ((not route_id_only or r.id == route_id_only) and 'route' in r.tags and r.tags['route'] == 'bus' and 'name' in r.tags):
                         bus = {
                             'name': r.tags['name'].encode('utf-8').strip(),
@@ -512,7 +530,11 @@ class Command(BaseCommand):
                 if hasattr(f, 'column') and f.column != 'ruta' and f.column != 'osm_id'
             ])
             cu.execute('SET STATEMENT_TIMEOUT=1000000')
-            recorridos = Recorrido.objects.raw("""
+            administrative_area_filter = ''
+            if options['administrative_area_filter']:
+                # posadas = 2294383
+                administrative_area_filter = f"""join planet_osm_polygon popfilter on (ST_Intersects(pl.way, popfilter.way) and popfilter.tags @> 'boundary=>administrative' and @popfilter.osm_id={options['administrative_area_filter']})"""
+            recorridos = Recorrido.objects.raw(("""
                 SELECT
                     {},
                     cr.ruta::bytea as ruta,
@@ -526,6 +548,7 @@ class Command(BaseCommand):
                     core_recorrido cr
                     right outer join core_linea cl on (cr.linea_id = cl.id)
                     right outer join public.planet_osm_line pl on (cr.osm_id = @pl.osm_id)
+                    """+administrative_area_filter+"""
                     right outer join planet_osm_polygon pop on (ST_Intersects(pl.way, pop.way))
                 where
                     pl.route='bus'
@@ -536,7 +559,7 @@ class Command(BaseCommand):
                     cl.id,
                     pl.osm_id,
                     pl.name;
-            """.format(colnames))
+            """).format(colnames))
 
             # HINT: run migrations in order to have osmbot in the db
             user_bot_osm = get_user_model().objects.get(username='osmbot')
@@ -566,6 +589,29 @@ class Command(BaseCommand):
                     osm_name=rec.osm_name
                 )
                 ilog.save()
+
+                if options['administrative_area_filter']:
+                    if rec.osm_id not in buses_master:
+                        self.out2(f'NO TIENE MASTER {rec.osm_id}')
+                        ilog.proposed_reason = 'broken master'
+                        ilog.save()
+                        continue  # TODO
+                    else:
+                        self.out2(f'MASTER: {buses_master[rec.osm_id]["id"]} {buses_master[rec.osm_id]["name"]}    RELATION: {rec.osm_id} {rec.osm_name.encode("utf-8").strip()}')
+                        continue
+                        linea = Linea.objects.filter(osm_id=buses_master[rec.osm_id]['id'])
+                        if not linea:
+                            lp = Linea(
+                                osm_id=buses_master[rec.osm_id]['id'],
+                                name=buses_master[rec.osm_id]['name'],
+                                proposed=True
+                                # more data if we have it in osm, like operator
+                            )
+                            # TODO: ciudad buscar o crear
+                            lp.save()
+                        else:
+                            lp = linea[0]
+
 
                 if rec.id is None:
                     self.out2('{} | {} : SKIP not linked {}'.format(rec.id, rec.osm_id, status))
@@ -603,8 +649,14 @@ class Command(BaseCommand):
                     rp = previous_proposals[0]
                 # else create a new proposal
                 else:
-                    proposal_info = 'NEW prev proposal'
-                    rp = RecorridoProposed.from_recorrido(rec)
+                    if rec.id:
+                        proposal_info = 'NEW prev proposal'
+                        rp = RecorridoProposed.from_recorrido(rec)
+                    else:
+                        if options['administrative_area_filter']:
+                            rp = RecorridoProposed(
+                                linea=lp
+                            )
 
                 # set proposal fields
                 rp.ruta = way
