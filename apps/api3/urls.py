@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^recorridos-por-ciudad/(?P<ciudad_id>\d+)/$', views.RecorridosPorCiudad.as_view({'get': 'list'})),
     url(r'^recorridos-best-matches/(?P<ciudad_id>\d+)/$', views.best_matches),
     url(r'^match-recorridos/(?P<recorrido_id>\d+)/$', views.match_recorridos),
+    url(r'^importerlog-stats/$', views.importerlog_stats),
     url(r'^display-recorridos/', views.display_recorridos),
     url(r'^', include((router.urls, 'v3'), namespace='v3')),
 ]

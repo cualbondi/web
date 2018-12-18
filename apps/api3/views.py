@@ -395,3 +395,34 @@ class ImporterLogViewSet(viewsets.ModelViewSet):
             ORDER BY
                 status desc
         """)
+
+
+@api_view(['GET'])
+def importerlog_stats(request):
+    with connection.cursor() as cursor:
+        query = """
+        select
+            run_timestamp,
+            json_agg(json_build_object(status, count)) as series
+        from (
+            select
+                run_timestamp,
+                status,
+                count(status) as count
+            from
+                core_importerlog
+            group by
+                status,
+                run_timestamp
+            order by
+                run_timestamp,
+                status
+            ) as x
+        where
+            status is not null
+        group by
+            run_timestamp
+        """
+        cursor.execute(query)
+        response = dictfetchall(cursor)
+    return Response(response)
