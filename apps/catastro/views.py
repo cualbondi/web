@@ -63,30 +63,18 @@ amenities = {
 }
 
 
-@csrf_exempt
 @require_GET
-def poiORint(request, slug=None):
-    poi = None
-    pois = Poi.objects.filter(slug=slug)
-
-    try:
-        if pois:
-            poi = pois[0]
-        else:
-            poi = get_object_or_404(Interseccion, slug=slug)
-    except Exception as e:
-        pois = fuzzy_like_query(slug)
-        slug = slug.replace('-', ' ')
-        return render(request, 'catastro/ver_poi-404.html', {'slug': slug, 'pois': pois}, status=404)
-    # TODO: resolver estas queries en 4 threads
-    #       ver https://stackoverflow.com/a/12542927/912450
+def poi(request, osm_type, osm_id, slug):
+    poi = get_object_or_404(Poi, osm_type=osm_type, osm_id=osm_id)
+    if slug != slugify(poi.nom):
+        return HttpResponsePermanentRedirect(poi.get_absolute_url())
     recorridos = Recorrido.objects \
         .filter(ruta__dwithin=(poi.latlng, 0.002)) \
         .select_related('linea') \
         .prefetch_related(Prefetch('ciudades', queryset=Ciudad.objects.all().only('slug'))) \
         .order_by('linea__nombre', 'nombre') \
         .defer('linea__envolvente', 'ruta')
-    pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
+    near_pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
     ciudad_actual = Ciudad.objects.annotate(distance=Distance('centro', poi.latlng)).order_by('distance').first()
 
@@ -94,11 +82,10 @@ def poiORint(request, slug=None):
     if (request.GET.get("dynamic_map")):
         template = 'core/ver_obj_map.html'
 
-    amenity = None
     try:
         amenity = amenities[poi.tags['amenity']]
     except KeyError:
-        pass
+        amenity = None
 
     return render(
         request,
@@ -110,9 +97,17 @@ def poiORint(request, slug=None):
             'paradas': ps,
             'poi': poi,
             'recorridos': recorridos,
-            'pois': pois
+            'pois': near_pois
         }
     )
+
+
+@csrf_exempt
+@require_GET
+def poiORint(request, slug=None):
+    # poi = get_object_or_404(EntityRedirect, old_url=f'{slug}')
+    # return HttpResponsePermanentRedirect(poi.get_absolute_url())
+    pass
 
 
 def zona(request, slug=None):
