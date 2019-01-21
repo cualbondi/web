@@ -3,10 +3,10 @@ from urllib import request
 import subprocess
 import os
 import sys
-from apps.catastro.models import Poi, Interseccion, Calle
+from apps.catastro.models import Poi, Interseccion, Calle, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog
 from apps.editor.models import RecorridoProposed
-from apps.utils.fix_way import fix_way
+from apps.utils.fix_way import fix_way, fix_polygon
 from django.contrib.auth import get_user_model
 from django.db import connection
 from datetime import datetime
@@ -15,7 +15,7 @@ import time
 import osmium
 import geopandas as gpd
 from psycopg2.extras import execute_values
-from django.contrib.gis.geos import LineString, MultiLineString
+from django.contrib.gis.geos import LineString, Polygon, MultiPolygon
 
 
 class Command(BaseCommand):
@@ -99,6 +99,13 @@ class Command(BaseCommand):
             help='Update routes'
         )
         parser.add_argument(
+            '--admin_areas',
+            action='store_true',
+            dest='admin_areas',
+            default=False,
+            help='Update admin areas'
+        )
+        parser.add_argument(
             '--osm_id',
             action='store',
             dest='osm-id',
@@ -124,7 +131,7 @@ class Command(BaseCommand):
         base = os.path.basename(url)
         try:
             percent = min((numblocks * blocksize * 100) / filesize, 100)
-        except:
+        except ZeroDivisionError:
             percent = 100
         if numblocks != 0:
             sys.stdout.write('\b' * 70)
@@ -132,12 +139,14 @@ class Command(BaseCommand):
 
     def out1(self, s):
         print('[{}] => {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s))
+        sys.stdout.flush()
 
     def out2(self, s, start=None, end='\n'):
         if start is None:
             print('[{}]    - {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s), end=end)
         else:
             print('{}'.format(s), end=end)
+        sys.stdout.flush()
 
     def handle(self, *args, **options):
 
@@ -356,7 +365,7 @@ class Command(BaseCommand):
             norm_factor = ruta_buffer_40_simplify.area.values + way_buffer_40_simplify.area.values
 
             self.out2('Generando diffs')
-            diffs = (diffs/norm_factor).tolist()
+            diffs = (diffs / norm_factor).tolist()
 
             self.out2('Pasando osm_ids a lista')
             osm_ids = intersections.osm_id.values.tolist()
@@ -475,7 +484,7 @@ class Command(BaseCommand):
                     if w.id in ways:
                         linestring = []
                         for node in w.nodes:
-                            linestring.append([float(node.x)/10000000, float(node.y)/10000000])
+                            linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
 
                         for rel_id in ways[w.id]:
                             for i, wid in enumerate(buses[rel_id]['ways']):
@@ -643,6 +652,191 @@ class Command(BaseCommand):
                 #
 
         #######################
+        #  Adminareas de osm  #
+        #######################
+        # 1. ./manage.py update_osm --all_arg --import_osm --admin_areas
+        # 2. ./manage.py update_osm -f /tmp/part-all.o5m --admin_areas
+
+        if options['admin_areas']:
+            self.out1('Admin Areas')
+            admin_areas = [[] for i in range(12)]  # index: admin_level, value
+            admin_relations = {}  # index: admin_level, value
+            admin_relations_ways_ids = {}
+            # this = self
+
+            class RelsHandler(osmium.SimpleHandler):
+                def relation(self, r):
+                    if 'boundary' in r.tags and r.tags['boundary'] == 'administrative' and 'name' in r.tags and 'admin_level' in r.tags:
+                        ways = []
+                        for m in r.members:
+                            # outer (parts and exclaves) / inner (hole)
+                            if m.type == 'w' and m.role in ['outer']:
+                                ways.append(m.ref)
+                                admin_relations_ways_ids.setdefault(m.ref, []).append(r.id)
+                        admin_relations[r.id] = {
+                            'osm_id': r.id,
+                            'osm_type': 'r',
+                            'ways': ways,
+                            'admin_level': int(r.tags['admin_level']),
+                            'name': r.tags['name'], #.encode('utf-8').strip(),
+                            'tags': r.tags.__dict__,
+                        }
+                        # this.out2(f"REL {r.id} {r.tags['name'].encode('utf-8').strip()}")
+
+            class WaysHandler(osmium.SimpleHandler):
+                def way(self, w):
+
+                    # ways that are admin areas
+                    if 'boundary' in w.tags and w.tags['boundary'] == 'administrative' and 'name' in w.tags and 'admin_level' in w.tags:
+                        linestring = []
+                        for node in w.nodes:
+                            linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
+                        if linestring[0][0] == linestring[-1][0] and linestring[0][1] == linestring[-1][1]:
+                            if int(w.tags['admin_level']) > 4 and int(w.tags['admin_level']) <= 6:
+                                admin_areas[int(w.tags['admin_level'])].append({
+                                    'osm_id': w.id,
+                                    'osm_type': 'w',
+                                    'geometry': Polygon(linestring),
+                                    'admin_level': int(w.tags['admin_level']),
+                                    'name': w.tags['name'], #.encode('utf-8').strip(),
+                                    'tags': r.tags.__dict__,
+                                })
+
+                    # fill relations that are admin areas
+                    if w.id in admin_relations_ways_ids:
+                        linestring = []
+                        for node in w.nodes:
+                            linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
+
+                        for rel_id in admin_relations_ways_ids[w.id]:
+                            for i, wid in enumerate(admin_relations[rel_id]['ways']):
+                                if wid == w.id:
+                                    admin_relations[rel_id]['ways'][i] = linestring
+
+            self.out2('Collecting rels')
+            h = RelsHandler()
+            h.apply_file(inputfile)
+            self.out2('Collecting ways & nodes')
+            h = WaysHandler()
+            h.apply_file(inputfile, locations=True)
+
+            admin_count_ok = 0
+            admin_count_all = 0
+            admin_count = 0
+            self.out2('Joining ways')
+            for (k, v) in admin_relations.items():
+                admin_count_all = admin_count_all + 1
+                if v['admin_level'] > 4 and v['admin_level'] <= 6:
+                    self.out2(f"osmid={k} level={v['admin_level']} name={v['name'].encode('utf-8')}", end="")
+                    way, status = fix_polygon(v['ways'], 0)
+                    if way is None:
+                        # si esta roto, buscar en la base de datos si hay uno con ese id y usar ese way
+                        self.out2(" ERROR")
+                        dbadminarea = AdministrativeArea.objects.filter(osm_id=v['osm_id'], osm_type=v['osm_type'])
+                        if dbadminarea:
+                            way = dbadminarea[0].geometry
+                    else:
+                        admin_count = admin_count + 1
+                        self.out2(f" OK -> {len(way)}")
+                        # last point equals first
+                        admin_count_ok = admin_count_ok + 1
+                        try:
+                            v['geometry'] = Polygon(way)
+                            admin_areas[v['admin_level']].append(v)
+                        except Exception as e:
+                            try:
+                                self.out2(f" {e}, retry as multipolygon")
+                                mp = []
+                                for p in way:
+                                    mp.append(Polygon(p))
+                                v['geometry'] = MultiPolygon(mp)
+                                admin_areas[v['admin_level']].append(v)
+                            except Exception as e2:
+                                self.out2(f" {e2}, error")
+            self.out2(f"TOTALS: {admin_count_all} {admin_count} {admin_count_ok}, {len(admin_areas)}")
+
+            # TODO: add tests!
+            # from django.contrib.gis.geos import LineString, Polygon
+
+            # admin_areas = [
+            #     [],
+            #     [],
+            #     [],
+            #     [],
+            #     [],
+            #     [
+            #         {
+            #             'geometry': Polygon([[0,0], [5,0], [5,5], [0,0]]),
+            #             'admin_level': 5,
+            #             'name': 'big1',
+            #             'osm_id': '123120',
+            #         },
+            #         {
+            #             'geometry': Polygon([[0,0], [5,0], [5,-5], [0,0]]),
+            #             'admin_level': 5,
+            #             'name': 'big2',
+            #             'osm_id': '123121',
+            #         }
+            #     ],
+            #     [
+            #         {
+            #             'geometry': Polygon([[0,0], [4,0], [4,4], [0,0]]),
+            #             'admin_level': 6,
+            #             'name': 'small1',
+            #             'osm_id': '123122',
+            #         },
+            #         {
+            #             'geometry': Polygon([[0,0], [4,0], [4,-4], [0,0]]),
+            #             'admin_level': 6,
+            #             'name': 'small2',
+            #             'osm_id': '123123',
+            #         }
+            #     ],
+            #     [],
+            #     [],
+            #     [],
+            #     [],
+            #     [],
+            #     [],
+            # ]
+            # import pdb; pdb.set_trace()
+            mock_argentina_geometry = Polygon([[0, 0], [1, 1], [2, 2], [0, 0]])
+            def get_parent_aa(node, geometry):
+                if node['data']['geometry'] is mock_argentina_geometry or node['data']['geometry'].covers(geometry):
+                    parent_aa = None
+                    for child in node['children']:
+                        parent_aa = get_parent_aa(child, geometry)
+                        if parent_aa is not None:
+                            break
+                    if parent_aa is None:
+                        return node
+                    else:
+                        return parent_aa
+                else:
+                    return None
+
+            tree = {'children': [], 'data': {'geometry': mock_argentina_geometry, 'osm_id': '0', 'osm_type': 'r', 'name': 'Argentina', 'tags': {}}}
+            for li in admin_areas:
+                # aa = admin area
+                for aa in li:
+                    parent_aa = get_parent_aa(tree, aa['geometry'])
+                    aa.pop('admin_level')
+                    aa.pop('ways')
+                    if parent_aa is None:
+                        tree['children'].append({'children': [], 'data': aa})
+                    else:
+                        parent_aa['children'].append({'children': [], 'data': aa})
+
+            def print_tree(node, level=0):
+                print(f'{" " * level} {level} {node["data"]["name"].encode("utf-8")}')
+                for node in node['children']:
+                    print_tree(node, level + 1)
+
+            # print_tree(tree)
+
+            AdministrativeArea.load_bulk([tree])
+
+        #######################
         #  POIs de osm        #
         #######################
 
@@ -659,7 +853,10 @@ class Command(BaseCommand):
                     SELECT
                         osm_id,
                         way,
-                        trim(regexp_replace(upper(translate(name, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU')), E'AV\.|AVENIDA|CALLE|DIAGONAL|BOULEVARD', '')) as nom_normal,
+                        trim(regexp_replace(
+                            upper(translate(name, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU')),
+                            E'AV\.|AVENIDA|CALLE|DIAGONAL|BOULEVARD', ''
+                        )) as nom_normal,
                         name as nom
                     FROM
                         planet_osm_line as pol
@@ -747,7 +944,7 @@ class Command(BaseCommand):
             for o in Poi.objects.filter(slug__isnull=True):
                 o.save()
                 i = i + 1
-                if i % 50 == 0 and time.time()-start > 1:
+                if i % 50 == 0 and time.time() - start > 1:
                     start = time.time()
                     self.out2('{}/{} ({:2.0f}%)'.format(i, total, i * 100.0 / total))
 
@@ -795,9 +992,9 @@ class Command(BaseCommand):
                 if (i * 100.0 / total) % 1 == 0:
                     self.out2('{:2.0f}%'.format(i * 100.0 / total))
 
-        #self.out1('Eliminando tablas no usadas')
-        #cu.execute('drop table planet_osm_roads;')
-        #cu.execute('drop table planet_osm_polygon;')
+        # self.out1('Eliminando tablas no usadas')
+        # cu.execute('drop table planet_osm_roads;')
+        # cu.execute('drop table planet_osm_polygon;')
         # cx.commit()
         # cx.close()
 

@@ -1,9 +1,13 @@
 from django.conf.urls import url
 from apps.core.views import index, ver_parada, redirect_nuevas_urls, ver_ciudad, ver_mapa_ciudad, ver_linea, ver_recorrido
+from apps.catastro.views import administrativearea
 
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+
+    url(r'^a/(?P<osm_type>[^\d])(?P<osm_id>[^/]+)/(?P<slug>[^/]+)/$', administrativearea, name='administrativearea'),
+    url(r'^a/(?P<osm_type>[^\d])(?P<osm_id>[^/]+)', administrativearea, name='administrativearea_redirect'),
 
     # Paradas
     url(r'^parada/(?P<id>[\d]+)/$', ver_parada, name='ver_parada'),

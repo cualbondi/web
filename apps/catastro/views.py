@@ -1,14 +1,15 @@
 # -*- coding: UTF-8 -*-
 from django.shortcuts import (get_object_or_404, render)
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponsePermanentRedirect
 
-from apps.catastro.models import Poi, Ciudad, Interseccion
-from apps.core.models import Recorrido, Parada
+from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
+from apps.core.models import Recorrido, Parada, Linea
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from django.contrib.gis.db.models.functions import Distance
+from django.template.defaultfilters import slugify
 
 
 def fuzzy_like_query(q):
@@ -67,6 +68,7 @@ amenities = {
 def poiORint(request, slug=None):
     poi = None
     pois = Poi.objects.filter(slug=slug)
+
     try:
         if pois:
             poi = pois[0]
@@ -115,3 +117,36 @@ def poiORint(request, slug=None):
 
 def zona(request, slug=None):
     return HttpResponse(status=504)
+
+
+def administrativearea(request, osm_type=None, osm_id=None, slug=None):
+    aa = get_object_or_404(AdministrativeArea, osm_type=osm_type, osm_id=osm_id)
+    if slug is None or slug != slugify(aa.name):
+        # Redirect with slug
+        return HttpResponsePermanentRedirect(aa.get_absolute_url())
+    else:
+        template = 'catastro/ver_administrativearea.html'
+        if (request.GET.get("dynamic_map")):
+            template = 'core/ver_obj_map.html'
+        aa_geometry = aa.geometry.simplify(0.02).ewkt
+        lineas = Linea.objects \
+            .filter(recorridos__ruta__intersects=aa_geometry) \
+            .order_by('nombre') \
+            .annotate(dcount=Count('id')) \
+            .defer('envolvente')
+        pois = Poi \
+            .objects \
+            .filter(latlng__intersects=aa_geometry) \
+            .order_by('?') \
+            [:30]
+        ps = Parada.objects.filter(latlng__intersects=aa_geometry)
+        return render(
+            request,
+            template,
+            {
+                'obj': aa,
+                'paradas': ps,
+                'lineas': lineas,
+                'pois': pois
+            }
+        )

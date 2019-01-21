@@ -150,6 +150,62 @@ def isMultiLineString(way):
     return isinstance(way[0][0][0], (int, float))
 
 
+def isClosedMultiPolygon(way):
+    isClosed = True
+    for w in way:
+        isClosed = isClosed and isinstance(w[0], (int, float)) or \
+        ( \
+            isinstance(w[0][0], (int, float)) and \
+            w[0][0] == w[-1][0] and \
+            w[0][1] == w[-1][1] \
+        )
+    return isClosed
+
+
+def isOpenMultiPolygon(way):
+    return not isClosedMultiPolygon(way)
+
+
+def fix_polygon(way, tolerance=0):
+    """ tries to sort and fix the polygon into a closed multipolygon """
+
+    try:
+
+        if len(way) == 0:
+            return None, '5: broken, empty'
+        if isClosedMultiPolygon(way):
+            return way, '0: ok'
+        if isOpenMultiPolygon(way):
+            passed = first_pass(way[:])
+            if isClosedMultiPolygon(passed):
+                # print('SAFE first_pass!')
+                return passed, '1: ok, first_pass'
+            sorted = sort_ways(way)
+            sorted_passed = first_pass(sorted)
+            if isClosedMultiPolygon(sorted_passed):
+                # print('SAFE sorted!')
+                return sorted_passed, '2: broken, sort'
+            if tolerance > 0:
+                tolerated = join_ways(way, tolerance)
+                if isClosedMultiPolygon(tolerated):
+                    # print('SAFE tolerance!')
+                    return tolerated, '3: broken, tolerance'
+            if tolerance > 0:
+                tolerated_sorted = join_ways(sorted, tolerance)
+                if isClosedMultiPolygon(tolerated_sorted):
+                    # print('SAFE tolerance!')
+                    return tolerated_sorted, '3b: broken, sort + tolerance'
+
+            # print(len(way))
+            # print(way.ewkt)
+
+        return None, '4: broken'
+
+    except Exception as e:
+        return None, '9: ERROR PROCESSING: {}'.format(str(e))
+
+
+
 def fix_way(way, tolerance=0):
     """ tries to sort and fix the way into a linestring """
 

@@ -84,6 +84,7 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
+    'treebeard',
 ]
 LOCAL_APPS = [
     'apps.usuarios.apps.UsuariosConfig',
@@ -349,3 +350,7 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 SHELL_PLUS_PRINT_SQL = True
+
+# This is to stop the engine doing a SELECT postgis_version() on every request
+# remember to change the version when upgrading postgis
+POSTGIS_VERSION = (2, 5, 0, )
