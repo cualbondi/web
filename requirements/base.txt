@@ -1,6 +1,6 @@
 Pillow==5.4.1  # https://github.com/python-pillow/Pillow
 pytz==2018.9  # https://github.com/stub42/pytz
-argon2-cffi==18.3.0  # https://github.com/hynek/argon2_cffi
+argon2-cffi==19.1.0  # https://github.com/hynek/argon2_cffi
 
 # Django
 # ------------------------------------------------------------------------------
