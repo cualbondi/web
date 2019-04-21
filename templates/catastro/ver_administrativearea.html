@@ -1,57 +1,61 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Cómo llegar a {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %} - Cualbondi{% endblock %}
-{% block meta_description %}Cómo llegar a {{poi.nom|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}.{% endblock %}
+{% block title %}Cómo llegar a {{obj.name|title}}{% if amenity %} ({{amenity}}) {% endif %}{% if parent %} en {{parent.nombre|title}}{% endif %} - Cualbondi{% endblock %}
+{% block meta_description %}Cómo llegar a {{obj.name|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{obj.name|title}}{% if parent %} en {{parent.nombre|title}}{% endif %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
-    <meta property="og:type"   content="cualbondi:punto_de_interes" />
-    <meta property="og:url"    content="{{ HOME_URL }}{{ poi.get_absolute_url }}" />
-    <meta property="og:title"  content="Como llegar a {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}" />
-    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{poi.nom|title}}. Entra para ver como llegar desde donde estes ahora" />
-    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ poi.img_cuadrada.url }}" />{% endif %}
+    <meta property="og:type"   content="cualbondi:administrative_area" />
+    <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
+    <meta property="og:title"  content="Como llegar a {{obj.name|title}}{% if parent %} en {{parent.nombre|title}}{% endif %}" />
+    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{obj.name|title}}. Entra para ver como llegar desde donde estes ahora" />
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
     <div itemscope itemtype="http://schema.org/Place">
-        <h1>¿Cómo llegar a <span itemprop="name">{{poi.nom}}</span>?</h1>
-        <link itemprop="url" content="{{HOME_URL}}{{poi.get_absolute_url}}" />
+        <h1><span itemprop="name">{{obj.name|title}}</span></h1>
+        <link itemprop="url" content="{{HOME_URL}}{{obj.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-            <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:"f"}}" />
-            <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:"f"}}" />
+            <meta itemprop="latitude" content="{{obj.latlng.1|stringformat:'f'}}" />
+            <meta itemprop="longitude" content="{{obj.latlng.0|stringformat:'f'}}" />
         </div>
         <div>
             {% if amenity %}
                 <span style="float:right" class="label label-default">{{amenity}}</span>
             {% endif %}
-            {% if poi.tags.website %}
-                <a href="{{poi.tags.website}}" target="_blank">Ir al sitio web</a>
+            {% if obj.tags.website %}
+                <a href="{{obj.tags.website}}" target="_blank">Ir al sitio web</a>
             {% endif %}
         </div>
         <div>
-            {% if poi.tags.phone %}
-                <span>Telefono: <a href="tel:{{poi.tags.phone}}">{{poi.tags.phone}}</a></span>
+            {% if obj.tags.phone %}
+                <span>Telefono: <a href="tel:{{obj.tags.phone}}">{{obj.tags.phone}}</a></span>
             {% endif %}
-            {% if poi.tags.email %}
-                <a href="mailto:{{poi.tags.email}}">{{poi.tags.email}}</div>
+            {% if obj.tags.email %}
+                <a href="mailto:{{obj.tags.email}}">{{obj.tags.email}}</div>
             {% endif %}
         </div>
-        {% if poi.tags.operator %}
-            <div>{{poi.tags.operator}}</div>
+        {% if obj.tags.operator %}
+            <div>{{obj.tags.operator}}</div>
         {% endif %}
-        {% if poi.tags.description %}
-            <div>{{poi.tags.description}}</div>
+        {% if obj.tags.description %}
+            <div>{{obj.tags.description}}</div>
         {% endif %}
     </div>
 
+    {% for ancestor in ancestors %}
+        <a href="{{HOME_URL}}{{ancestor.get_absolute_url}}">{{ancestor.name}}</a>
+    {% endfor %}
+
     <div class="thumbnail">
-        <a href="/mapa/{{ciudad_actual.slug}}/geolocation|{{poi.latlng.0|stringformat:"f"}},{{poi.latlng.1|stringformat:"f"}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
-        {% if poi.img_panorama %}
+        <a href="/mapa/{{parent.slug}}/geolocation|{{obj.latlng.0|stringformat:'f'}},{{obj.latlng.1|stringformat:'f'}},{{obj.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
+        {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;">
-            <img src="/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}." />
+            <img src="/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
         </div>
         {% endif %}
     </div>
@@ -77,6 +81,22 @@
         {% endfor %}
     </div>
 
+
+    {% if children %}
+        <div class="row-fluid">
+            <h2>Lugares</h2>
+            <ul>
+                {% for child in children %}
+                <li>
+                    <a href="{{HOME_URL}}{{child.get_absolute_url}}">{{child.name}}</a>
+                    <small>({{child.recorridos_count}})</small>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+
     {% if paradas %}
         <h2>Paradas cercanas</h2>
         <ul>
@@ -95,8 +115,8 @@
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:"f"}}" />
-                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:"f"}}" />
+                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />
+                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:'f'}}" />
                 </div>
             </li>
             {% endfor %}

@@ -12,8 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gdal-bin \
     libspatialindex-dev \
     postgresql-client \
-    libboost-all-dev \
+    libboost-python-dev \
     libbz2-dev \
+    zlib1g-dev \
     gcc \
     g++ \
     git \

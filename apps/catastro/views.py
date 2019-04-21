@@ -5,10 +5,9 @@ from django.http import HttpResponse, HttpResponsePermanentRedirect
 from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
 from apps.core.models import Recorrido, Parada, Linea
 
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
-from django.db.models import Prefetch, Count
-from django.contrib.gis.db.models.functions import Distance
+from django.db.models import Prefetch, Count, F, OuterRef, Subquery, IntegerField
+from django.contrib.gis.db.models.functions import GeoFunc, Distance, Cast, Value
 from django.template.defaultfilters import slugify
 
 
@@ -68,6 +67,23 @@ def poi(request, osm_type, osm_id, slug):
     poi = get_object_or_404(Poi, osm_type=osm_type, osm_id=osm_id)
     if slug != slugify(poi.nom):
         return HttpResponsePermanentRedirect(poi.get_absolute_url())
+
+
+def poiORint(request, slug=None):
+    poi = None
+    pois = Poi.objects.filter(slug=slug)
+
+    try:
+        if pois:
+            poi = pois[0]
+        else:
+            poi = get_object_or_404(Interseccion, slug=slug)
+    except Exception:
+        pois = fuzzy_like_query(slug)
+        slug = slug.replace('-', ' ')
+        return render(request, 'catastro/ver_poi-404.html', {'slug': slug, 'pois': pois}, status=404)
+    # TODO: resolver estas queries en 4 threads
+    #       ver https://stackoverflow.com/a/12542927/912450
     recorridos = Recorrido.objects \
         .filter(ruta__dwithin=(poi.latlng, 0.002)) \
         .select_related('linea') \
@@ -102,20 +118,15 @@ def poi(request, osm_type, osm_id, slug):
     )
 
 
-@csrf_exempt
-@require_GET
-def poiORint(request, slug=None):
-    # poi = get_object_or_404(EntityRedirect, old_url=f'{slug}')
-    # return HttpResponsePermanentRedirect(poi.get_absolute_url())
-    pass
-
-
-def zona(request, slug=None):
-    return HttpResponse(status=504)
+class Simplify(GeoFunc):
+    def __init__(self, expression, tolerance=0.02, **extra):
+        super().__init__(expression, tolerance, **extra)
 
 
 def administrativearea(request, osm_type=None, osm_id=None, slug=None):
-    aa = get_object_or_404(AdministrativeArea, osm_type=osm_type, osm_id=osm_id)
+    print(osm_type, osm_id, slug)
+    qs = AdministrativeArea.objects.defer('geometry').annotate(geometry_simplified=Simplify(F('geometry'), 0.02))
+    aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
     if slug is None or slug != slugify(aa.name):
         # Redirect with slug
         return HttpResponsePermanentRedirect(aa.get_absolute_url())
@@ -123,23 +134,39 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
         template = 'catastro/ver_administrativearea.html'
         if (request.GET.get("dynamic_map")):
             template = 'core/ver_obj_map.html'
-        aa_geometry = aa.geometry.simplify(0.02).ewkt
-        lineas = Linea.objects \
-            .filter(recorridos__ruta__intersects=aa_geometry) \
-            .order_by('nombre') \
-            .annotate(dcount=Count('id')) \
-            .defer('envolvente')
-        pois = Poi \
-            .objects \
-            .filter(latlng__intersects=aa_geometry) \
-            .order_by('?') \
-            [:30]
-        ps = Parada.objects.filter(latlng__intersects=aa_geometry)
+        lineas = None
+        pois = None
+        ps = None
+        if aa.geometry_simplified is not None:
+            lineas = Linea.objects \
+                .filter(recorridos__ruta__intersects=aa.geometry_simplified) \
+                .order_by('nombre') \
+                .annotate(dcount=Count('id')) \
+                .defer('envolvente')
+            pois = Poi \
+                .objects \
+                .filter(latlng__intersects=aa.geometry_simplified) \
+                .order_by('?')[:30]
+            ps = Parada.objects.filter(latlng__intersects=aa.geometry_simplified)
+        ancestors = aa.get_ancestors()
+        children = aa.get_children().annotate(
+            recorridos_count=Cast(Subquery(
+                Recorrido.objects
+                .order_by()
+                .annotate(group=Value(1))
+                .filter(ruta__intersects=OuterRef('geometry'))
+                .values('group')
+                .annotate(count=Count('*'))
+                .values('count')
+            ), output_field=IntegerField())
+        ).filter(recorridos_count__gt=0).order_by('-recorridos_count', 'name')
         return render(
             request,
             template,
             {
                 'obj': aa,
+                'ancestors': ancestors,
+                'children': children,
                 'paradas': ps,
                 'lineas': lineas,
                 'pois': pois

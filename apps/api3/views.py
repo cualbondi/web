@@ -101,7 +101,7 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
                 for p in l.split('|'):
                     ps = p.split(',')
                     lp.append({'p': GEOSGeometry('POINT({} {})'.format(ps[0], ps[1]), srid=4326), 'r': int(ps[2])})
-            except:
+            except Exception:
                 raise exceptions.ValidationError(
                     {'detail': '\'l\' parameter malformed'}
                 )
@@ -186,10 +186,19 @@ class GeocoderViewSet(LoggingMixin, viewsets.GenericViewSet):
         Busca el valor del parámetro `q`
         usando varias fuentes según el formato del string de búsqueda
 
-         - **Geocoder** [Google] (ej: [12 1234](/api//geocoder/?q=12%201234&c=la-plata) / [12 n 1234](/api//geocoder/?q=12%20n%201234&c=la-plata) / [centenario 1234](/api//geocoder/?q=centenario%20n%201234&c=la-plata))
-         - **Intersección de calles** [OSM] (ej: [12 y 62](/api//geocoder/?q=12%20y%2062&c=la-plata) / perón y alvarez)
-         - **POI (Point Of Interest)** [OSM y Cualbondi] (ej: plaza rocha / hospital)
-         - **Zona (Barrio / Ciudad)** [Cualbondi] (ej: berisso / colegiales) (devuelve geocentro)
+         - **Geocoder** [Google]
+            - [12 1234](/api//geocoder/?q=12%201234&c=la-plata)
+            - [12 n 1234](/api//geocoder/?q=12%20n%201234&c=la-plata)
+            - [centenario 1234](/api//geocoder/?q=centenario%20n%201234&c=la-plata))
+         - **Intersección de calles** [OSM]
+            - [12 y 62](/api//geocoder/?q=12%20y%2062&c=la-plata)
+            - perón y alvarez
+         - **POI (Point Of Interest)** [OSM y Cualbondi]
+            - plaza rocha
+            - hospital
+         - **Zona (Barrio / Ciudad)** [Cualbondi] (devuelve geocentro)
+            - berisso
+            - colegiales
 
         El geocoder usa varias fuentes y técnicas, entre ellas fuzzy search.
         Por esto, devuelve un valor de "precision" para cada registro.
@@ -205,7 +214,7 @@ class GeocoderViewSet(LoggingMixin, viewsets.GenericViewSet):
     def list(self, request):
         q = request.query_params.get('q', None)
         c = request.query_params.get('c', None)
-        mk = request.query_params.get('mk', None)
+        # mk = request.query_params.get('mk', None)
         if not q:
             raise exceptions.ValidationError(
                 {'detail': 'expected \'q\' parameter'}

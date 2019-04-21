@@ -24,6 +24,7 @@ class Linea(models.Model):
     cp = models.CharField(max_length=20, blank=True, null=True)
     telefono = models.CharField(max_length=200, blank=True, null=True)
     envolvente = models.PolygonField(blank=True, null=True)
+    osm_id = models.BigIntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.nombre

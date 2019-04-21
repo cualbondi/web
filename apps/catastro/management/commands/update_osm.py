@@ -678,7 +678,7 @@ class Command(BaseCommand):
                             'osm_type': 'r',
                             'ways': ways,
                             'admin_level': int(r.tags['admin_level']),
-                            'name': r.tags['name'], #.encode('utf-8').strip(),
+                            'name': r.tags['name'],  # .encode('utf-8').strip(),
                             'tags': r.tags.__dict__,
                         }
                         # this.out2(f"REL {r.id} {r.tags['name'].encode('utf-8').strip()}")
@@ -692,14 +692,14 @@ class Command(BaseCommand):
                         for node in w.nodes:
                             linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
                         if linestring[0][0] == linestring[-1][0] and linestring[0][1] == linestring[-1][1]:
-                            if int(w.tags['admin_level']) > 4 and int(w.tags['admin_level']) <= 6:
+                            if int(w.tags['admin_level']) > 4 and int(w.tags['admin_level']) <= 8:
                                 admin_areas[int(w.tags['admin_level'])].append({
                                     'osm_id': w.id,
                                     'osm_type': 'w',
                                     'geometry': Polygon(linestring),
                                     'admin_level': int(w.tags['admin_level']),
-                                    'name': w.tags['name'], #.encode('utf-8').strip(),
-                                    'tags': r.tags.__dict__,
+                                    'name': w.tags['name'],  # .encode('utf-8').strip(),
+                                    'tags': w.tags.__dict__,
                                 })
 
                     # fill relations that are admin areas
@@ -726,7 +726,7 @@ class Command(BaseCommand):
             self.out2('Joining ways')
             for (k, v) in admin_relations.items():
                 admin_count_all = admin_count_all + 1
-                if v['admin_level'] > 4 and v['admin_level'] <= 6:
+                if v['admin_level'] > 4 and v['admin_level'] <= 8:
                     self.out2(f"osmid={k} level={v['admin_level']} name={v['name'].encode('utf-8')}", end="")
                     way, status = fix_polygon(v['ways'], 0)
                     if way is None:
@@ -745,7 +745,7 @@ class Command(BaseCommand):
                             admin_areas[v['admin_level']].append(v)
                         except Exception as e:
                             try:
-                                self.out2(f" {e}, retry as multipolygon")
+                                self.out2(f" {e}, retrying as multipolygon")
                                 mp = []
                                 for p in way:
                                     mp.append(Polygon(p))
@@ -821,7 +821,10 @@ class Command(BaseCommand):
                 for aa in li:
                     parent_aa = get_parent_aa(tree, aa['geometry'])
                     aa.pop('admin_level')
-                    aa.pop('ways')
+                    if 'ways' in aa:
+                        aa.pop('ways')
+                    else:
+                        self.out2(f" {aa['osm_id']}: {aa['name'].encode('utf-8').strip()}, does not have 'ways' attribute")
                     if parent_aa is None:
                         tree['children'].append({'children': [], 'data': aa})
                     else:
@@ -886,14 +889,15 @@ class Command(BaseCommand):
             self.out2('Generando POIs a partir de poligonos normalizando nombres')
             cu.execute("""
                 INSERT INTO
-                    catastro_poi(osm_id, latlng, nom_normal, nom, tags)
+                    catastro_poi(osm_id, latlng, nom_normal, nom, tags, osm_type)
                 (
                     SELECT
                         osm_id,
                         ST_Centroid(way),
                         upper(translate(pop.name, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ"', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU ')),
                         pop.name || coalesce(', ' || zo.name, ''),
-                        tags
+                        tags,
+                        'w'
                     FROM
                         planet_osm_polygon as pop
                         left outer join catastro_zona zo on (ST_Intersects(pop.way, zo.geo))
@@ -914,14 +918,15 @@ class Command(BaseCommand):
             self.out2('Generando POIs a partir de puntos normalizando nombres')
             cu.execute("""
                 INSERT INTO
-                    catastro_poi(osm_id, latlng, nom_normal, nom, tags)
+                    catastro_poi(osm_id, latlng, nom_normal, nom, tags, osm_type)
                 (
                     SELECT
                         osm_id,
                         way,
                         upper(translate(pop.name, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ"', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU ')),
                         pop.name || coalesce(', ' || zo.name, ''),
-                        tags
+                        tags,
+                        'n'
                     FROM
                         planet_osm_point as pop
                         left outer join catastro_zona zo on (ST_Intersects(pop.way, zo.geo))

@@ -142,39 +142,46 @@ def ver_linea(request, nombre_ciudad, nombre_linea):
     if ( request.GET.get("dynamic_map") ):
         template = "core/ver_obj_map.html"
 
-    return render(request, template,
-                              {'obj': linea_actual,
-                               'ciudad_actual': ciudad_actual,
-                               'linea_actual': linea_actual,
-                               'recorridos': recorridos
-                               })
+    return render(
+        request,
+        template,
+        {
+            'obj': linea_actual,
+            'ciudad_actual': ciudad_actual,
+            'linea_actual': linea_actual,
+            'recorridos': recorridos
+        }
+    )
 
 
 import threading
 
+
 class PararellThread(threading.Thread):
-    def __init__(self, qs):
+    def __init__(self, qs, i):
         threading.Thread.__init__(self)
         self.qs = qs
+        self.i = i
         self.result = []
 
     def run(self):
         self.result = list(self.qs)
 
+
 def get_objects_in_pararell(querysets):
     threads = []
-    result = []
-    for qs in querysets:
-        t = PararellThread(qs)
+    results = [None] * len(querysets)
+    for i in range(0, len(querysets)):
+        qs = querysets[i]
+        t = PararellThread(qs, i)
         t.start()
         threads.append(t)
 
     for thread in threads:
         thread.join()
-        for obj in thread.result:
-            result.append(obj)
+        results[thread.i] = thread.result
 
-    return result
+    return results
 
 
 @csrf_exempt
