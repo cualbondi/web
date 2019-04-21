@@ -152,7 +152,7 @@ class Poi(models.Model):
         super(Poi, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('poi', kwargs={'slug': self.slug})
+        return reverse('poi_old', kwargs={'slug': self.slug})
 
 
 class Interseccion(models.Model):
