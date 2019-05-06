@@ -4,6 +4,7 @@ from .models import Provincia, Ciudad, Poicb, Zona, ImagenCiudad, Administrative
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
+
 class CustomAdmin(admin.OSMGeoAdmin):
     search_fields = ['nombre', 'variantes_nombre']
     exclude = ()
@@ -12,8 +13,10 @@ class CustomAdmin(admin.OSMGeoAdmin):
 class ZonaAdmin(admin.OSMGeoAdmin):
     search_fields = ['name']
 
+
 class AdministrativeAreaAdmin(TreeAdmin):
     form = movenodeform_factory(AdministrativeArea)
+
 
 admin.site.register(Provincia, CustomAdmin)
 admin.site.register(Ciudad, CustomAdmin)

@@ -212,15 +212,11 @@ TEMPLATES = [
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
+                # 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
-                'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'apps.core.context_processors.lista_ciudades',
-                'apps.core.context_processors.get_ciudad_actual',
                 'apps.core.context_processors.home_url',
                 'apps.core.context_processors.facebook_app_id',
 
@@ -272,7 +268,7 @@ RADIO_ORIGEN_DEFAULT = 200
 RADIO_DESTINO_DEFAULT = 200
 LONGITUD_PAGINA = 5
 
-HOME_URL = env.get_value('HOME_URL', default='https://cualbondi.com.ar')
+HOME_URL = env.get_value('HOME_URL', default='https://localhost:8080')
 FACEBOOK_APP_ID = env.get_value('FACEBOOK_APP_ID', default='')
 API_URL = env.get_value('API_URL', default='')
 
@@ -282,6 +278,7 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
     ],
+    'EXCEPTION_HANDLER': 'apps.api3.exceptions.exception_handler',
 }
 DRFSO2_PROPRIETARY_BACKEND_NAME = 'Facebook'
 AUTHENTICATION_BACKENDS = [

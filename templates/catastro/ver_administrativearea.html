@@ -68,7 +68,7 @@
         <div class="span2">
             <ul class="nav nav-pills nav-stacked">
                 {% for linea in columna %}
-                <li><a href={{linea.slug}} />{{linea.nombre}}</a></li>
+                <li><a href="{{linea.get_absolute_url}}">{{linea.nombre}}</a></li>
                 {% endfor %}
             </ul>
         </div>

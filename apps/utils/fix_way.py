@@ -153,12 +153,11 @@ def isMultiLineString(way):
 def isClosedMultiPolygon(way):
     isClosed = True
     for w in way:
-        isClosed = isClosed and isinstance(w[0], (int, float)) or \
-        ( \
-            isinstance(w[0][0], (int, float)) and \
-            w[0][0] == w[-1][0] and \
-            w[0][1] == w[-1][1] \
-        )
+        isClosed = isClosed and (isinstance(w[0], (int, float)) or (
+            isinstance(w[0][0], (int, float)) and
+            w[0][0] == w[-1][0] and
+            w[0][1] == w[-1][1]
+        ))
     return isClosed
 
 

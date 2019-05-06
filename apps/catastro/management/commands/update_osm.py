@@ -1,21 +1,25 @@
-from django.core.management.base import BaseCommand
-from urllib import request
+import traceback
 import subprocess
 import os
 import sys
+import time
+
+
+from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
+from django.db import connection
+from django.contrib.gis.geos import LineString, Polygon, MultiPolygon
+
 from apps.catastro.models import Poi, Interseccion, Calle, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog
 from apps.editor.models import RecorridoProposed
 from apps.utils.fix_way import fix_way, fix_polygon
-from django.contrib.auth import get_user_model
-from django.db import connection
-from datetime import datetime
-import time
 
 import osmium
 import geopandas as gpd
+from datetime import datetime
+from urllib import request
 from psycopg2.extras import execute_values
-from django.contrib.gis.geos import LineString, Polygon, MultiPolygon
 
 
 class Command(BaseCommand):
@@ -659,6 +663,10 @@ class Command(BaseCommand):
 
         if options['admin_areas']:
             self.out1('Admin Areas')
+
+            ADMIN_LEVEL_MIN = 4
+            ADMIN_LEVEL_MAX = 8
+
             admin_areas = [[] for i in range(12)]  # index: admin_level, value
             admin_relations = {}  # index: admin_level, value
             admin_relations_ways_ids = {}
@@ -692,11 +700,13 @@ class Command(BaseCommand):
                         for node in w.nodes:
                             linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
                         if linestring[0][0] == linestring[-1][0] and linestring[0][1] == linestring[-1][1]:
-                            if int(w.tags['admin_level']) > 4 and int(w.tags['admin_level']) <= 8:
+                            if int(w.tags['admin_level']) >= ADMIN_LEVEL_MIN and int(w.tags['admin_level']) <= ADMIN_LEVEL_MAX:
+                                poly = Polygon(linestring)
                                 admin_areas[int(w.tags['admin_level'])].append({
                                     'osm_id': w.id,
                                     'osm_type': 'w',
-                                    'geometry': Polygon(linestring),
+                                    'geometry': poly,
+                                    'geometry_simple': poly.simplify(0.01, True),
                                     'admin_level': int(w.tags['admin_level']),
                                     'name': w.tags['name'],  # .encode('utf-8').strip(),
                                     'tags': w.tags.__dict__,
@@ -726,9 +736,9 @@ class Command(BaseCommand):
             self.out2('Joining ways')
             for (k, v) in admin_relations.items():
                 admin_count_all = admin_count_all + 1
-                if v['admin_level'] > 4 and v['admin_level'] <= 8:
+                if v['admin_level'] >= ADMIN_LEVEL_MIN and v['admin_level'] <= ADMIN_LEVEL_MAX:
                     self.out2(f"osmid={k} level={v['admin_level']} name={v['name'].encode('utf-8')}", end="")
-                    way, status = fix_polygon(v['ways'], 0)
+                    way, status = fix_polygon(v['ways'], 1000)
                     if way is None:
                         # si esta roto, buscar en la base de datos si hay uno con ese id y usar ese way
                         self.out2(" ERROR")
@@ -741,17 +751,28 @@ class Command(BaseCommand):
                         # last point equals first
                         admin_count_ok = admin_count_ok + 1
                         try:
-                            v['geometry'] = Polygon(way)
+                            poly = Polygon(way)
+                            v['geometry'] = poly
+                            v['geometry_simple'] = poly.simplify(0.01, True)
                             admin_areas[v['admin_level']].append(v)
                         except Exception as e:
                             try:
                                 self.out2(f" {e}, retrying as multipolygon")
                                 mp = []
                                 for p in way:
-                                    mp.append(Polygon(p))
-                                v['geometry'] = MultiPolygon(mp)
+                                    p_fixed, status = fix_polygon(p, 1000)
+                                    if p_fixed:
+                                        try:
+                                            mp.append(Polygon(p_fixed))
+                                        except Exception as e3:
+                                            print(p_fixed)
+                                            self.out2(f" {e3} {status}, skipping fragment")
+                                poly = MultiPolygon(mp)
+                                v['geometry'] = poly
+                                v['geometry_simple'] = poly.simplify(0.01, True)
                                 admin_areas[v['admin_level']].append(v)
                             except Exception as e2:
+                                traceback.print_exc()
                                 self.out2(f" {e2}, error")
             self.out2(f"TOTALS: {admin_count_all} {admin_count} {admin_count_ok}, {len(admin_areas)}")
 
@@ -801,21 +822,40 @@ class Command(BaseCommand):
             # ]
             # import pdb; pdb.set_trace()
             mock_argentina_geometry = Polygon([[0, 0], [1, 1], [2, 2], [0, 0]])
-            def get_parent_aa(node, geometry):
-                if node['data']['geometry'] is mock_argentina_geometry or node['data']['geometry'].covers(geometry):
-                    parent_aa = None
-                    for child in node['children']:
-                        parent_aa = get_parent_aa(child, geometry)
-                        if parent_aa is not None:
-                            break
-                    if parent_aa is None:
-                        return node
-                    else:
-                        return parent_aa
-                else:
-                    return None
 
-            tree = {'children': [], 'data': {'geometry': mock_argentina_geometry, 'osm_id': '0', 'osm_type': 'r', 'name': 'Argentina', 'tags': {}}}
+            def get_parent_aa(node, geometry):
+                try:
+                    if node['data']['geometry_simple'] is mock_argentina_geometry or node['data']['geometry_simple'].covers(geometry):
+                        parent_aa = None
+                        for child in node['children']:
+                            parent_aa = get_parent_aa(child, geometry)
+                            if parent_aa is not None:
+                                break
+                        if parent_aa is None:
+                            return node
+                        else:
+                            return parent_aa
+                    else:
+                        return None
+                except Exception:
+                    # print('node.geometry', node['data']['geometry'])
+                    print('node.data', node['data']['name'].encode('utf-8'))
+                    print('node.osm_id', node['data']['osm_id'])
+                    print('node.osm_type', node['data']['osm_type'])
+                    traceback.print_exc()
+                    raise
+
+            tree = {
+                'children': [],
+                'data': {
+                    'geometry': mock_argentina_geometry,
+                    'geometry_simple': mock_argentina_geometry,
+                    'osm_id': '0',
+                    'osm_type': 'r',
+                    'name': 'Argentina',
+                    'tags': {}
+                }
+            }
             for li in admin_areas:
                 # aa = admin area
                 for aa in li:

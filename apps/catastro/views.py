@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from django.shortcuts import (get_object_or_404, render)
-from django.http import HttpResponse, HttpResponsePermanentRedirect
+from django.http import HttpResponsePermanentRedirect
 
 from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
 from apps.core.models import Recorrido, Parada, Linea
@@ -124,7 +124,6 @@ class Simplify(GeoFunc):
 
 
 def administrativearea(request, osm_type=None, osm_id=None, slug=None):
-    print(osm_type, osm_id, slug)
     qs = AdministrativeArea.objects.defer('geometry').annotate(geometry_simplified=Simplify(F('geometry'), 0.02))
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
     if slug is None or slug != slugify(aa.name):

@@ -1,18 +1,18 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Línea {{linea_actual.nombre|title}} en {{ciudad_actual.nombre|title}} - Cualbondi{% endblock %}
-{% block meta_description %}Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{linea_actual.nombre|title}} que pasa por la ciudad de {{ciudad_actual.nombre|title}}.{% endblock %}
+{% block title %}Línea {{obj.nombre|title}} en {{administrativearea.nombre|title}} - Cualbondi{% endblock %}
+{% block meta_description %}Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por la ciudad de {{administrativearea.nombre|title}}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block custom_top_scripts %}
-    <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" /> 
-    <meta property="og:type"   content="cualbondi:linea" /> 
-    <meta property="og:url"    content="{{ HOME_URL }}{{ linea_actual.get_absolute_url }}" /> 
-    <meta property="og:title"  content="Línea {{linea_actual.nombre|title}}" /> 
-    <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{linea_actual.nombre|title}} que pasa por la ciudad de {{ciudad_actual.nombre|title}}" /> 
-    {% if linea_actual.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ linea_actual.img_cuadrada.url }}" />{% endif %}
+    <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
+    <meta property="og:type"   content="cualbondi:linea" />
+    <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
+    <meta property="og:title"  content="Línea {{obj.nombre|title}}" />
+    <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{administrativearea.nombre|title}}" />
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -24,37 +24,44 @@
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/{{ciudad_actual.slug}}/" itemprop="url">
-                <span itemprop="title">{{ciudad_actual.nombre}}</span>
+            <a href="{{ HOME_URL }}{{administrativearea.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{administrativearea.name}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/{{ciudad_actual.slug}}/{{linea_actual.slug}}/" itemprop="url">
-                <span itemprop="title">{{linea_actual.nombre}}</span>
+            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{obj.nombre}}</span>
             </a>
         </li>
     </ul>
 
     <div>
-        <h1 style="display:inline;">Linea {{linea_actual.nombre}}</h1>
+        <h1 style="display:inline;">Linea {{obj.nombre}}</h1>
         <div style="vertical-align: super;margin-left: 10px;" class="fb-like" data-layout="button" data-action="like" data-show-faces="false" data-share="false"></div>
     </div>
 
-    {% if linea_actual.info_empresa and linea_actual.info_terminal %}
+    {% if obj.info_empresa and obj.info_terminal %}
         <h2>Información de la empresa</h2>
-        <div>{{linea_actual.info_empresa}}</div>
-        <div>{{linea_actual.info_terminal}}</div>
+        <div>{{obj.info_empresa}}</div>
+        <div>{{obj.info_terminal}}</div>
     {% endif %}
 
     <div class="row-fluid">
-        <h2>Recorridos de la linea {{linea_actual.nombre}}</h2>
+        <h2>Recorridos de la linea {{obj.nombre}}</h2>
         {% for cols in recorridos|partition_horizontal:48 %}
             {% for columna in cols|dividir_columnas:3 %}
                 <div class="span4">
                     <ul class="nav nav-pills nav-stacked">
                     {% for recorrido in columna %}
-                        <li style="text-align:left"><a href={{recorrido.slug}}/>{{recorrido.nombre}}{% if recorrido.inicio and recorrido.fin %} <span class="light">de {{recorrido.inicio}} a {{recorrido.fin}}</span>{% endif %}</a></li>
+                        <li style="text-align:left">
+                            <a href={{recorrido.get_absolute_url}}>
+                                {{recorrido.nombre}}
+                                {% if recorrido.inicio and recorrido.fin %}
+                                    <span class="light">de {{recorrido.inicio}} a {{recorrido.fin}}</span>
+                                {% endif %}
+                            </a>
+                        </li>
                     {% endfor %}
                     </ul>
                 </div>
@@ -69,16 +76,16 @@
 
     {% include "ad_contenido.html"%}
 
-    {% if linea_actual.img_panorama %}
+    {% if obj.img_panorama %}
     <div class="thumbnail">
         <div id="map" style="background:lightblue;">
-            <img src="/{{ linea_actual.img_panorama.url }}" alt="Cobertura de transporte público de la línea {{ linea_actual.nombre }} en la ciudad de {{ ciudad_actual.nombre }}." />
+            <img src="/{{ obj.img_panorama.url }}" alt="Cobertura de transporte público de la línea {{ obj.nombre }} en {{ administrativearea.nombre }}." />
         </div>
     </div>
     {% endif %}
 
     <!--
-        <h2>Dejanos un comentario sobre la linea {{linea_actual.nombre}}</h2>
+        <h2>Dejanos un comentario sobre la linea {{obj.nombre}}</h2>
         <div id="disqus_thread"></div>
         <script type="text/javascript">
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */

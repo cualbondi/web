@@ -1,18 +1,18 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Recorrido {{recorrido_actual.nombre|title}} {% if recorrido_actual.inicio and recorrido_actual.fin %} desde {{recorrido_actual.inicio}} hasta {{recorrido_actual.fin}} {% endif %} de la linea {{linea_actual.nombre|title}}, en {{ciudad_actual.nombre|title}} - Cualbondi{% endblock %}
-{% block meta_description %}Toda la información sobre paradas, horarios y tarifas del recorrido {{recorrido_actual.nombre|title}} de la línea {{linea_actual.nombre|title}} desde {{recorrido_actual.inicio}} hasta {{recorrido_actual.fin}} en la ciudad de {{ciudad_actual.nombre|title}}: Descripción del recorrido de colectivo, micro, bus.{% endblock %}
+{% block title %}Recorrido {{obj.nombre|title}} {% if obj.inicio and obj.fin %} desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} de la linea {{linea.nombre|title}}, en {{administrativearea.name|title}} - Cualbondi{% endblock %}
+{% block meta_description %}Toda la información sobre paradas, horarios y tarifas del recorrido {{obj.nombre|title}} de la línea {{linea.nombre|title}} desde {{obj.inicio}} hasta {{obj.fin}} en la ciudad de {{administrativearea.name|title}}: Descripción del recorrido de colectivo, micro, bus.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block custom_top_scripts %}
-    <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" /> 
-    <meta property="og:type"   content="cualbondi:recorrido" /> 
-    <meta property="og:url"    content="{{ HOME_URL }}{{ recorrido_actual.get_absolute_url }}" /> 
-    <meta property="og:title"  content="{{linea_actual.nombre|title}} - {{recorrido_actual.nombre|title}}" /> 
-    <meta property="og:description"  content="Linea {{linea_actual.nombre|title}}, Ramal {{recorrido_actual.nombre|title}} en {{ciudad_actual.nombre|title}} - Cualbondi{% if recorrido_actual.inicio and recorrido_actual.fin %}, Recorrido desde {{recorrido_actual.inicio}} hasta {{recorrido_actual.fin}} {% endif %} en {{ciudad_actual.nombre|title}}: Descripción del recorrido de colectivo, micro, bus" /> 
-    {% if recorrido_actual.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ recorrido_actual.img_cuadrada.url }}" />{% endif %}
+    <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
+    <meta property="og:type"   content="cualbondi:recorrido" />
+    <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
+    <meta property="og:title"  content="{{linea.nombre|title}} - {{obj.nombre|title}}" />
+    <meta property="og:description"  content="Linea {{linea.nombre|title}}, Ramal {{obj.nombre|title}} en {{administrativearea.name|title}} - Cualbondi{% if obj.inicio and obj.fin %}, Recorrido desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} en {{administrativearea.name|title}}: Descripción del recorrido de colectivo, micro, bus" />
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -24,29 +24,29 @@
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/{{ciudad_actual.slug}}/" itemprop="url">
-                <span itemprop="title">{{ciudad_actual.nombre}}</span>
+            <a href="{{ HOME_URL }}{{administrativearea.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{administrativearea.name}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/{{ciudad_actual.slug}}/{{linea_actual.slug}}/" itemprop="url">
-                <span itemprop="title">{{linea_actual.nombre}}</span>
+            <a href="{{ HOME_URL }}{{linea.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{linea.nombre}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/{{ciudad_actual.slug}}/{{linea_actual.slug}}/{{recorrido_actual.slug}}/" itemprop="url">
-                <span itemprop="title">{{recorrido_actual.nombre}} {% if recorrido_actual.inicio and recorrido_actual.fin %}(de {{recorrido_actual.inicio}} a {{recorrido_actual.fin}}){% endif %}</span>
+            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{obj.nombre}} {% if obj.inicio and obj.fin %}(de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
             </a>
         </li>
     </ul>
-    
+
     <div>
         <h1>
-            Recorrido {{linea_actual.nombre}} {{recorrido_actual.nombre}}
+            Recorrido {{linea.nombre}} {{obj.nombre}}
             <span style="margin-left:5px;" class="fb-like" data-layout="button_count" data-action="like" data-colorscheme="light" data-show-faces="false" data-share="false"></span>
-            {% if recorrido_actual.inicio and recorrido_actual.fin %}<small>desde {{recorrido_actual.inicio}} hasta {{recorrido_actual.fin}}</small>{% endif %}
+            {% if obj.inicio and obj.fin %}<small>desde {{obj.inicio}} hasta {{obj.fin}}</small>{% endif %}
         </h1>
     </div>
 
@@ -69,19 +69,19 @@
             {% endfor %}
         </ol>
     {% else %}
-        {% if recorrido_actual.descripcion %}
+        {% if obj.descripcion %}
             <h2>Calles que componen este recorrido</h2>
-            <div>{{ recorrido_actual.descripcion }}</div>
+            <div>{{ obj.descripcion }}</div>
         {% endif %}
     {% endif %}
 
     {% include "ad_contenido.html"%}
 
-    {% if recorrido_actual.img_panorama %}
+    {% if obj.img_panorama %}
     <div class="thumbnail">
-	<a href="/editor/{{ recorrido_actual.id }}/" class="btn btn-primary" style="position:absolute; margin:6px">Modificar recorrido</a>
+	<a href="/editor/{{ obj.id }}/" class="btn btn-primary" style="position:absolute; margin:6px">Modificar recorrido</a>
         <div id="map" style="background:lightblue;">
-            <img src="/{{ recorrido_actual.img_panorama.url }}" alt="Mapa del recorrido {{ recorrido_actual.nombre }} de la línea {{ linea_actual.nombre }} en la ciudad de {{ ciudad_actual.nombre }}." />
+            <img src="/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en la ciudad de {{ administrativearea.name }}." />
         </div>
     </div>
     <br />
@@ -149,8 +149,8 @@
     {% endif %}
 
     <!--
-    <h2>Dejanos un comentario sobre el recorrido "{{linea_actual.nombre}} {{recorrido_actual.nombre}}"</h2>
-	<p>Si el recorrido esta mal, podés ayudar haciendo <a href="/editor/{{ recorrido_actual.id }}/">click acá</a></p>
+    <h2>Dejanos un comentario sobre el recorrido "{{linea.nombre}} {{obj.nombre}}"</h2>
+	<p>Si el recorrido esta mal, podés ayudar haciendo <a href="/editor/{{ obj.id }}/">click acá</a></p>
         <div id="disqus_thread"></div>
         <script type="text/javascript">
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */

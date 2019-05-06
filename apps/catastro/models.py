@@ -6,7 +6,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
-from treebeard.ns_tree import NS_Node
+from treebeard.mp_tree import MP_Node
 from .managers import (
     CiudadManager,
     ZonaManager,
@@ -231,7 +231,7 @@ class GoogleGeocoderCache(models.Model):
         unique_together = ('query', 'ciudad')
 
 
-class AdministrativeArea(NS_Node):
+class AdministrativeArea(MP_Node):
     TYPE_RELATION = 'r'
     TYPE_WAY = 'w'
     TYPE_NODE = 'n'
@@ -244,6 +244,7 @@ class AdministrativeArea(NS_Node):
     osm_id = models.BigIntegerField(db_index=True)
     name = models.TextField()
     geometry = models.GeometryField(spatial_index=True)
+    geometry_simple = models.GeometryField(spatial_index=True)
     tags = HStoreField()
     img_panorama = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
