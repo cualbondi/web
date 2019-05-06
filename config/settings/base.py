@@ -158,11 +158,15 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.core.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'apps.core.middleware.WhodidMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+]
+
+IGNORE_AUTH_URL_PATTERNS = [
+    '^/$',
 ]
 
 # STATIC
