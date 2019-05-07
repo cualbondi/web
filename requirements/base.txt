@@ -24,6 +24,6 @@ geopy==1.18.1 # https://github.com/geopy/geopy
 django-rest-framework-social-oauth2==1.1.0 # https://github.com/RealmTeam/django-rest-framework-social-oauth2
 geopandas==0.5.0
 pandas==0.24.2
-Shapely==1.6.4
+Shapely==1.6.4.post2
 Rtree==0.8.3
 osmium==2.15.2
