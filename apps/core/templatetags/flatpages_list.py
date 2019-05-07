@@ -34,7 +34,7 @@ class FlatpagesList(template.Node):
 
 
 @register.tag(name="flatpages_list")
-def do_flatpages_list(parser, token): 
+def do_flatpages_list(parser, token):
     m = re.search(r'^(\w+)( as \w+)?$', token.contents)
     if not m:
         raise template.TemplateSyntaxError("flatpages_list tag had invalid arguments")

@@ -60,33 +60,25 @@ def natural_sort_qs(qs, key):
 
 @require_http_methods(["GET"])
 def index(request):
+    administrativeareas = [
+        {
+            'name': 'La Plata',
+            'slug': 'partido-de-la-plata',
+        },
+    ]
     return render(
         request,
-        'core/seleccionar_ciudad.html'
+        'core/seleccionar_ciudad.html',
+        {
+            'administrativeareas': administrativeareas
+        }
     )
 
 
 @csrf_exempt
 @require_GET
-def ver_mapa_ciudad(request, nombre_ciudad):
-    desde = request.GET.get("desde")
-    hasta = request.GET.get("hasta")
-    slug_ciudad = slugify(nombre_ciudad)
-    ciudad_actual = get_object_or_404(Ciudad, slug=slug_ciudad, activa=True)
-    #        "default_lat":ciudad_actual.centro.coords[1],
-    #        "default_lon":ciudad_actual.centro.coords[0],
-#    pois = Poi.objects.filter(ciudad=ciudad_actual)
-#    comercios = Comercio.objects.filter(ciudad=ciudad_actual)
-
-    API_URL = settings.API_URL
-
-    return render(request, 'core/buscador.html', {
-                                    'es_vista_mapa': True,
-                                    'ciudad_actual': ciudad_actual,
-                                    'desde': desde,
-                                    'hasta': hasta,
-                                    'API_URL': API_URL,
-                              })
+def ver_mapa_ciudad(request, administrativearea_slug):
+    return redirect('https://localhost:8083' + request.path + '?' + request.GET.urlencode())
 
 
 @csrf_exempt
