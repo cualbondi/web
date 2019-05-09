@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from apps.core.views import index, ver_parada, ver_mapa_ciudad, ver_linea, ver_recorrido
+from apps.core.views import redirect_nuevas_urls
 from apps.catastro.views import administrativearea
 
 
@@ -18,17 +19,11 @@ urlpatterns = [
     # Paradas
     url(r'^parada/(?P<id>[\d]+)/$', ver_parada, name='ver_parada'),
 
-    # TODO: Redirects para las URLs viejas
+    # Redirects para las URLs viejas
+    url(r'^(?P<slug_ciudad>[\w-]+)/$', redirect_nuevas_urls),
+    url(r'^(?P<slug_ciudad>[\w-]+)/(?P<slug_linea>[\w-]+)/$', redirect_nuevas_urls),
+    url(r'^(?P<slug_ciudad>[\w-]+)/(?P<slug_linea>[\w-]+)/(?P<slug_recorrido>[\w-]+)/$', redirect_nuevas_urls),
 
+    # only for local dev / debugging purposes
     url(r'mapa/(?P<administrativearea_slug>[^/]+)/$', ver_mapa_ciudad, name='ver_mapa_ciudad'),
-
-    # Ciudades
-    # url(r'^(?P<nombre_ciudad>[\w-]+)/$', ver_ciudad, name='ver_ciudad'),
-    # url(r'^mapa/(?P<nombre_ciudad>[\w-]+)/$', ver_mapa_ciudad, name='ver_mapa_ciudad'),
-
-    # Lineas
-    # url(r'^(?P<nombre_ciudad>[\w-]+)/(?P<nombre_linea>[\w-]+)/$', ver_linea_redirect_old, name='ver_linea_redirect_old'),
-
-    # Recorridos
-    # url(r'^(?P<nombre_ciudad>[\w-]+)/(?P<nombre_linea>[\w-]+)/(?P<nombre_recorrido>[\w-]+)/$', ver_recorrido, name='ver_recorrido'),
 ]

@@ -3,10 +3,9 @@ from django.shortcuts import (get_object_or_404, render,
                               redirect)
 from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_GET, require_http_methods
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.measure import D
-from django.http import HttpResponsePermanentRedirect
-from django.contrib.gis.db.models.functions import SymDifference, Area, Union
+from django.http import HttpResponsePermanentRedirect, Http404
+from django.contrib.gis.db.models.functions import SymDifference, Area
 
 from apps.core.models import Linea, Recorrido, Parada
 from apps.catastro.models import Ciudad, Poi, Zona, AdministrativeArea
@@ -15,9 +14,7 @@ from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 from django.db.models import Prefetch, Count, F
-
 
 
 @csrf_exempt
@@ -249,12 +246,14 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     if not recorrido.descripcion or not recorrido.descripcion.strip():
         def uniquify(seq, idfun=None):
             if idfun is None:
-                def idfun(x): return x
+                def idfun(x):
+                    return x
             seen = {}
             result = []
             for item in seq:
                 marker = idfun(item)
-                if marker in seen: continue
+                if marker in seen:
+                    continue
                 seen[marker] = 1
                 result.append(item)
             return result
@@ -311,7 +310,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     horarios = recorrido.horario_set.all().prefetch_related('parada')
 
     template = "core/ver_recorrido.html"
-    if ( request.GET.get("dynamic_map") ):
+    if request.GET.get("dynamic_map"):
         template = "core/ver_obj_map.html"
 
     recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_simplified)
@@ -342,17 +341,19 @@ def ver_parada(request, id=None):
         .prefetch_related(Prefetch('ciudades', queryset=Ciudad.objects.all().only('slug'))) \
         .order_by('linea__nombre', 'nombre') \
         .defer('linea__envolvente', 'ruta')
-    recorridosp = [h.recorrido for h in
-                   p.horario_set
-                    .all()
-                    .select_related('recorrido', 'recorrido__linea')
-                    .prefetch_related(Prefetch('recorrido__ciudades', queryset=Ciudad.objects.all().only('slug')))
-                    .order_by('recorrido__linea__nombre', 'recorrido__nombre')
+    recorridosp = [
+        h.recorrido for h in
+        p.horario_set
+        .all()
+        .select_related('recorrido', 'recorrido__linea')
+        .prefetch_related(Prefetch('recorrido__ciudades', queryset=Ciudad.objects.all().only('slug')))
+        .order_by('recorrido__linea__nombre', 'recorrido__nombre')
     ]
-    #Recorrido.objects.filter(horarios_set__parada=p).select_related('linea').order_by('linea__nombre', 'nombre')
-    pois = Poi.objects.filter(latlng__dwithin=(p.latlng, 300)) # este esta en metros en vez de degrees... no se por que, pero esta genial!
+    # Recorrido.objects.filter(horarios_set__parada=p).select_related('linea').order_by('linea__nombre', 'nombre')
+    pois = Poi.objects.filter(latlng__dwithin=(p.latlng, 300))  # este esta en metros en vez de degrees... no se por que, pero esta genial!
     ps = Parada.objects.filter(latlng__dwithin=(p.latlng, 0.004)).exclude(id=p.id)
-    return render(request,
+    return render(
+        request,
         "core/ver_parada.html",
         {
             'ciudad_actual': Ciudad.objects.filter(poligono__intersects=p.latlng),
@@ -367,22 +368,45 @@ def ver_parada(request, id=None):
 
 @csrf_exempt
 @require_GET
-def redirect_nuevas_urls(request, ciudad=None, linea=None, ramal=None, recorrido=None):
+def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorrido=None):
     """
-    cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/ (ANTES)
-    cualbondi.com.ar/la-plata/norte/10-desde-x-hasta-y (DESPUES)
+    # v1
+    cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/
     cualbondi.com.ar/cordoba/recorridos/T%20(Transversal)/Central/IDA/
+    # v2
+    cualbondi.com.ar/la-plata/norte/10-desde-x-hasta-y
+    # v3
+    cualbondi.com.ar/r/c123/asdasd
     """
-    url = '/'
-    if not ciudad:
-        ciudad = 'la-plata'
-    url += slugify(ciudad) + '/'
-    if linea:
-        url += slugify(linea) + '/'
-        if ramal and recorrido:
-            try:
-                recorrido = Recorrido.objects.get(linea__nombre=linea, nombre=ramal, sentido=recorrido)
-                url += slugify(recorrido.nombre) + '-desde-' + slugify(recorrido.inicio) + '-hasta-' + slugify(recorrido.fin)
-            except ObjectDoesNotExist:
-                pass
-    return redirect(url)
+    ciudades = {
+        # ciudad slug: osmid
+        'bahia-blanca': '2582799',
+        'buenos-aires': '3082668',
+        'cordoba': '1862787',
+        'la-plata': '2499263',
+        'mar-del-plata': '3402727',
+        'mendoza': '4206710',
+        'rosario': '3368048',
+        'salta': '3059842',
+        'santa-fe': '7517633',
+    }
+    if slug_ciudad not in ciudades:
+        raise Http404
+
+    # ciudad
+    if not slug_linea:
+        return redirect(get_object_or_404(AdministrativeArea, osm_type='r', osm_id=ciudades[slug_ciudad]))
+
+    # linea
+    lineas = Linea.objects.filter(slug=slug_linea, ciudades__slug=slug_ciudad)
+    if len(lineas) == 0:
+        raise Http404
+
+    if not slug_recorrido:
+        return redirect(lineas[0])
+
+    # recorrido
+    recorridos = Recorrido.objects.filter(slug=slug_recorrido, ciudades__slug=slug_ciudad, linea__slug=lineas[0].slug)
+    if len(lineas) == 0:
+        raise Http404
+    return redirect(recorridos[0])
