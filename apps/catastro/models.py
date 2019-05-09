@@ -98,7 +98,7 @@ class ImagenCiudad(models.Model):
     def _custom_890x300(self):
         try:
             return self.custom_890x300
-        except:
+        except Exception:
             return None
 
     custom_890x300 = property(_custom_890x300)
