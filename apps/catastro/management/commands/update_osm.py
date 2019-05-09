@@ -4,11 +4,11 @@ import os
 import sys
 import time
 
-
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import connection
 from django.contrib.gis.geos import LineString, Polygon, MultiPolygon
+from django.contrib.gis.geos.error import GEOSException
 
 from apps.catastro.models import Poi, Interseccion, Calle, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog
@@ -825,7 +825,18 @@ class Command(BaseCommand):
 
             def get_parent_aa(node, geometry):
                 try:
-                    if node['data']['geometry_simple'] is mock_argentina_geometry or node['data']['geometry_simple'].covers(geometry):
+                    condition = False
+                    try:
+                        condition = node['data']['geometry_simple'] is mock_argentina_geometry or (
+                            node['data']['geometry_simple'].intersects(geometry) and  # optimization
+                            node['data']['geometry_simple'].intersection(geometry).area > geometry.area * 0.8
+                        )
+                    except Exception:
+                        condition = node['data']['geometry_simple'] is mock_argentina_geometry or (
+                            # node['data']['geometry'].intersects(geometry) and  # optimization
+                            node['data']['geometry'].intersection(geometry).area > geometry.area * 0.8
+                        )
+                    if condition:
                         parent_aa = None
                         for child in node['children']:
                             parent_aa = get_parent_aa(child, geometry)
@@ -859,16 +870,19 @@ class Command(BaseCommand):
             for li in admin_areas:
                 # aa = admin area
                 for aa in li:
-                    parent_aa = get_parent_aa(tree, aa['geometry'])
-                    aa.pop('admin_level')
-                    if 'ways' in aa:
-                        aa.pop('ways')
-                    else:
-                        self.out2(f" {aa['osm_id']}: {aa['name'].encode('utf-8').strip()}, does not have 'ways' attribute")
-                    if parent_aa is None:
-                        tree['children'].append({'children': [], 'data': aa})
-                    else:
-                        parent_aa['children'].append({'children': [], 'data': aa})
+                    try:
+                        parent_aa = get_parent_aa(tree, aa['geometry'])
+                        aa.pop('admin_level')
+                        if 'ways' in aa:
+                            aa.pop('ways')
+                        else:
+                            self.out2(f" {aa['osm_id']}: {aa['name'].encode('utf-8').strip()}, does not have 'ways' attribute")
+                        if parent_aa is None:
+                            tree['children'].append({'children': [], 'data': aa})
+                        else:
+                            parent_aa['children'].append({'children': [], 'data': aa})
+                    except GEOSException as e:
+                        self.out2(f'{str(e)}\n{tree["data"]["osm_id"]} {tree["data"]["name"].encode("utf-8")}\n{aa["osm_id"]} {aa["name"].encode("utf-8")}')
 
             def print_tree(node, level=0):
                 print(f'{" " * level} {level} {node["data"]["name"].encode("utf-8")}')
