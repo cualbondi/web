@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 from django.shortcuts import (get_object_or_404, render)
 from django.http import HttpResponsePermanentRedirect
 
@@ -9,6 +8,8 @@ from django.views.decorators.http import require_GET
 from django.db.models import Prefetch, Count, F, OuterRef, Subquery, IntegerField
 from django.contrib.gis.db.models.functions import GeoFunc, Distance, Cast, Value
 from django.template.defaultfilters import slugify
+
+from ..utils.parallel_query import parallelize
 
 
 def fuzzy_like_query(q):
@@ -137,16 +138,18 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
         pois = None
         ps = None
         if aa.geometry_simplified is not None:
-            lineas = Linea.objects \
-                .filter(recorridos__ruta__intersects=aa.geometry_simplified) \
-                .order_by('nombre') \
-                .annotate(dcount=Count('id')) \
-                .defer('envolvente')
-            pois = Poi \
-                .objects \
-                .filter(latlng__intersects=aa.geometry_simplified) \
-                .order_by('?')[:30]
-            ps = Parada.objects.filter(latlng__intersects=aa.geometry_simplified)
+            lineas, pois, ps = parallelize(
+                Linea.objects
+                .filter(recorridos__ruta__intersects=aa.geometry_simplified)
+                .order_by('nombre')
+                .annotate(dcount=Count('id'))
+                .defer('envolvente'),
+                Poi
+                .objects
+                .filter(latlng__intersects=aa.geometry_simplified)
+                .order_by('?')[:30],
+                Parada.objects.filter(latlng__intersects=aa.geometry_simplified)
+            )
         ancestors = aa.get_ancestors()
         children = aa.get_children().annotate(
             recorridos_count=Cast(Subquery(
