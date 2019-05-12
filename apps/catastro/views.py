@@ -1,15 +1,13 @@
 from django.shortcuts import (get_object_or_404, render)
 from django.http import HttpResponsePermanentRedirect
-
-from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
-from apps.core.models import Recorrido, Parada, Linea
-
 from django.views.decorators.http import require_GET
-from django.db.models import Prefetch, Count, F, OuterRef, Subquery, IntegerField
+from django.db.models import Prefetch, Count, OuterRef, Subquery, IntegerField
 from django.contrib.gis.db.models.functions import GeoFunc, Distance, Cast, Value
 from django.template.defaultfilters import slugify
 
-from ..utils.parallel_query import parallelize
+from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
+from apps.core.models import Recorrido, Parada, Linea
+from apps.utils.parallel_query import parallelize
 
 
 def fuzzy_like_query(q):
@@ -125,7 +123,7 @@ class Simplify(GeoFunc):
 
 
 def administrativearea(request, osm_type=None, osm_id=None, slug=None):
-    qs = AdministrativeArea.objects.defer('geometry').annotate(geometry_simplified=Simplify(F('geometry'), 0.02))
+    qs = AdministrativeArea.objects.defer('geometry')
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
     if slug is None or slug != slugify(aa.name):
         # Redirect with slug
@@ -137,31 +135,31 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
         lineas = None
         pois = None
         ps = None
-        if aa.geometry_simplified is not None:
-            lineas, pois, ps = parallelize(
+        if aa.geometry_simple is not None:
+            lineas, pois, ps, ancestors, children = parallelize(
                 Linea.objects
-                .filter(recorridos__ruta__intersects=aa.geometry_simplified)
+                .filter(recorridos__ruta__intersects=aa.geometry_simple)
                 .order_by('nombre')
                 .annotate(dcount=Count('id'))
                 .defer('envolvente'),
                 Poi
                 .objects
-                .filter(latlng__intersects=aa.geometry_simplified)
+                .filter(latlng__intersects=aa.geometry_simple)
                 .order_by('?')[:30],
-                Parada.objects.filter(latlng__intersects=aa.geometry_simplified)
+                Parada.objects.filter(latlng__intersects=aa.geometry_simple),
+                aa.get_ancestors(),
+                aa.get_children().annotate(
+                    recorridos_count=Cast(Subquery(
+                        Recorrido.objects
+                        .order_by()
+                        .annotate(group=Value(1))
+                        .filter(ruta__intersects=OuterRef('geometry'))
+                        .values('group')
+                        .annotate(count=Count('*'))
+                        .values('count')
+                    ), output_field=IntegerField())
+                ).filter(recorridos_count__gt=0).order_by('-recorridos_count', 'name'),
             )
-        ancestors = aa.get_ancestors()
-        children = aa.get_children().annotate(
-            recorridos_count=Cast(Subquery(
-                Recorrido.objects
-                .order_by()
-                .annotate(group=Value(1))
-                .filter(ruta__intersects=OuterRef('geometry'))
-                .values('group')
-                .annotate(count=Count('*'))
-                .values('count')
-            ), output_field=IntegerField())
-        ).filter(recorridos_count__gt=0).order_by('-recorridos_count', 'name')
         return render(
             request,
             template,
