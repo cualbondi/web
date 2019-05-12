@@ -199,8 +199,8 @@
                 <div class="floated-left" align="center" style="width: 300px; margin-top: 20px;"><img style="min" src="{{ STATIC_URL }}img/isologo.png"></div>
                 <div class="floated-left bs-docs-sidebar" style="width: 250px; margin-top: 20px;">
                     <ul class="nav nav-list bs-docs-sidenav">
-                        {% for aa in administrativeareas %}
-                        <li><a href="/mapa/{{aa.slug}}/"><i class="icon-chevron-right"></i> {{aa.name}}</a></li>
+                        {% for c in ciudades %}
+                        <li><a href="/mapa/{{c.slug}}/"><i class="icon-chevron-right"></i> {{c.name}}</a></li>
                         {% endfor %}
                     </ul>
                 </div>

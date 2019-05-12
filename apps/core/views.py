@@ -1,20 +1,18 @@
 # -*- coding: UTF-8 -*-
-from django.shortcuts import (get_object_or_404, render,
-                              redirect)
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_GET, require_http_methods
-from django.contrib.gis.measure import D
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponsePermanentRedirect, Http404
-from django.contrib.gis.db.models.functions import SymDifference, Area
-
-from apps.core.models import Linea, Recorrido, Parada
-from apps.catastro.models import Ciudad, Poi, Zona, AdministrativeArea
-
+from django.db.models import Prefetch, Count, F
+from django.contrib.gis.measure import D, A
+from django.contrib.gis.db.models.functions import SymDifference, Area, Intersection
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 
-from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Prefetch, Count, F
+from apps.core.models import Linea, Recorrido, Parada
+from apps.catastro.models import Ciudad, Poi, Zona, AdministrativeArea
+from apps.utils import data
 
 
 @csrf_exempt
@@ -57,17 +55,11 @@ def natural_sort_qs(qs, key):
 
 @require_http_methods(["GET"])
 def index(request):
-    administrativeareas = [
-        {
-            'name': 'La Plata',
-            'slug': 'partido-de-la-plata',
-        },
-    ]
     return render(
         request,
         'core/seleccionar_ciudad.html',
         {
-            'administrativeareas': administrativeareas
+            'ciudades': data.ciudades
         }
     )
 
@@ -91,6 +83,7 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
             - 'c': cualbondi recorrido, usar id de la tabla directamente
             - 'r': relation de osm, usar osm_id con el campo osm_id
     """
+    # TODO: redirect id c123 a r123 si viene con osm_type=c y existe el osm_id
     linea_q = Linea.objects.only('nombre', 'slug', 'img_cuadrada', 'info_empresa', 'info_terminal', 'img_panorama', 'envolvente')
     linea = None
     if osm_type == 'c':
@@ -121,7 +114,12 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
     administrativearea = AdministrativeArea.objects \
         .filter(geometry_simple__intersects=linea__envolvente) \
         .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea__envolvente)) / (Area(F('geometry_simple')) + Area(linea__envolvente))) \
+        .annotate(intersection_area=Area(Intersection(F('geometry_simple'), linea__envolvente)) / Area(linea__envolvente)) \
+        .filter(intersection_area__gt=A(sq_m=0.8)) \
         .order_by('symdiff_area')
+
+    for a in administrativearea:
+        print(f'{a.symdiff_area, a.intersection_area, a.name}')
 
     # administrativearea = AdministrativeArea.objects \
     #     .filter(geometry_simple__intersects=linea.envolvente) \
@@ -348,27 +346,17 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
     # v3
     cualbondi.com.ar/r/c123/asdasd
     """
-    ciudades = {
-        # ciudad slug: osmid
-        'bahia-blanca': '2582799',
-        'buenos-aires': '3082668',
-        'cordoba': '1862787',
-        'la-plata': '2499263',
-        'mar-del-plata': '3402727',
-        'mendoza': '4206710',
-        'rosario': '3368048',
-        'salta': '3059842',
-        'santa-fe': '7517633',
-    }
-    if slug_ciudad not in ciudades:
+    ciudades = data.ciudades
+    ciudad = next((c for c in ciudades if c.slug == slug_ciudad), False)
+    if not ciudad:
         raise Http404
 
     # ciudad
     if not slug_linea:
-        return redirect(get_object_or_404(AdministrativeArea, osm_type='r', osm_id=ciudades[slug_ciudad]))
+        return redirect(get_object_or_404(AdministrativeArea, osm_type='r', osm_id=ciudad.osm_id))
 
     # linea
-    lineas = Linea.objects.filter(slug=slug_linea, ciudades__slug=slug_ciudad)
+    lineas = Linea.objects.filter(slug=slug_linea, ciudades__slug=ciudad.slug)
     if len(lineas) == 0:
         raise Http404
 
@@ -376,7 +364,7 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
         return redirect(lineas[0])
 
     # recorrido
-    recorridos = Recorrido.objects.filter(slug=slug_recorrido, ciudades__slug=slug_ciudad, linea__slug=lineas[0].slug)
+    recorridos = Recorrido.objects.filter(slug=slug_recorrido, ciudades__slug=ciudad.slug, linea__slug=lineas[0].slug)
     if len(lineas) == 0:
         raise Http404
     return redirect(recorridos[0])
