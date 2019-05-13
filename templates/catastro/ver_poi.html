@@ -1,8 +1,8 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Cómo llegar a {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %} - Cualbondi{% endblock %}
-{% block meta_description %}Cómo llegar a {{poi.nom|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}.{% endblock %}
+{% block title %}Cómo llegar a {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}Cómo llegar a {{poi.nom|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -10,12 +10,34 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:punto_de_interes" />
     <meta property="og:url"    content="{{ HOME_URL }}{{ poi.get_absolute_url }}" />
-    <meta property="og:title"  content="Como llegar a {{poi.nom|title}}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}" />
-    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{poi.nom|title}}. Entra para ver como llegar desde donde estes ahora" />
-    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ poi.img_cuadrada.url }}" />{% endif %}
+    <meta property="og:title"  content="Como llegar a {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
+    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
+    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}{{ poi.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
+    <ul class="breadcrumb">
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+            <a href="{{ HOME_URL }}" itemprop="url">
+                <span itemprop="title">Inicio</span>
+            </a>
+            <span class="divider">&gt;</span>
+        </li>
+        {% for a in adminareas reversed %}
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+            <a href="{{ HOME_URL }}{{a.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{a.name}}</span>
+            </a>
+            <span class="divider">&gt;</span>
+        </li>
+        {% endfor %}
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{obj.nombre}} {% if obj.inicio and obj.fin %}(de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
+            </a>
+        </li>
+    </ul>
+
     <div itemscope itemtype="http://schema.org/Place">
         <h1>¿Cómo llegar a <span itemprop="name">{{poi.nom}}</span>?</h1>
         <link itemprop="url" content="{{HOME_URL}}{{poi.get_absolute_url}}" />
@@ -48,10 +70,10 @@
     </div>
 
     <div class="thumbnail">
-        <a href="/mapa/{{ciudad_actual.slug}}/geolocation|{{poi.latlng.0|stringformat:"f"}},{{poi.latlng.1|stringformat:"f"}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
+        {% comment %} <a href="/mapa/{{adminareas.0.slug}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a> {% endcomment %}
         {% if poi.img_panorama %}
         <div id="map" style="background:lightblue;">
-            <img src="/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }}{% if ciudad_actual %} en {{ciudad_actual.nombre|title}}{% endif %}." />
+            <img src="/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />
         </div>
         {% endif %}
     </div>
@@ -101,15 +123,6 @@
                     <meta itemprop="longitude" content="{{p.latlng.0|stringformat:"f"}}" />
                 </div>
             </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    {% if zonas %}
-        <h2>Barrios cercanos</h2>
-        <ul>
-            {% for z in zonas %}
-            <li>{{ z.name }}</li>
             {% endfor %}
         </ul>
     {% endif %}

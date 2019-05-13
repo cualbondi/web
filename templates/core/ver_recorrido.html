@@ -1,8 +1,8 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Recorrido {{obj.nombre|title}} {% if obj.inicio and obj.fin %} desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} de la linea {{linea.nombre|title}}, en {{administrativearea.name|title}} - Cualbondi{% endblock %}
-{% block meta_description %}Toda la información sobre paradas, horarios y tarifas del recorrido {{obj.nombre|title}} de la línea {{linea.nombre|title}} desde {{obj.inicio}} hasta {{obj.fin}} en la ciudad de {{administrativearea.name|title}}: Descripción del recorrido de colectivo, micro, bus.{% endblock %}
+{% block title %}Recorrido {{obj.nombre|title}} {% if obj.inicio and obj.fin %} desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} de la linea {{linea.nombre|title}}, en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}Toda la información sobre paradas, horarios y tarifas del recorrido {{obj.nombre|title}} de la línea {{linea.nombre|title}} desde {{obj.inicio}} hasta {{obj.fin}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}: Descripción del recorrido de colectivo, micro, bus.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -11,21 +11,21 @@
     <meta property="og:type"   content="cualbondi:recorrido" />
     <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="{{linea.nombre|title}} - {{obj.nombre|title}}" />
-    <meta property="og:description"  content="Linea {{linea.nombre|title}}, Ramal {{obj.nombre|title}} en {{administrativearea.name|title}} - Cualbondi{% if obj.inicio and obj.fin %}, Recorrido desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} en {{administrativearea.name|title}}: Descripción del recorrido de colectivo, micro, bus" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ obj.img_cuadrada.url }}" />{% endif %}
+    <meta property="og:description"  content="Linea {{linea.nombre|title}}, Ramal {{obj.nombre|title}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, Recorrido desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} en {{adminarea.name|title}}: Descripción del recorrido de colectivo, micro, bus" />
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
     <ul class="breadcrumb">
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/" itemprop="url">
+            <a href="{{ HOME_URL }}" itemprop="url">
                 <span itemprop="title">Inicio</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{administrativearea.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{administrativearea.name}}</span>
+            <a href="{{ HOME_URL }}{{adminarea.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{adminarea.name}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
@@ -50,11 +50,11 @@
         </h1>
     </div>
 
-    {% if zonas %}
-        <h2>Barrios que transita</h2>
+    {% if adminareas %}
+        <h2>Lugares que transita</h2>
         <ul>
-            {% for z in zonas %}
-            <li>{{ z.name }}</li>
+            {% for a in adminareas %}
+            <li><a href="{{HOME_URL}}{{a.get_absolute_url}}">{{ a.name }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -81,7 +81,7 @@
     <div class="thumbnail">
 	<a href="/editor/{{ obj.id }}/" class="btn btn-primary" style="position:absolute; margin:6px">Modificar recorrido</a>
         <div id="map" style="background:lightblue;">
-            <img src="/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en la ciudad de {{ administrativearea.name }}." />
+            <img src="{{HOME_URL}}{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
         </div>
     </div>
     <br />
@@ -118,7 +118,7 @@
                         <ul class="nav nav-pills nav-stacked">
                         {% for p in columna %}
                             <li itemscope itemtype="http://schema.org/Place">
-                                <a itemprop="url" href="https://cualbondi.com.ar{{p.get_absolute_url}}">
+                                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
                                     <span itemprop="name">{{ p.nom }}</span>
                                 </a>
                                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">

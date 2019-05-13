@@ -1,8 +1,8 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Línea {{obj.nombre|title}} en {{administrativearea.nombre|title}} - Cualbondi{% endblock %}
-{% block meta_description %}Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por la ciudad de {{administrativearea.nombre|title}}.{% endblock %}
+{% block title %}Línea {{obj.nombre|title}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -11,8 +11,8 @@
     <meta property="og:type"   content="cualbondi:linea" />
     <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="Línea {{obj.nombre|title}}" />
-    <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{administrativearea.nombre|title}}" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ obj.img_cuadrada.url }}" />{% endif %}
+    <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -24,8 +24,8 @@
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{administrativearea.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{administrativearea.name}}</span>
+            <a href="{{ HOME_URL }}{{adminarea.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{adminarea.name}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
@@ -45,6 +45,15 @@
         <h2>Información de la empresa</h2>
         <div>{{obj.info_empresa}}</div>
         <div>{{obj.info_terminal}}</div>
+    {% endif %}
+
+    {% if adminareas %}
+        <h2>Lugares que transita</h2>
+        <ul>
+            {% for a in adminareas %}
+            <li><a href="{{HOME_URL}}{{a.get_absolute_url}}">{{ a.name }}</a></li>
+            {% endfor %}
+        </ul>
     {% endif %}
 
     <div class="row-fluid">
@@ -79,7 +88,7 @@
     {% if obj.img_panorama %}
     <div class="thumbnail">
         <div id="map" style="background:lightblue;">
-            <img src="/{{ obj.img_panorama.url }}" alt="Cobertura de transporte público de la línea {{ obj.nombre }} en {{ administrativearea.nombre }}." />
+            <img src="/{{ obj.img_panorama.url }}" alt="Cobertura de transporte público de la línea {{ obj.nombre }} en {{ adminarea.name }}." />
         </div>
     </div>
     {% endif %}

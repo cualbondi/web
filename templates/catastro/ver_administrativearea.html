@@ -1,8 +1,8 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 
-{% block title %}Cómo llegar a {{obj.name|title}}{% if amenity %} ({{amenity}}) {% endif %}{% if parent %} en {{parent.nombre|title}}{% endif %} - Cualbondi{% endblock %}
-{% block meta_description %}Cómo llegar a {{obj.name|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{obj.name|title}}{% if parent %} en {{parent.nombre|title}}{% endif %}.{% endblock %}
+{% block title %}Transporte publico en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}Cómo moverse en {{adminarea.name|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -10,52 +10,53 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:administrative_area" />
     <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
-    <meta property="og:title"  content="Como llegar a {{obj.name|title}}{% if parent %} en {{parent.nombre|title}}{% endif %}" />
-    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{obj.name|title}}. Entra para ver como llegar desde donde estes ahora" />
+    <meta property="og:title"  content="Como moverse en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
+    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
-    <div itemscope itemtype="http://schema.org/Place">
+    <ul class="breadcrumb">
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+            <a href="{{ HOME_URL }}/" itemprop="url">
+                <span itemprop="title">Inicio</span>
+            </a>
+            <span class="divider">&gt;</span>
+        </li>
+
+        {% for a in adminareaancestors reversed %}
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+            <a href="{{ HOME_URL }}{{a.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{a.name}}</span>
+            </a>
+            <span class="divider">&gt;</span>
+        </li>
+        {% endfor %}
+
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+                <span itemprop="title">{{obj.name}}</span>
+            </a>
+        </li>
+    </ul>
+
+    <div itemscope itemtype="http://schema.org/AdministrativeArea">
         <h1><span itemprop="name">{{obj.name|title}}</span></h1>
         <link itemprop="url" content="{{HOME_URL}}{{obj.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-            <meta itemprop="latitude" content="{{obj.latlng.1|stringformat:'f'}}" />
-            <meta itemprop="longitude" content="{{obj.latlng.0|stringformat:'f'}}" />
+            <meta itemprop="latitude" content="{{aacentroid.1|stringformat:'f'}}" />
+            <meta itemprop="longitude" content="{{aacentroid.0|stringformat:'f'}}" />
         </div>
-        <div>
-            {% if amenity %}
-                <span style="float:right" class="label label-default">{{amenity}}</span>
-            {% endif %}
-            {% if obj.tags.website %}
-                <a href="{{obj.tags.website}}" target="_blank">Ir al sitio web</a>
-            {% endif %}
-        </div>
-        <div>
-            {% if obj.tags.phone %}
-                <span>Telefono: <a href="tel:{{obj.tags.phone}}">{{obj.tags.phone}}</a></span>
-            {% endif %}
-            {% if obj.tags.email %}
-                <a href="mailto:{{obj.tags.email}}">{{obj.tags.email}}</div>
-            {% endif %}
-        </div>
-        {% if obj.tags.operator %}
-            <div>{{obj.tags.operator}}</div>
-        {% endif %}
         {% if obj.tags.description %}
             <div>{{obj.tags.description}}</div>
         {% endif %}
     </div>
 
-    {% for ancestor in ancestors %}
-        <a href="{{HOME_URL}}{{ancestor.get_absolute_url}}">{{ancestor.name}}</a>
-    {% endfor %}
-
     <div class="thumbnail">
-        <a href="/mapa/{{parent.slug}}/geolocation|{{obj.latlng.0|stringformat:'f'}},{{obj.latlng.1|stringformat:'f'}},{{obj.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
+        {% comment %} <a href="/mapa/{{parent.slug}}/geolocation|{{obj.latlng.0|stringformat:'f'}},{{obj.latlng.1|stringformat:'f'}},{{obj.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a> {% endcomment %}
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;">
-            <img src="/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
+            <img src="{{HOME_URL}}{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
         </div>
         {% endif %}
     </div>
@@ -68,7 +69,7 @@
         <div class="span2">
             <ul class="nav nav-pills nav-stacked">
                 {% for linea in columna %}
-                <li><a href="{{linea.get_absolute_url}}">{{linea.nombre}}</a></li>
+                <li><a href="{{HOME_URL}}{{linea.get_absolute_url}}">{{linea.nombre}}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -101,7 +102,7 @@
         <h2>Paradas cercanas</h2>
         <ul>
             {% for p in paradas %}
-            <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>
+            <li><a href="{{HOME_URL}}{{p.get_absolute_url}}">{{ p }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -111,7 +112,7 @@
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="https://cualbondi.com.ar{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
@@ -119,15 +120,6 @@
                     <meta itemprop="longitude" content="{{p.latlng.0|stringformat:'f'}}" />
                 </div>
             </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    {% if zonas %}
-        <h2>Barrios cercanos</h2>
-        <ul>
-            {% for z in zonas %}
-            <li>{{ z.name }}</li>
             {% endfor %}
         </ul>
     {% endif %}

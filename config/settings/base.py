@@ -221,8 +221,10 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
                 'django.contrib.messages.context_processors.messages',
+
                 'apps.core.context_processors.home_url',
                 'apps.core.context_processors.facebook_app_id',
+                'apps.core.context_processors.ciudades',
 
                 # TODO: revisar si necesitamos estos dos https://github.com/RealmTeam/django-rest-framework-social-oauth2
                 'social_django.context_processors.backends',

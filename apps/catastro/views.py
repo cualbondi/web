@@ -2,7 +2,7 @@ from django.shortcuts import (get_object_or_404, render)
 from django.http import HttpResponsePermanentRedirect
 from django.views.decorators.http import require_GET
 from django.db.models import Prefetch, Count, OuterRef, Subquery, IntegerField
-from django.contrib.gis.db.models.functions import GeoFunc, Distance, Cast, Value
+from django.contrib.gis.db.models.functions import GeoFunc, Cast, Value
 from django.template.defaultfilters import slugify
 
 from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
@@ -91,7 +91,11 @@ def poiORint(request, slug=None):
         .defer('linea__envolvente', 'ruta')
     near_pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
-    ciudad_actual = Ciudad.objects.annotate(distance=Distance('centro', poi.latlng)).order_by('distance').first()
+
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=poi.latlng) \
+        .order_by('depth') \
+        .reverse()
 
     template = 'catastro/ver_poi.html'
     if (request.GET.get("dynamic_map")):
@@ -108,7 +112,7 @@ def poiORint(request, slug=None):
         {
             'obj': poi,
             'amenity': amenity,
-            'ciudad_actual': ciudad_actual,
+            'adminareas': aas,
             'paradas': ps,
             'poi': poi,
             'recorridos': recorridos,
@@ -136,7 +140,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
         pois = None
         ps = None
         if aa.geometry_simple is not None:
-            lineas, pois, ps, ancestors, children = parallelize(
+            lineas, pois, ps, aaancestors, children = parallelize(
                 Linea.objects
                 .filter(recorridos__ruta__intersects=aa.geometry_simple)
                 .order_by('nombre')
@@ -147,7 +151,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
                 .filter(latlng__intersects=aa.geometry_simple)
                 .order_by('?')[:30],
                 Parada.objects.filter(latlng__intersects=aa.geometry_simple),
-                aa.get_ancestors(),
+                aa.get_ancestors().reverse(),
                 aa.get_children().annotate(
                     recorridos_count=Cast(Subquery(
                         Recorrido.objects
@@ -165,7 +169,9 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
             template,
             {
                 'obj': aa,
-                'ancestors': ancestors,
+                'adminarea': aa,
+                'adminareaancestors': aaancestors,
+                'aacentroid': aa.geometry_simple.centroid,
                 'children': children,
                 'paradas': ps,
                 'lineas': lineas,

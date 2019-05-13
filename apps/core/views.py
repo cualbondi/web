@@ -99,37 +99,44 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
 
     recorridos = natural_sort_qs(linea.recorridos.all().defer('ruta'), 'slug')
 
-    # administrativearea = AdministrativeArea.objects \
+    # aa = AdministrativeArea.objects \
     #     .filter(geometry_simple__intersects=linea.envolvente) \
     #     .annotate(inter_area=DBArea(Intersection(F('geometry_simple'), linea.envolvente))) \
     #     .filter(inter_area__gt=Area(sq_m=linea.envolvente.area * 0.8)) \
     #     .annotate(area=DBArea(F('geometry_simple'))) \
     #     .order_by('area')
 
-    # administrativearea = AdministrativeArea.objects \
+    # aa = AdministrativeArea.objects \
     #     .filter(geometry_simple__intersects=linea.envolvente) \
     #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea.envolvente)) / Area(Union(F('geometry_simple'), linea.envolvente))) \
     #     .order_by('symdiff_area')
 
-    administrativearea = AdministrativeArea.objects \
+    aa = AdministrativeArea.objects \
         .filter(geometry_simple__intersects=linea__envolvente) \
         .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea__envolvente)) / (Area(F('geometry_simple')) + Area(linea__envolvente))) \
         .annotate(intersection_area=Area(Intersection(F('geometry_simple'), linea__envolvente)) / Area(linea__envolvente)) \
         .filter(intersection_area__gt=A(sq_m=0.8)) \
         .order_by('symdiff_area')
 
-    for a in administrativearea:
-        print(f'{a.symdiff_area, a.intersection_area, a.name}')
+    # for a in aa:
+    #     print(f'{a.symdiff_area, a.intersection_area, a.name}')
 
-    # administrativearea = AdministrativeArea.objects \
+    # aa = AdministrativeArea.objects \
     #     .filter(geometry_simple__intersects=linea.envolvente) \
     #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea.envolvente))) \
     #     .order_by('symdiff_area')
 
-    if administrativearea:
-        administrativearea = administrativearea[0]
+    # Zonas por las que pasa el recorrido
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=linea__envolvente, depth__gt=3) \
+        .order_by('depth', 'name')
+
+    if aa:
+        aa = aa[0]
+        aaancestors = aa.get_ancestors().reverse()
     else:
-        administrativearea = None
+        aa = None
+        aaancestors = None
 
     template = "core/ver_linea.html"
     if (request.GET.get("dynamic_map")):
@@ -141,7 +148,9 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
         {
             'obj': linea,
             'recorridos': recorridos,
-            'administrativearea': administrativearea,
+            'adminarea': aa,
+            'adminareaancestors': aaancestors,
+            'adminareas': aas,
         }
     )
 
@@ -168,16 +177,26 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
         return HttpResponsePermanentRedirect(recorrido.get_absolute_url())
 
     recorrido_simplified = recorrido.ruta.simplify(0.00005)
+    recorrido_buffer = recorrido_simplified.buffer(0.0001)
 
-    administrativearea = AdministrativeArea.objects \
-        .filter(geometry_simple__intersects=recorrido_simplified) \
-        .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), recorrido_simplified)) / (Area(F('geometry_simple')) + Area(recorrido_simplified))) \
+    # aa = AdministrativeArea.objects \
+    #     .filter(geometry_simple__intersects=recorrido_simplified) \
+    #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), recorrido_simplified)) / (Area(F('geometry_simple')) + Area(recorrido_simplified))) \
+    #     .order_by('symdiff_area')
+
+    aa = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=recorrido_buffer) \
+        .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), recorrido_buffer)) / (Area(F('geometry_simple')) + Area(recorrido_buffer))) \
+        .annotate(intersection_area=Area(Intersection(F('geometry_simple'), recorrido_buffer)) / Area(recorrido_buffer)) \
+        .filter(intersection_area__gt=A(sq_m=0.8)) \
         .order_by('symdiff_area')
 
-    if administrativearea:
-        administrativearea = administrativearea[0]
+    if aa:
+        aa = aa[0]
+        aaancestors = aa.get_ancestors().reverse()
     else:
-        administrativearea = None
+        aa = None
+        aaancestors = None
 
     # Calles por las que pasa el recorrido
     """
@@ -272,7 +291,9 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     pois = Poi.objects.filter(latlng__dwithin=(recorrido_simplified, D(m=400)))
 
     # Zonas por las que pasa el recorrido
-    zonas = Zona.objects.filter(geo__intersects=recorrido_simplified).values('name')
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=recorrido_buffer, depth__gt=3) \
+        .order_by('depth')
 
     # Horarios + paradas que tiene este recorrido
     horarios = recorrido.horario_set.all().prefetch_related('parada')
@@ -289,10 +310,11 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
         {
             'obj': recorrido,
             'linea': recorrido.linea,
-            'administrativearea': administrativearea,
+            'adminarea': aa,
+            'adminareaancestors': aaancestors,
             'calles': calles_fin,
             'pois': pois,
-            'zonas': zonas,
+            'adminareas': aas,
             'horarios': horarios,
             'recorridos_similares': recorridos_similares
         }
@@ -353,7 +375,7 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
 
     # ciudad
     if not slug_linea:
-        return redirect(get_object_or_404(AdministrativeArea, osm_type='r', osm_id=ciudad.osm_id))
+        return redirect(get_object_or_404(AdministrativeArea, osm_type='r', osm_id=ciudad.osm_id), permanent=True)
 
     # linea
     lineas = Linea.objects.filter(slug=slug_linea, ciudades__slug=ciudad.slug)
@@ -361,10 +383,10 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
         raise Http404
 
     if not slug_recorrido:
-        return redirect(lineas[0])
+        return redirect(lineas[0], permanent=True)
 
     # recorrido
     recorridos = Recorrido.objects.filter(slug=slug_recorrido, ciudades__slug=ciudad.slug, linea__slug=lineas[0].slug)
     if len(lineas) == 0:
         raise Http404
-    return redirect(recorridos[0])
+    return redirect(recorridos[0], permanent=True)
