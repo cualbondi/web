@@ -733,7 +733,7 @@ class Command(BaseCommand):
                                 if wid == w.id:
                                     admin_relations[rel_id]['ways'][i] = linestring
 
-            self.out2('Collecting rels')
+            self.out2(f'Collecting rels, using {inputfile}')
             h = RelsHandler()
             h.apply_file(inputfile)
             self.out2('Collecting ways & nodes')

@@ -133,9 +133,9 @@ LOGGING = {
 # django-cors-headers
 # ------------------------------------------------------------------------------
 # https://github.com/ottoyiu/django-cors-headers/#configuration
-CORS_ORIGIN_WHITELIST = (
-    'cualbondi.com.ar',
-)
+CORS_ORIGIN_WHITELIST = [
+    'https://cualbondi.com.ar',
+]
 
 
 
