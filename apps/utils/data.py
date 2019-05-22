@@ -1,3 +1,6 @@
+from django.contrib.gis.geos import GEOSGeometry
+
+
 class Bunch(dict):
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
@@ -15,3 +18,5 @@ ciudades = [
     Bunch({'slug': 'salta', 'osm_id': 3059842, 'name': 'Salta'}),
     Bunch({'slug': 'santa-fe', 'osm_id': 3550091, 'name': 'Santa Fe'}),
 ]
+
+argentina_simplified = GEOSGeometry('POINT(0 0)')

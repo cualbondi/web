@@ -14,6 +14,7 @@ from apps.catastro.models import Poi, Interseccion, Calle, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog
 from apps.editor.models import RecorridoProposed
 from apps.utils.fix_way import fix_way, fix_polygon
+from apps.utils.data import argentina_simplified
 
 import osmium
 import geopandas as gpd
@@ -158,24 +159,25 @@ class Command(BaseCommand):
 
         cu = connection.cursor()
 
-        inputfile = '/tmp/argentina.cache.osm-{}.pbf'.format(datetime.now().strftime('%Y%m%d%H%M%S'))
+        inputfile = '/tmp/cache.osm-{}.pbf'.format(datetime.now().strftime('%Y%m%d%H%M%S'))
         if options['no-tmp']:
-            inputfile = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'argentina.cache.osm.pbf')
+            inputfile = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'cache.osm.pbf')
         if options['inputFile'] or options['use_cache']:
             if options['inputFile']:
                 inputfile = options['inputFile']
 
         if options['import_osm']:
 
-            inputfile = '/tmp/argentina.cache.osm-{}.pbf'.format(datetime.now().strftime('%Y%m%d%H%M%S'))
+            inputfile = '/tmp/cache.osm-{}.pbf'.format(datetime.now().strftime('%Y%m%d%H%M%S'))
             if options['no-tmp']:
-                inputfile = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'argentina.cache.osm.pbf')
+                inputfile = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'cache.osm.pbf')
             if options['inputFile'] or options['use_cache']:
                 if options['inputFile']:
                     inputfile = options['inputFile']
             else:
                 self.out1('Descargando mapa de Argentina de geofabrik')
                 url = 'http://download.geofabrik.de/south-america/argentina-latest.osm.pbf'
+                # url = 'http://download.geofabrik.de/south-america-latest.osm.pbf'
                 self.out2(url)
                 f, d = request.urlretrieve(url, inputfile, lambda nb, bs, fs, url=url: self.reporthook(nb, bs, fs, url))
 
@@ -187,7 +189,7 @@ class Command(BaseCommand):
             cu = connection.cursor()
             cu.execute('SELECT slug, box(poligono::geometry) as box FROM catastro_ciudad;')
 
-            # TODO: osmconvert /tmp/argentina.cache.osm-20160711192104.pbf -b=-57.8526306071815,-38.1354198737499,-57.5065612712919,-37.8562051788731 -o=1.pbf
+            # TODO: osmconvert /tmp/cache.osm-20160711192104.pbf -b=-57.8526306071815,-38.1354198737499,-57.5065612712919,-37.8562051788731 -o=1.pbf
 
             self.out1('Cargando data de osm en la base de cualbondi')
 
@@ -664,8 +666,12 @@ class Command(BaseCommand):
         if options['admin_areas']:
             self.out1('Admin Areas')
 
-            ADMIN_LEVEL_MIN = 4
+            ADMIN_LEVEL_MIN = 1
             ADMIN_LEVEL_MAX = 8
+            KING_ID = 286393  # osm_id Argentina
+
+            OLD_KING = list(AdministrativeArea.objects.filter(osm_id=KING_ID))
+            KING = None
 
             admin_areas = [[] for i in range(12)]  # index: admin_level, value
             admin_relations = {}  # index: admin_level, value
@@ -674,18 +680,22 @@ class Command(BaseCommand):
 
             class RelsHandler(osmium.SimpleHandler):
                 def relation(self, r):
-                    if 'boundary' in r.tags and r.tags['boundary'] == 'administrative' and 'name' in r.tags and 'admin_level' in r.tags:
+                    if 'boundary' in r.tags and r.tags['boundary'] == 'administrative' and 'name' in r.tags and 'admin_level' in r.tags:  # and r.id == KING_ID:
                         ways = []
                         for m in r.members:
                             # outer (parts and exclaves) / inner (hole)
                             if m.type == 'w' and m.role in ['outer']:
                                 ways.append(m.ref)
                                 admin_relations_ways_ids.setdefault(m.ref, []).append(r.id)
+                        try:
+                            admin_level = int(r.tags['admin_level'])
+                        except ValueError:
+                            return
                         admin_relations[r.id] = {
                             'osm_id': r.id,
                             'osm_type': 'r',
                             'ways': ways,
-                            'admin_level': int(r.tags['admin_level']),
+                            'admin_level': admin_level,
                             'name': r.tags['name'],  # .encode('utf-8').strip(),
                             'tags': r.tags.__dict__,
                         }
@@ -736,15 +746,20 @@ class Command(BaseCommand):
             self.out2('Joining ways')
             for (k, v) in admin_relations.items():
                 admin_count_all = admin_count_all + 1
+                dbadminarea = AdministrativeArea.objects.filter(osm_id=v['osm_id'], osm_type=v['osm_type'])
+                if dbadminarea:
+                    dbadminarea = dbadminarea[0]
+                    v['img_panorama'] = dbadminarea.img_panorama
+                    v['img_cuadrada'] = dbadminarea.img_cuadrada
+
                 if v['admin_level'] >= ADMIN_LEVEL_MIN and v['admin_level'] <= ADMIN_LEVEL_MAX:
                     self.out2(f"osmid={k} level={v['admin_level']} name={v['name'].encode('utf-8')}", end="")
-                    way, status = fix_polygon(v['ways'], 1000)
+                    way, status = fix_polygon([w for w in v['ways'] if not isinstance(w, int)], 10000000)
                     if way is None:
                         # si esta roto, buscar en la base de datos si hay uno con ese id y usar ese way
-                        self.out2(" ERROR")
-                        dbadminarea = AdministrativeArea.objects.filter(osm_id=v['osm_id'], osm_type=v['osm_type'])
+                        self.out2(f' ERROR: {status}')
                         if dbadminarea:
-                            way = dbadminarea[0].geometry
+                            way = dbadminarea.geometry
                     else:
                         admin_count = admin_count + 1
                         self.out2(f" OK -> {len(way)}")
@@ -754,13 +769,14 @@ class Command(BaseCommand):
                             poly = Polygon(way)
                             v['geometry'] = poly
                             v['geometry_simple'] = poly.simplify(0.01, True)
-                            admin_areas[v['admin_level']].append(v)
+                            if v['osm_id'] != KING_ID:
+                                admin_areas[v['admin_level']].append(v)
                         except Exception as e:
                             try:
                                 self.out2(f" {e}, retrying as multipolygon")
                                 mp = []
                                 for p in way:
-                                    p_fixed, status = fix_polygon(p, 1000)
+                                    p_fixed, status = fix_polygon(p, 10000000)
                                     if p_fixed:
                                         try:
                                             mp.append(Polygon(p_fixed))
@@ -770,73 +786,30 @@ class Command(BaseCommand):
                                 poly = MultiPolygon(mp)
                                 v['geometry'] = poly
                                 v['geometry_simple'] = poly.simplify(0.01, True)
-                                admin_areas[v['admin_level']].append(v)
+                                if v['osm_id'] != KING_ID:
+                                    admin_areas[v['admin_level']].append(v)
+                                self.out2('-> ok')
                             except Exception as e2:
                                 traceback.print_exc()
                                 self.out2(f" {e2}, error")
+                        if v['osm_id'] == KING_ID:
+                            KING = v
             self.out2(f"TOTALS: {admin_count_all} {admin_count} {admin_count_ok}, {len(admin_areas)}")
 
-            # TODO: add tests!
-            # from django.contrib.gis.geos import LineString, Polygon
+            def fuzzy_contains(out_geom, in_geom, buffer=0):
+                return (
+                    out_geom.intersects(in_geom) and  # optimization
+                    out_geom.buffer(buffer).contains(in_geom)
+                )
 
-            # admin_areas = [
-            #     [],
-            #     [],
-            #     [],
-            #     [],
-            #     [],
-            #     [
-            #         {
-            #             'geometry': Polygon([[0,0], [5,0], [5,5], [0,0]]),
-            #             'admin_level': 5,
-            #             'name': 'big1',
-            #             'osm_id': '123120',
-            #         },
-            #         {
-            #             'geometry': Polygon([[0,0], [5,0], [5,-5], [0,0]]),
-            #             'admin_level': 5,
-            #             'name': 'big2',
-            #             'osm_id': '123121',
-            #         }
-            #     ],
-            #     [
-            #         {
-            #             'geometry': Polygon([[0,0], [4,0], [4,4], [0,0]]),
-            #             'admin_level': 6,
-            #             'name': 'small1',
-            #             'osm_id': '123122',
-            #         },
-            #         {
-            #             'geometry': Polygon([[0,0], [4,0], [4,-4], [0,0]]),
-            #             'admin_level': 6,
-            #             'name': 'small2',
-            #             'osm_id': '123123',
-            #         }
-            #     ],
-            #     [],
-            #     [],
-            #     [],
-            #     [],
-            #     [],
-            #     [],
-            # ]
-            # import pdb; pdb.set_trace()
-            mock_argentina_geometry = Polygon([[0, 0], [1, 1], [2, 2], [0, 0]])
+            KING_GEOM_BUFF = KING['geometry_simple'].buffer(0.01)
 
             def get_parent_aa(node, geometry):
                 try:
-                    condition = False
-                    try:
-                        condition = node['data']['geometry_simple'] is mock_argentina_geometry or (
-                            node['data']['geometry_simple'].intersects(geometry) and  # optimization
-                            node['data']['geometry_simple'].intersection(geometry).area > geometry.area * 0.8
-                        )
-                    except Exception:
-                        condition = node['data']['geometry_simple'] is mock_argentina_geometry or (
-                            # node['data']['geometry'].intersects(geometry) and  # optimization
-                            node['data']['geometry'].intersection(geometry).area > geometry.area * 0.8
-                        )
-                    if condition:
+                    if (
+                        node['data']['osm_id'] is KING_ID or
+                        fuzzy_contains(node['data']['geometry_simple'], geometry, 0.01)
+                    ):
                         parent_aa = None
                         for child in node['children']:
                             parent_aa = get_parent_aa(child, geometry)
@@ -859,17 +832,19 @@ class Command(BaseCommand):
             tree = {
                 'children': [],
                 'data': {
-                    'geometry': mock_argentina_geometry,
-                    'geometry_simple': mock_argentina_geometry,
-                    'osm_id': '0',
-                    'osm_type': 'r',
-                    'name': 'Argentina',
-                    'tags': {}
+                    'geometry': KING['geometry_simple'],
+                    'geometry_simple': KING['geometry_simple'],
+                    'osm_id': KING['osm_id'],
+                    'osm_type': KING['osm_type'],
+                    'name': KING['name'],
+                    'tags': KING['tags'],
                 }
             }
             for li in admin_areas:
                 # aa = admin area
                 for aa in li:
+                    if not aa['geometry'].intersects(KING_GEOM_BUFF):
+                        continue
                     try:
                         parent_aa = get_parent_aa(tree, aa['geometry'])
                         aa.pop('admin_level')
@@ -892,6 +867,9 @@ class Command(BaseCommand):
             # print_tree(tree)
 
             AdministrativeArea.load_bulk([tree])
+
+            for K in OLD_KING:
+                K.delete()
 
         #######################
         #  POIs de osm        #
@@ -949,12 +927,11 @@ class Command(BaseCommand):
                         osm_id,
                         ST_Centroid(way),
                         upper(translate(pop.name, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ"', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU ')),
-                        pop.name || coalesce(', ' || zo.name, ''),
+                        pop.name,
                         tags,
                         'w'
                     FROM
                         planet_osm_polygon as pop
-                        left outer join catastro_zona zo on (ST_Intersects(pop.way, zo.geo))
                     WHERE
                         pop.name is not null and
                         highway is null and
@@ -978,12 +955,11 @@ class Command(BaseCommand):
                         osm_id,
                         way,
                         upper(translate(pop.name, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ"', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU ')),
-                        pop.name || coalesce(', ' || zo.name, ''),
+                        pop.name,
                         tags,
                         'n'
                     FROM
                         planet_osm_point as pop
-                        left outer join catastro_zona zo on (ST_Intersects(pop.way, zo.geo))
                     WHERE
                         pop.name is not null
                         and osm_id > 0
@@ -1033,13 +1009,12 @@ class Command(BaseCommand):
             cu.execute('delete from catastro_interseccion')
             cu.execute('''
                 SELECT
-                    SEL1.nom || ' y ' || SEL2.nom || coalesce(', ' || z.name, '') as nom,
-                    upper(translate(SEL1.nom || ' y ' || SEL2.nom || coalesce(', ' || z.name, ''), 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU')) as nom_normal,
+                    SEL1.nom || ' y ' || SEL2.nom as nom,
+                    upper(translate(SEL1.nom || ' y ' || SEL2.nom, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU')) as nom_normal,
                     ST_Intersection(SEL1.way, SEL2.way) as latlng
                 FROM
                     catastro_calle AS SEL1
                     join catastro_calle as SEL2 on (ST_Intersects(SEL1.way, SEL2.way) and ST_GeometryType(ST_Intersection(SEL1.way, SEL2.way):: Geometry)='ST_Point' )
-                    left outer join catastro_zona as z on(ST_Intersects(z.geo, ST_Intersection(SEL1.way, SEL2.way)))
             ''')
             self.out2('Generando slugs')
             intersections = cu.fetchall()

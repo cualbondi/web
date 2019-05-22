@@ -140,6 +140,7 @@
             var geojson = L.geoJson({{ obj.latlng.geojson | safe }});
             var geojsonc = geojson;
             {% elif obj.geometry %}
+            // TODO: add all recorridos in this adminarea also
             var geojson = L.geoJson({{ obj.geometry.geojson | safe }});
             var geojsonc = geojson;
             {% endif %}
