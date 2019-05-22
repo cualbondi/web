@@ -1,3 +1,4 @@
+import unicodedata
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import HStoreField
 from django.db.models import Manager as GeoManager
@@ -5,61 +6,18 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
-
+from treebeard.mp_tree import MP_Node
 from .managers import (
-    CiudadManager, ZonaManager, PuntoBusquedaManager)
+    CiudadManager,
+    ZonaManager,
+    PuntoBusquedaManager
+)
 
-""" Dejemos estos modelos comentados hasta que resolvamos
-la migracion de Provincia y Ciudad """
 
-
-# class ArgAdm1(models.Model):
-#    gid = models.IntegerField(primary_key=True)
-#    id_0 = models.IntegerField()
-#    iso = models.CharField(max_length=3)
-#    name_0 = models.CharField(max_length=75)
-#    id_1 = models.IntegerField()
-#    name_1 = models.CharField(max_length=75)
-#    varname_1 = models.CharField(max_length=150)
-#    nl_name_1 = models.CharField(max_length=50)
-#    hasc_1 = models.CharField(max_length=15)
-#    cc_1 = models.CharField(max_length=15)
-#    type_1 = models.CharField(max_length=50)
-#    engtype_1 = models.CharField(max_length=50)
-#    validfr_1 = models.CharField(max_length=25)
-#    validto_1 = models.CharField(max_length=25)
-#    remarks_1 = models.CharField(max_length=125)
-#    shape_leng = models.DecimalField(max_digits=7, decimal_places=2)
-#    shape_area = models.DecimalField(max_digits=7, decimal_places=2)
-#    the_geom = models.MultiPolygonField(srid=-1)
-#    objects = GeoManager()
-#    class Meta:
-#        db_table = u'arg_adm1'
-
-# class ArgAdm2(models.Model):
-#    gid = models.IntegerField(primary_key=True)
-#    id_0 = models.IntegerField()
-#    iso = models.CharField(max_length=3)
-#    name_0 = models.CharField(max_length=75)
-#    id_1 = models.IntegerField()
-#    name_1 = models.CharField(max_length=75)
-#    id_2 = models.IntegerField()
-#    name_2 = models.CharField(max_length=75)
-#    varname_2 = models.CharField(max_length=150)
-#    nl_name_2 = models.CharField(max_length=75)
-#    hasc_2 = models.CharField(max_length=15)
-#    cc_2 = models.CharField(max_length=15)
-#    type_2 = models.CharField(max_length=50)
-#    engtype_2 = models.CharField(max_length=50)
-#    validfr_2 = models.CharField(max_length=25)
-#    validto_2 = models.CharField(max_length=25)
-#    remarks_2 = models.CharField(max_length=100)
-#    shape_leng = models.DecimalField(max_digits=7, decimal_places=2)
-#    shape_area = models.DecimalField(max_digits=7, decimal_places=2)
-#    the_geom = models.MultiPolygonField(srid=-1)
-#    objects = GeoManager()
-#    class Meta:
-#        db_table = u'arg_adm2'
+# de http://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string/517974#517974
+def remove_accents(input_str):
+    nkfd_form = unicodedata.normalize('NFKD', input_str)
+    return "".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
 
 class Provincia(models.Model):
@@ -140,7 +98,7 @@ class ImagenCiudad(models.Model):
     def _custom_890x300(self):
         try:
             return self.custom_890x300
-        except:
+        except Exception:
             return None
 
     custom_890x300 = property(_custom_890x300)
@@ -194,7 +152,7 @@ class Poi(models.Model):
         super(Poi, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('poi', kwargs={'slug': self.slug})
+        return reverse('poi_old', kwargs={'slug': self.slug})
 
 
 class Interseccion(models.Model):
@@ -219,15 +177,6 @@ class Interseccion(models.Model):
 
     def get_absolute_url(self):
         return reverse('interseccion', kwargs={'slug': self.slug})
-
-
-# de http://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string/517974#517974
-import unicodedata
-
-
-def remove_accents(input_str):
-    nkfd_form = unicodedata.normalize('NFKD', input_str)
-    return "".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
 
 class Poicb(models.Model):
@@ -280,3 +229,30 @@ class GoogleGeocoderCache(models.Model):
 
     class Meta:
         unique_together = ('query', 'ciudad')
+
+
+class AdministrativeArea(MP_Node):
+    TYPE_RELATION = 'r'
+    TYPE_WAY = 'w'
+    TYPE_NODE = 'n'
+    OSM_TYPE_CHOICES = (
+        (TYPE_RELATION, 'Relation'),
+        (TYPE_WAY, 'Way'),
+        (TYPE_NODE, 'Node'),
+    )
+    osm_type = models.CharField(db_index=True, max_length=1, choices=OSM_TYPE_CHOICES)
+    osm_id = models.BigIntegerField(db_index=True)
+    name = models.TextField()
+    geometry = models.GeometryField(spatial_index=True)
+    geometry_simple = models.GeometryField(spatial_index=True)
+    tags = HStoreField()
+    img_panorama = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
+    img_cuadrada = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
+
+    node_order_by = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('administrativearea', kwargs={'osm_type': self.osm_type, 'osm_id': self.osm_id, 'slug': slugify(self.name)})

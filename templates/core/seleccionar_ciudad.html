@@ -191,7 +191,6 @@
             }
             a.social-icon.facebook { background-position: -60px 0; margin-right: 10px; }
             a.social-icon.twitter { background-position: 0px 0; margin-right: 10px; }
-            a.social-icon.android { background-position: -118px 0; }
         </style>
 	</head>
 	<body>
@@ -200,8 +199,8 @@
                 <div class="floated-left" align="center" style="width: 300px; margin-top: 20px;"><img style="min" src="{{ STATIC_URL }}img/isologo.png"></div>
                 <div class="floated-left bs-docs-sidebar" style="width: 250px; margin-top: 20px;">
                     <ul class="nav nav-list bs-docs-sidenav">
-                        {% for ciudad in ciudades %}
-                        <li><a href="/mapa/{{ciudad.slug}}/"><i class="icon-chevron-right"></i> {{ciudad.nombre}}</a></li>
+                        {% for c in ciudades %}
+                        <li><a href="/mapa/{{c.slug}}/"><i class="icon-chevron-right"></i> {{c.name}}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -213,7 +212,6 @@
                     <div>
                         <a class="social-icon facebook" href="http://facebook.com/cualbondi"></a>
                         <a class="social-icon twitter" href="http://twitter.com/cualbondi"></a>
-                        <a class="social-icon android" href="http://bit.ly/HfmNTT"></a>
                     </div>
                 </div>
             </div>

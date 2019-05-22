@@ -590,6 +590,7 @@ FROM
                 r.inicio as inicio,
                 r.fin as fin,
                 r.slug as slug,
+                r.osm_id,
                 l.slug as linea_slug,
                 l.nombre as linea_nombre,
                 cc.slug as ciudad_slug

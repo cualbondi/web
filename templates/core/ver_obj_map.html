@@ -139,6 +139,10 @@
             {% elif obj.latlng %}
             var geojson = L.geoJson({{ obj.latlng.geojson | safe }});
             var geojsonc = geojson;
+            {% elif obj.geometry %}
+            // TODO: add all recorridos in this adminarea also
+            var geojson = L.geoJson({{ obj.geometry.geojson | safe }});
+            var geojsonc = geojson;
             {% endif %}
             map.fitBounds(geojsonc);
             var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';

@@ -4,10 +4,10 @@ argon2-cffi==19.1.0  # https://github.com/hynek/argon2_cffi
 
 # Django
 # ------------------------------------------------------------------------------
-django==2.2.1  # pyup: < 2.1  # https://www.djangoproject.com/
+django==2.2.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 
-django-extensions==2.1.6 # for shell_plus
+django-extensions==2.1.6  # https://github.com/django-extensions/django-extensions
 
 # Django REST Framework
 djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
@@ -20,6 +20,8 @@ django-cors-headers==3.0.0 # https://github.com/ottoyiu/django-cors-headers
 django-leaflet==0.24.0 # https://github.com/makinacorpus/django-leaflet
 
 geopy==1.19.0 # https://github.com/geopy/geopy
+
+django-treebeard==4.3 # https://github.com/django-treebeard/django-treebeard
 
 django-rest-framework-social-oauth2==1.1.0 # https://github.com/RealmTeam/django-rest-framework-social-oauth2
 geopandas==0.5.0

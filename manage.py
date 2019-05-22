@@ -27,4 +27,14 @@ if __name__ == "__main__":
     current_path = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(os.path.join(current_path, "web"))
 
+    if os.environ.get("DEBUG", False):
+        if os.environ.get('RUN_MAIN') or os.environ.get('WERKZEUG_RUN_MAIN'):
+            try:
+                import ptvsd
+                ptvsd.enable_attach(address=("0.0.0.0", 4000), redirect_output=True)
+            except ModuleNotFoundError as ex:
+                print("%s required to debug the application" % ex.name)
+            except Exception as e:
+                print(e)
+
     execute_from_command_line(sys.argv)

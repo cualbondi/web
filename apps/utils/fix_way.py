@@ -1,4 +1,5 @@
-from django.contrib.gis.geos import GEOSGeometry, MultiLineString, LineString
+from django.contrib.gis.geos import GEOSGeometry, MultiLineString, LineString, Point
+from functools import lru_cache
 import math
 
 
@@ -13,6 +14,7 @@ def first_pass(ways):
     n = len(ways)
     ordered_ways = [ways[0][:]]
     for i in range(1, n):
+        # print(f'{i},', end='')
         way = ways[i][:]
         prev_way = ordered_ways[-1][:]
         # if its the first segment on the linestring,
@@ -36,6 +38,37 @@ def first_pass(ways):
     return ordered_ways
 
 
+@lru_cache(maxsize=2**20)
+def pointdistance(p1, p2):
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+    # return Point(p1).distance(Point(p2))
+
+
+def edgedistance(w1, w2):
+    w1p1 = tuple(w1[0])
+    w1p2 = tuple(w1[-1])
+    w2p1 = tuple(w2[0])
+    w2p2 = tuple(w2[-1])
+    return min(
+        pointdistance(w1p1, w2p1),
+        pointdistance(w1p2, w2p2),
+        pointdistance(w1p1, w2p2),
+        pointdistance(w1p2, w2p1),
+    )
+
+# import cProfile
+
+# def profileit(func):
+#     def wrapper(*args, **kwargs):
+#         datafn = func.__name__ + ".profile"  # Name the data file sensibly
+#         prof = cProfile.Profile()
+#         retval = prof.runcall(func, *args, **kwargs)
+#         prof.dump_stats(datafn)
+#         return retval
+
+#     return wrapper
+
+# @profileit
 def sort_ways(ways):
     """
         move ways from one place to another to get the closest ones together
@@ -58,14 +91,34 @@ def sort_ways(ways):
     #     if (first[-1] == w[-1]):
     #         count_touches -= 1
     #     return d + count_touches
-    ws = [w if isinstance(w, LineString) else LineString(w) for w in ways[:]]
+    # from timeit import default_timer as timer
+    # t1 = timer()
+    ws = ways[:]
+    # ws = [w if isinstance(w, LineString) else LineString(w) for w in ways[:]]
     sorted_ways = [ws[0]]
     ws = ws[1:]
     while len(ws) > 0:
+        # print(f'{len(ws)}')
+        # print(pointdistance.cache_info())
         # ws = sorted(ws, key=lambda w: sort_function(sorted_ways[-1], w))
-        ws = sorted(ws, key=lambda w: w.distance(sorted_ways[-1]))
-        sorted_ways.append(ws[0])
-        ws = ws[1:]
+        # ws = sorted(ws, key=lambda w: edgedistance(w, sorted_ways[-1]))
+        mindist = float('Inf')
+        minidx = None
+        for i in range(0, len(ws)):
+            w = ws[i]
+            dist = edgedistance(w, sorted_ways[-1])
+            if dist < mindist:
+                mindist = dist
+                minidx = i
+
+        sorted_ways.append(ws[minidx])
+        ws.pop(minidx)
+
+        # print(pointdistance.cache_info())
+    # 30.82882612600224
+
+    # t2 = timer()
+    # print(f'time: {t2-t1}')
 
     sorted_ways = [[list(n) for n in w] for w in sorted_ways]
 
@@ -148,6 +201,57 @@ def isLineString(way):
 
 def isMultiLineString(way):
     return isinstance(way[0][0][0], (int, float))
+
+
+def isClosedMultiPolygon(way):
+    isClosed = True
+    for w in way:
+        isClosed = isClosed and (isinstance(w[0], (int, float)) or (
+            isinstance(w[0][0], (int, float)) and
+            w[0][0] == w[-1][0] and
+            w[0][1] == w[-1][1]
+        ))
+    return isClosed
+
+
+def isOpenMultiPolygon(way):
+    return not isClosedMultiPolygon(way)
+
+
+def fix_polygon(way, tolerance=0):
+    """ tries to sort and fix the polygon into a closed multipolygon """
+
+    try:
+
+        if len(way) == 0:
+            return None, '5: broken, empty'
+        if isClosedMultiPolygon(way):
+            return way, '0: ok'
+        if isOpenMultiPolygon(way):
+            passed = first_pass(way[:])
+            if isClosedMultiPolygon(passed):
+                # print('SAFE first_pass!')
+                return passed, '1: ok, first_pass'
+            sorted = sort_ways(passed)
+            sorted_passed = first_pass(sorted)
+            if isClosedMultiPolygon(sorted_passed):
+                # print('SAFE sorted!')
+                return sorted_passed, '2: broken, sort'
+            if tolerance > 0:
+                tolerated_sorted = join_ways(sorted, tolerance)
+                if isClosedMultiPolygon(tolerated_sorted):
+                    # print('SAFE tolerance!')
+                    return tolerated_sorted, '3b: broken, sort + tolerance'
+
+            # print(len(way))
+            # print(way.ewkt)
+
+        return None, '4: broken'
+
+    except Exception as e:
+        # import traceback
+        # traceback.print_exc()
+        return None, '9: ERROR PROCESSING: {}'.format(str(e))
 
 
 def fix_way(way, tolerance=0):

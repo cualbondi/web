@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:disco
 
 ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev pngcrush \
     libtiff5-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev google-chrome-stable \
     cron \
-    libboost-all-dev \
+    libboost-python-dev \
     libbz2-dev \
     gcc \
     g++ \
@@ -45,6 +45,8 @@ RUN echo "14 3 * * * root /usr/bin/python3 /app/manage.py update_osm --cross --i
 RUN echo "54 3 * * * root /usr/bin/python3 /app/manage.py update_osm --pois >> /var/log/cualbondi-pois.log 2>&1" >> /etc/cron.d/osm-cualbondi
 RUN echo "20 4 * * * root /usr/bin/python3 /app/manage.py calcular_envolventes >> /var/log/cualbondi-envolventes.log 2>&1" >> /etc/cron.d/osm-cualbondi
 RUN echo "30 4 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sP >> /var/log/cualbondi-thumbs_pois.log 2>&1" >> /etc/cron.d/osm-cualbondi
+RUN echo "10 5 * * * root /usr/bin/python3 /app/manage.py -f /tmp/part-all.o5m --admin_areas >> /var/log/cualbondi-adminareas.log 2>&1" >> /etc/cron.d/osm-cualbondi
+RUN echo "30 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs_catastro -s >> /var/log/cualbondi-thumbs_catastro.log 2>&1" >> /etc/cron.d/osm-cualbondi
 RUN chmod 0644 /etc/cron.d/osm-cualbondi
 
 COPY ./docker/production/gunicorn.sh /gunicorn.sh

@@ -84,6 +84,7 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
+    'treebeard',
 ]
 LOCAL_APPS = [
     'apps.usuarios.apps.UsuariosConfig',
@@ -157,11 +158,15 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.core.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'apps.core.middleware.WhodidMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+]
+
+IGNORE_AUTH_URL_PATTERNS = [
+    '^/$',
 ]
 
 # STATIC
@@ -211,17 +216,15 @@ TEMPLATES = [
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
+                # 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
-                'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'apps.core.context_processors.lista_ciudades',
-                'apps.core.context_processors.get_ciudad_actual',
+
                 'apps.core.context_processors.home_url',
                 'apps.core.context_processors.facebook_app_id',
+                'apps.core.context_processors.ciudades',
 
                 # TODO: revisar si necesitamos estos dos https://github.com/RealmTeam/django-rest-framework-social-oauth2
                 'social_django.context_processors.backends',
@@ -271,7 +274,7 @@ RADIO_ORIGEN_DEFAULT = 200
 RADIO_DESTINO_DEFAULT = 200
 LONGITUD_PAGINA = 5
 
-HOME_URL = env.get_value('HOME_URL', default='https://cualbondi.com.ar')
+HOME_URL = env.get_value('HOME_URL', default='https://localhost:8080')
 FACEBOOK_APP_ID = env.get_value('FACEBOOK_APP_ID', default='')
 API_URL = env.get_value('API_URL', default='')
 
@@ -281,6 +284,7 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
     ],
+    'EXCEPTION_HANDLER': 'apps.api3.exceptions.exception_handler',
 }
 DRFSO2_PROPRIETARY_BACKEND_NAME = 'Facebook'
 AUTHENTICATION_BACKENDS = [
@@ -349,3 +353,7 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 SHELL_PLUS_PRINT_SQL = True
+
+# This is to stop the engine doing a SELECT postgis_version() on every request
+# remember to change the version when upgrading postgis
+POSTGIS_VERSION = (2, 5, 0, )

@@ -2,7 +2,6 @@ import uuid
 from datetime import datetime
 from django.contrib.gis.db import models
 from django.db.models import Manager as GeoManager
-from django.shortcuts import get_object_or_404
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 
@@ -24,6 +23,7 @@ class Linea(models.Model):
     cp = models.CharField(max_length=20, blank=True, null=True)
     telefono = models.CharField(max_length=200, blank=True, null=True)
     envolvente = models.PolygonField(blank=True, null=True)
+    osm_id = models.BigIntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.nombre
@@ -32,22 +32,20 @@ class Linea(models.Model):
         self.slug = slugify(self.nombre)
         super(Linea, self).save(*args, **kwargs)
 
-    def get_absolute_url(self, ciudad_slug=None):
-        # chequear si la linea está en esta ciudad, sino tirar excepcion
-        if ciudad_slug is None:
-            try:
-                ciudad_slug = self.ciudades.all().only('slug')[0].slug
-            except Exception as e:
-                print(e)
-                print(self)
-                return ""
-        else:
-            get_object_or_404(Ciudad, slug=ciudad_slug, lineas=self)
-        return reverse('ver_linea',
-                       kwargs={
-                           'nombre_ciudad': ciudad_slug,
-                           'nombre_linea': self.slug
-                       })
+    def get_absolute_url(self):
+        sid = self.osm_id
+        tid = 'r'
+        if self.osm_id is None:
+            sid = self.id
+            tid = 'c'
+        return reverse(
+            'ver_linea',
+            kwargs={
+                'osm_type': tid,
+                'osm_id': sid,
+                'slug': self.slug,
+            }
+        )
 
 
 class Recorrido(models.Model):
@@ -108,37 +106,20 @@ class Recorrido(models.Model):
     class Meta:
         ordering = ['linea__nombre', 'nombre']
 
-    def get_absolute_url(self, ciudad_slug=None, linea_slug=None, slug=None):
-        # chequear si la linea/recorrido está en esta ciudad, sino tirar excepcion
-        if ciudad_slug is None:
-            try:
-                ciudad_slug = self.ciudad_slug
-            except:
-                try:
-                    ciudad_slug = self.ciudades.all()[0].slug
-                except Exception as e:
-                    print(e)
-                    print(self)
-                    return ""
-                    # raise
-        else:
-            # Esto lo comento porque hace muuuy lento a todo el sistema.
-            # Mas vale tomo como que el slug esta siempre bien. De ultima como mucho, me genera un link que da un 404.
-            # get_object_or_404(Ciudad, slug=ciudad_slug, lineas=self.linea)
-            pass
-        if linea_slug is None:
-            try:
-                linea_slug = self.linea_slug
-            except:
-                linea_slug = self.linea.slug  # Esto genera una consulta mas
-        if slug is None:
-            slug = self.slug  # Esto puede generar otra a veces
-        return reverse('ver_recorrido',
-                       kwargs={
-                           'nombre_ciudad': ciudad_slug,
-                           'nombre_linea': linea_slug,
-                           'nombre_recorrido': slug
-                       })
+    def get_absolute_url(self):
+        sid = self.osm_id
+        tid = 'w'
+        if self.osm_id is None:
+            sid = self.id
+            tid = 'c'
+        return reverse(
+            'ver_recorrido',
+            kwargs={
+                'osm_type': tid,
+                'osm_id': sid,
+                'slug': self.slug,
+            }
+        )
 
 
 class Posicion(models.Model):

@@ -1,22 +1,18 @@
 # -*- coding: UTF-8 -*-
-from django.shortcuts import (get_object_or_404, render,
-                              redirect)
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_GET, require_http_methods
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.gis.measure import D
-
-from apps.core.models import Linea, Recorrido, Tarifa, Parada
-from apps.catastro.models import Ciudad, ImagenCiudad, Poi, Zona
-
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponsePermanentRedirect, Http404
+from django.db.models import Prefetch, Count, F
+from django.contrib.gis.measure import D, A
+from django.contrib.gis.db.models.functions import SymDifference, Area, Intersection
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
-from apps.editor.models import LogModeracion
 
-from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
-from django.db.models import Prefetch, Count
-
+from apps.core.models import Linea, Recorrido, Parada
+from apps.catastro.models import Ciudad, Poi, Zona, AdministrativeArea
+from apps.utils import data
 
 
 @csrf_exempt
@@ -29,7 +25,7 @@ def agradecimientos(request):
 
     try:
         flatpage_edicion = FlatPage.objects.get(url__contains='contribuir')
-    except:
+    except Exception:
         flatpage_edicion = None
 
     return render(
@@ -61,60 +57,17 @@ def natural_sort_qs(qs, key):
 def index(request):
     return render(
         request,
-        'core/seleccionar_ciudad.html'
+        'core/seleccionar_ciudad.html',
+        {
+            'ciudades': data.ciudades
+        }
     )
 
 
 @csrf_exempt
 @require_GET
-def ver_ciudad(request, nombre_ciudad):
-    slug_ciudad = slugify(nombre_ciudad)
-    ciudad_actual = get_object_or_404(
-        Ciudad.objects
-            .only('nombre', 'slug', 'img_panorama', 'descripcion')
-            .prefetch_related(Prefetch('lineas', queryset=Linea.objects.all().only('nombre', 'slug'))),
-        slug=slug_ciudad,
-        activa=True)
-
-    lineas = natural_sort_qs(ciudad_actual.lineas.all(), 'slug')
-    tarifas = Tarifa.objects.filter(ciudad=ciudad_actual)
-
-    imagenes = ImagenCiudad.objects.filter(ciudad=ciudad_actual)
-
-    template = "core/ver_ciudad.html"
-    if (request.GET.get("dynamic_map")):
-        template = "core/ver_obj_map.html"
-
-    return render(request, template,
-                              {'obj': ciudad_actual,
-                               'ciudad_actual': ciudad_actual,
-                               'imagenes': imagenes,
-                               'lineas': lineas,
-                               'tarifas': tarifas}
-                               )
-
-
-@csrf_exempt
-@require_GET
-def ver_mapa_ciudad(request, nombre_ciudad):
-    desde = request.GET.get("desde")
-    hasta = request.GET.get("hasta")
-    slug_ciudad = slugify(nombre_ciudad)
-    ciudad_actual = get_object_or_404(Ciudad, slug=slug_ciudad, activa=True)
-    #        "default_lat":ciudad_actual.centro.coords[1],
-    #        "default_lon":ciudad_actual.centro.coords[0],
-#    pois = Poi.objects.filter(ciudad=ciudad_actual)
-#    comercios = Comercio.objects.filter(ciudad=ciudad_actual)
-
-    API_URL = settings.API_URL
-
-    return render(request, 'core/buscador.html', {
-                                    'es_vista_mapa': True,
-                                    'ciudad_actual': ciudad_actual,
-                                    'desde': desde,
-                                    'hasta': hasta,
-                                    'API_URL': API_URL,
-                              })
+def ver_mapa_ciudad(request, administrativearea_slug):
+    return redirect('https://localhost:8083' + request.path + '?' + request.GET.urlencode())
 
 
 @csrf_exempt
@@ -124,85 +77,126 @@ def redirect_sockjs_dev(request):
 
 @csrf_exempt
 @require_GET
-def ver_linea(request, nombre_ciudad, nombre_linea):
-    slug_ciudad = slugify(nombre_ciudad)
-    slug_linea = slugify(nombre_linea)
+def ver_linea(request, osm_type=None, osm_id=None, slug=None):
+    """
+        osm_type =
+            - 'c': cualbondi recorrido, usar id de la tabla directamente
+            - 'r': relation de osm, usar osm_id con el campo osm_id
+    """
+    # TODO: redirect id c123 a r123 si viene con osm_type=c y existe el osm_id
+    linea_q = Linea.objects.only('nombre', 'slug', 'img_cuadrada', 'info_empresa', 'info_terminal', 'img_panorama', 'envolvente')
+    linea = None
+    if osm_type == 'c':
+        linea = get_object_or_404(linea_q, id=osm_id)
+    elif osm_type == 'r':
+        linea = get_object_or_404(linea_q, osm_id=osm_id)
 
-    ciudad_actual = get_object_or_404(Ciudad.objects.only('nombre', 'slug'), slug=slug_ciudad, activa=True)
-    """ TODO: Buscar solo lineas activas """
-    linea_actual = get_object_or_404(
-        Linea.objects
-            .only('nombre', 'slug', 'img_cuadrada', 'info_empresa', 'info_terminal', 'img_panorama'),
-        slug=slug_linea,
-        ciudades=ciudad_actual
-    )
-    recorridos = natural_sort_qs(linea_actual.recorridos.all().defer('ruta'), 'slug')
+    if slug is None or slug != slugify(linea.nombre):
+        # Redirect with correct slug
+        return HttpResponsePermanentRedirect(linea.get_absolute_url())
+
+    linea__envolvente = linea.envolvente.simplify(0.001, True)
+
+    recorridos = natural_sort_qs(linea.recorridos.all().defer('ruta'), 'slug')
+
+    # aa = AdministrativeArea.objects \
+    #     .filter(geometry_simple__intersects=linea.envolvente) \
+    #     .annotate(inter_area=DBArea(Intersection(F('geometry_simple'), linea.envolvente))) \
+    #     .filter(inter_area__gt=Area(sq_m=linea.envolvente.area * 0.8)) \
+    #     .annotate(area=DBArea(F('geometry_simple'))) \
+    #     .order_by('area')
+
+    # aa = AdministrativeArea.objects \
+    #     .filter(geometry_simple__intersects=linea.envolvente) \
+    #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea.envolvente)) / Area(Union(F('geometry_simple'), linea.envolvente))) \
+    #     .order_by('symdiff_area')
+
+    aa = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=linea__envolvente) \
+        .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea__envolvente)) / (Area(F('geometry_simple')) + Area(linea__envolvente))) \
+        .annotate(intersection_area=Area(Intersection(F('geometry_simple'), linea__envolvente)) / Area(linea__envolvente)) \
+        .filter(intersection_area__gt=A(sq_m=0.8)) \
+        .order_by('symdiff_area')
+
+    # for a in aa:
+    #     print(f'{a.symdiff_area, a.intersection_area, a.name}')
+
+    # aa = AdministrativeArea.objects \
+    #     .filter(geometry_simple__intersects=linea.envolvente) \
+    #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea.envolvente))) \
+    #     .order_by('symdiff_area')
+
+    # Zonas por las que pasa el recorrido
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=linea__envolvente, depth__gt=3) \
+        .order_by('depth', 'name')
+
+    if aa:
+        aa = aa[0]
+        aaancestors = aa.get_ancestors().reverse()
+    else:
+        aa = None
+        aaancestors = None
 
     template = "core/ver_linea.html"
-    if ( request.GET.get("dynamic_map") ):
+    if (request.GET.get("dynamic_map")):
         template = "core/ver_obj_map.html"
 
-    return render(request, template,
-                              {'obj': linea_actual,
-                               'ciudad_actual': ciudad_actual,
-                               'linea_actual': linea_actual,
-                               'recorridos': recorridos
-                               })
-
-
-import threading
-
-class PararellThread(threading.Thread):
-    def __init__(self, qs):
-        threading.Thread.__init__(self)
-        self.qs = qs
-        self.result = []
-
-    def run(self):
-        self.result = list(self.qs)
-
-def get_objects_in_pararell(querysets):
-    threads = []
-    result = []
-    for qs in querysets:
-        t = PararellThread(qs)
-        t.start()
-        threads.append(t)
-
-    for thread in threads:
-        thread.join()
-        for obj in thread.result:
-            result.append(obj)
-
-    return result
+    return render(
+        request,
+        template,
+        {
+            'obj': linea,
+            'recorridos': recorridos,
+            'adminarea': aa,
+            'adminareaancestors': aaancestors,
+            'adminareas': aas,
+        }
+    )
 
 
 @csrf_exempt
 @require_GET
-def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
-    slug_ciudad = slugify(nombre_ciudad)
-    slug_linea = slugify(nombre_linea)
-    slug_recorrido = slugify(nombre_recorrido)
+def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
+    """
+        osm_type =
+            - 'c': cualbondi recorrido, usar id de la tabla directamente
+            - 'r': relation de osm, usar osm_id con el campo osm_id
+    """
+    recorrido_q = Recorrido.objects \
+        .only('nombre', 'slug', 'inicio', 'fin', 'img_cuadrada', 'img_panorama', 'ruta', 'linea', 'osm_id') \
+        .select_related('linea')
+    recorrido = None
+    if osm_type == 'c':
+        recorrido = get_object_or_404(recorrido_q, id=osm_id)
+    elif osm_type == 'w':
+        recorrido = get_object_or_404(recorrido_q, osm_id=osm_id)
 
-    ciudad_actual = get_object_or_404(
-        Ciudad.objects.only('nombre', 'slug'),
-        slug=slug_ciudad,
-        activa=True
-    )
-    """ TODO: Buscar solo lineas activas """
-    linea_actual = get_object_or_404(
-        Linea.objects.defer('envolvente'),
-        slug=slug_linea,
-        ciudades=ciudad_actual
-    )
-    """ TODO: Buscar solo recorridos activos """
-    recorrido_actual = get_object_or_404(
-        Recorrido.objects.select_related('linea').defer('linea__envolvente'),
-        slug=slug_recorrido,
-        linea=linea_actual
-    )
+    if slug is None or slug != recorrido.slug:
+        # Redirect with correct slug
+        return HttpResponsePermanentRedirect(recorrido.get_absolute_url())
 
-    recorrido_actual_simplified = recorrido_actual.ruta.simplify(0.00005)
+    recorrido_simplified = recorrido.ruta.simplify(0.00005)
+    recorrido_buffer = recorrido_simplified.buffer(0.0001)
+
+    # aa = AdministrativeArea.objects \
+    #     .filter(geometry_simple__intersects=recorrido_simplified) \
+    #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), recorrido_simplified)) / (Area(F('geometry_simple')) + Area(recorrido_simplified))) \
+    #     .order_by('symdiff_area')
+
+    aa = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=recorrido_buffer) \
+        .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), recorrido_buffer)) / (Area(F('geometry_simple')) + Area(recorrido_buffer))) \
+        .annotate(intersection_area=Area(Intersection(F('geometry_simple'), recorrido_buffer)) / Area(recorrido_buffer)) \
+        .filter(intersection_area__gt=A(sq_m=0.8)) \
+        .order_by('symdiff_area')
+
+    if aa:
+        aa = aa[0]
+        aaancestors = aa.get_ancestors().reverse()
+    else:
+        aa = None
+        aaancestors = None
 
     # Calles por las que pasa el recorrido
     """
@@ -210,11 +204,11 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     # toma todas las calles cercanas al recorrido
     # simple pero no funciona bien, genera "falsos positivos", trae calles perpendiculares al recorrido
     # igual es lento: 13 seg
-    calles_fin = Calle.objects.filter(way__distance_lte=(recorrido_actual.ruta, D(m=20)))
+    calles_fin = Calle.objects.filter(way__distance_lte=(recorrido.ruta, D(m=20)))
 
     # alternativa con dwithin
     # igual es lento, pero 10 veces mejor que antes: 1.4 seg
-    calles_fin = Calle.objects.filter(way__dwithin=(recorrido_actual.ruta, D(m=20)))
+    calles_fin = Calle.objects.filter(way__dwithin=(recorrido.ruta, D(m=20)))
     """
     """
     # solucion 2
@@ -223,7 +217,7 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     # 0.003 seg x cant_puntos
     calles_ant = None
     calles_fin = []
-    for p in recorrido_actual.ruta.coords:
+    for p in recorrido.ruta.coords:
         calles = Calle.objects.filter(way__dwithin=(Point(p), D(m=50)))
         if calles_ant is not None:
             for c in calles_ant:
@@ -236,22 +230,25 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
     # TODO: tal vez se pueda mejorar eso con una custom query sola.
     """
     # solucion 3, como la solucion 2 pero con raw query (para bs as no anda bien)
-    if not recorrido_actual.descripcion or not recorrido_actual.descripcion.strip():
+    if not recorrido.descripcion or not recorrido.descripcion.strip():
         def uniquify(seq, idfun=None):
             if idfun is None:
-                def idfun(x): return x
+                def idfun(x):
+                    return x
             seen = {}
             result = []
             for item in seq:
                 marker = idfun(item)
-                if marker in seen: continue
+                if marker in seen:
+                    continue
                 seen[marker] = 1
                 result.append(item)
             return result
 
         from django.db import connection
         cursor = connection.cursor()
-        cursor.execute('''
+        cursor.execute(
+            '''
                 SELECT
                     (dp).path[1] as idp,
                     cc.nom       as nom
@@ -261,7 +258,7 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
                     ON ST_DWithin(cc.way, (dp).geom, 20)
             ''',
             (
-                recorrido_actual_simplified.ewkb,
+                recorrido_simplified.ewkb,
             )
         )
         from collections import OrderedDict
@@ -291,30 +288,33 @@ def ver_recorrido(request, nombre_ciudad, nombre_linea, nombre_recorrido):
         calles_fin = None
 
     # POI por los que pasa el recorrido
-    pois = Poi.objects.filter(latlng__dwithin=(recorrido_actual_simplified, D(m=400)))
+    pois = Poi.objects.filter(latlng__dwithin=(recorrido_simplified, D(m=400)))
 
     # Zonas por las que pasa el recorrido
-    zonas = Zona.objects.filter(geo__intersects=recorrido_actual_simplified).values('name')
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=recorrido_buffer, depth__gt=3) \
+        .order_by('depth')
 
     # Horarios + paradas que tiene este recorrido
-    horarios = recorrido_actual.horario_set.all().prefetch_related('parada')
+    horarios = recorrido.horario_set.all().prefetch_related('parada')
 
     template = "core/ver_recorrido.html"
-    if ( request.GET.get("dynamic_map") ):
+    if request.GET.get("dynamic_map"):
         template = "core/ver_obj_map.html"
 
-    recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_actual_simplified)
+    recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_simplified)
 
-    return render(request,
+    return render(
+        request,
         template,
         {
-            'obj': recorrido_actual,
-            'ciudad_actual': ciudad_actual,
-            'linea_actual': linea_actual,
-            'recorrido_actual': recorrido_actual,
+            'obj': recorrido,
+            'linea': recorrido.linea,
+            'adminarea': aa,
+            'adminareaancestors': aaancestors,
             'calles': calles_fin,
             'pois': pois,
-            'zonas': zonas,
+            'adminareas': aas,
             'horarios': horarios,
             'recorridos_similares': recorridos_similares
         }
@@ -331,17 +331,19 @@ def ver_parada(request, id=None):
         .prefetch_related(Prefetch('ciudades', queryset=Ciudad.objects.all().only('slug'))) \
         .order_by('linea__nombre', 'nombre') \
         .defer('linea__envolvente', 'ruta')
-    recorridosp = [h.recorrido for h in
-                   p.horario_set
-                    .all()
-                    .select_related('recorrido', 'recorrido__linea')
-                    .prefetch_related(Prefetch('recorrido__ciudades', queryset=Ciudad.objects.all().only('slug')))
-                    .order_by('recorrido__linea__nombre', 'recorrido__nombre')
+    recorridosp = [
+        h.recorrido for h in
+        p.horario_set
+        .all()
+        .select_related('recorrido', 'recorrido__linea')
+        .prefetch_related(Prefetch('recorrido__ciudades', queryset=Ciudad.objects.all().only('slug')))
+        .order_by('recorrido__linea__nombre', 'recorrido__nombre')
     ]
-    #Recorrido.objects.filter(horarios_set__parada=p).select_related('linea').order_by('linea__nombre', 'nombre')
-    pois = Poi.objects.filter(latlng__dwithin=(p.latlng, 300)) # este esta en metros en vez de degrees... no se por que, pero esta genial!
+    # Recorrido.objects.filter(horarios_set__parada=p).select_related('linea').order_by('linea__nombre', 'nombre')
+    pois = Poi.objects.filter(latlng__dwithin=(p.latlng, 300))  # este esta en metros en vez de degrees... no se por que, pero esta genial!
     ps = Parada.objects.filter(latlng__dwithin=(p.latlng, 0.004)).exclude(id=p.id)
-    return render(request,
+    return render(
+        request,
         "core/ver_parada.html",
         {
             'ciudad_actual': Ciudad.objects.filter(poligono__intersects=p.latlng),
@@ -356,22 +358,35 @@ def ver_parada(request, id=None):
 
 @csrf_exempt
 @require_GET
-def redirect_nuevas_urls(request, ciudad=None, linea=None, ramal=None, recorrido=None):
+def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorrido=None):
     """
-    cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/ (ANTES)
-    cualbondi.com.ar/la-plata/norte/10-desde-x-hasta-y (DESPUES)
+    # v1
+    cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/
     cualbondi.com.ar/cordoba/recorridos/T%20(Transversal)/Central/IDA/
+    # v2
+    cualbondi.com.ar/la-plata/norte/10-desde-x-hasta-y
+    # v3
+    cualbondi.com.ar/r/c123/asdasd
     """
-    url = '/'
+    ciudades = data.ciudades
+    ciudad = next((c for c in ciudades if c.slug == slug_ciudad), False)
     if not ciudad:
-        ciudad = 'la-plata'
-    url += slugify(ciudad) + '/'
-    if linea:
-        url += slugify(linea) + '/'
-        if ramal and recorrido:
-            try:
-                recorrido = Recorrido.objects.get(linea__nombre=linea, nombre=ramal, sentido=recorrido)
-                url += slugify(recorrido.nombre) + '-desde-' + slugify(recorrido.inicio) + '-hasta-' + slugify(recorrido.fin)
-            except ObjectDoesNotExist:
-                pass
-    return redirect(url)
+        raise Http404
+
+    # ciudad
+    if not slug_linea:
+        return redirect(get_object_or_404(AdministrativeArea, osm_type='r', osm_id=ciudad.osm_id), permanent=True)
+
+    # linea
+    lineas = Linea.objects.filter(slug=slug_linea, ciudades__slug=ciudad.slug)
+    if len(lineas) == 0:
+        raise Http404
+
+    if not slug_recorrido:
+        return redirect(lineas[0], permanent=True)
+
+    # recorrido
+    recorridos = Recorrido.objects.filter(slug=slug_recorrido, ciudades__slug=ciudad.slug, linea__slug=lineas[0].slug)
+    if len(lineas) == 0:
+        raise Http404
+    return redirect(recorridos[0], permanent=True)
