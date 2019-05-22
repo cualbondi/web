@@ -9,16 +9,16 @@
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:administrative_area" />
-    <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
+    <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="Como moverse en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
     <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ obj.img_cuadrada.url }}" />{% endif %}
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
     <ul class="breadcrumb">
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/" itemprop="url">
+            <a href="{{HOME_URL}}" itemprop="url">
                 <span itemprop="title">Inicio</span>
             </a>
             <span class="divider">&gt;</span>
@@ -26,7 +26,7 @@
 
         {% for a in adminareaancestors reversed %}
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{a.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{a.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{a.name}}</span>
             </a>
             <span class="divider">&gt;</span>
@@ -34,7 +34,7 @@
         {% endfor %}
 
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{obj.name}}</span>
             </a>
         </li>
@@ -56,7 +56,7 @@
         {% comment %} <a href="/mapa/{{parent.slug}}/geolocation|{{obj.latlng.0|stringformat:'f'}},{{obj.latlng.1|stringformat:'f'}},{{obj.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a> {% endcomment %}
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;">
-            <img src="{{HOME_URL}}{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
+            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
         </div>
         {% endif %}
     </div>

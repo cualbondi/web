@@ -9,34 +9,34 @@
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:recorrido" />
-    <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
+    <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="{{linea.nombre|title}} - {{obj.nombre|title}}" />
     <meta property="og:description"  content="Linea {{linea.nombre|title}}, Ramal {{obj.nombre|title}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, Recorrido desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} en {{adminarea.name|title}}: Descripción del recorrido de colectivo, micro, bus" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}{{ obj.img_cuadrada.url }}" />{% endif %}
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
     <ul class="breadcrumb">
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}" itemprop="url">
+            <a href="{{HOME_URL}}" itemprop="url">
                 <span itemprop="title">Inicio</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{adminarea.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{adminarea.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{adminarea.name}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{linea.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{linea.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{linea.nombre}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{obj.nombre}} {% if obj.inicio and obj.fin %}(de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
             </a>
         </li>

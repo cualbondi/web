@@ -6,13 +6,13 @@
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block custom_top_scripts %}
-    <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" /> 
-    <meta property="og:type"   content="cualbondi:edicion" /> 
-    <meta property="og:url"    content="{{ HOME_URL }}{{ revision.get_absolute_url }}" /> 
-    <meta property="og:title"  content="Edición por {{ revision.get_pretty_user }} de {{original.linea.nombre|title}} - {{original.nombre|title}}" /> 
+    <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
+    <meta property="og:type"   content="cualbondi:edicion" />
+    <meta property="og:url"    content="{{HOME_URL}}{{ revision.get_absolute_url }}" />
+    <meta property="og:title"  content="Edición por {{ revision.get_pretty_user }} de {{original.linea.nombre|title}} - {{original.nombre|title}}" />
     <meta property="og:description"  content="Edición del recorrido {{original.linea.nombre|title}} {{original.nombre|title}} creada por el usuario {{ revision.get_pretty_user }} en Cualbondi. Visualización de la edición del recorrido en el estado {{ revision.get_moderacion_last.get_newStatus_display }}" /> 
-    {% if original.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}/{{ original.img_cuadrada.url }}" />{% endif %}
-    
+    {% if original.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ original.img_cuadrada.url }}" />{% endif %}
+
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.css" />
     <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet-polylinedecorator/1.1.0/leaflet.polylineDecorator.min.js"></script>
@@ -26,7 +26,7 @@
         <li><a href="/editor/{{ original.id }}">{{original.linea.nombre|title}} - {{original.nombre|title}}</a> <span class="divider">&gt;</span></li>
         <li class="active">Visualizar</li>
     </ul !-->
-    
+
     <div>
         <h1 style="display:inline;">Edición por {{ revision.get_pretty_user }} de {{original.linea.nombre}} {{original.nombre}}</h1>
         <div style="vertical-align: super;margin-left: 10px;" class="fb-like" data-layout="button" data-action="like" data-show-faces="false" data-share="false"></div>

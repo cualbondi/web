@@ -9,28 +9,28 @@
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:linea" />
-    <meta property="og:url"    content="{{ HOME_URL }}{{ obj.get_absolute_url }}" />
+    <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="Línea {{obj.nombre|title}}" />
     <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}{{ obj.img_cuadrada.url }}" />{% endif %}
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
     <ul class="breadcrumb">
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}/" itemprop="url">
+            <a href="{{HOME_URL}}" itemprop="url">
                 <span itemprop="title">Inicio</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{adminarea.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{adminarea.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{adminarea.name}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{obj.nombre}}</span>
             </a>
         </li>

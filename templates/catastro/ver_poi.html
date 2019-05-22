@@ -9,30 +9,30 @@
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:punto_de_interes" />
-    <meta property="og:url"    content="{{ HOME_URL }}{{ poi.get_absolute_url }}" />
+    <meta property="og:url"    content="{{HOME_URL}}{{ poi.get_absolute_url }}" />
     <meta property="og:title"  content="Como llegar a {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
     <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
-    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{ HOME_URL }}{{ poi.img_cuadrada.url }}" />{% endif %}
+    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ poi.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
     <ul class="breadcrumb">
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}" itemprop="url">
+            <a href="{{HOME_URL}}" itemprop="url">
                 <span itemprop="title">Inicio</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         {% for a in adminareas reversed %}
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{a.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{a.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{a.name}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
         {% endfor %}
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{ HOME_URL }}{{obj.get_absolute_url}}" itemprop="url">
+            <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{obj.nombre}} {% if obj.inicio and obj.fin %}(de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
             </a>
         </li>
