@@ -12,7 +12,7 @@
     <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="Línea {{obj.nombre|title}}" />
     <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -88,7 +88,7 @@
     {% if obj.img_panorama %}
     <div class="thumbnail">
         <div id="map" style="background:lightblue;">
-            <img src="/{{ obj.img_panorama.url }}" alt="Cobertura de transporte público de la línea {{ obj.nombre }} en {{ adminarea.name }}." />
+            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Cobertura de transporte público de la línea {{ obj.nombre }} en {{ adminarea.name }}." />
         </div>
     </div>
     {% endif %}

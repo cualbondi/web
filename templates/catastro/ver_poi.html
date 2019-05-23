@@ -12,7 +12,7 @@
     <meta property="og:url"    content="{{HOME_URL}}{{ poi.get_absolute_url }}" />
     <meta property="og:title"  content="Como llegar a {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
     <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
-    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ poi.img_cuadrada.url }}" />{% endif %}
+    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ poi.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -70,10 +70,10 @@
     </div>
 
     <div class="thumbnail">
-        {% comment %} <a href="/mapa/{{adminareas.0.slug}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a> {% endcomment %}
+        <a href="/mapa/{{adminareas.0.name|slugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
         {% if poi.img_panorama %}
         <div id="map" style="background:lightblue;">
-            <img src="/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />
+            <img src="{{HOME_URL}}/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />
         </div>
         {% endif %}
     </div>

@@ -12,7 +12,7 @@
     <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="{{linea.nombre|title}} - {{obj.nombre|title}}" />
     <meta property="og:description"  content="Linea {{linea.nombre|title}}, Ramal {{obj.nombre|title}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, Recorrido desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} en {{adminarea.name|title}}: Descripción del recorrido de colectivo, micro, bus" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -81,7 +81,7 @@
     <div class="thumbnail">
 	<a href="/editor/{{ obj.id }}/" class="btn btn-primary" style="position:absolute; margin:6px">Modificar recorrido</a>
         <div id="map" style="background:lightblue;">
-            <img src="{{HOME_URL}}{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
+            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
         </div>
     </div>
     <br />
