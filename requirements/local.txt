@@ -26,4 +26,4 @@ django-extensions==2.1.7  # https://github.com/django-extensions/django-extensio
 django_coverage_plugin==1.6.0 # https://github.com/nedbat/django_coverage_plugin
 pytest-django==3.4.8  # https://github.com/pytest-dev/pytest-django
 pyOpenSSL==19.0.0
-ptvsd==4.2.8
+ptvsd==4.2.10
