@@ -141,16 +141,20 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
         ps = None
         if aa.geometry_simple is not None:
             lineas, pois, ps, aaancestors, children = parallelize(
-                Linea.objects
+                Linea
+                .objects
                 .filter(recorridos__ruta__intersects=aa.geometry_simple)
                 .order_by('nombre')
                 .annotate(dcount=Count('id'))
-                .defer('envolvente'),
+                .defer('envolvente') if aa.depth > 2 else None,
                 Poi
                 .objects
                 .filter(latlng__intersects=aa.geometry_simple)
-                .order_by('?')[:30],
-                Parada.objects.filter(latlng__intersects=aa.geometry_simple),
+                .order_by('?')[:30] if aa.depth > 2 else None,
+                Parada
+                .objects
+                .filter(latlng__intersects=aa.geometry_simple)
+                .order_by('?')[:30] if aa.depth > 2 else None,
                 aa.get_ancestors().reverse(),
                 aa.get_children().annotate(
                     recorridos_count=Cast(Subquery(

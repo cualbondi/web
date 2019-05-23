@@ -11,8 +11,9 @@ from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 
 from apps.core.models import Linea, Recorrido, Parada
-from apps.catastro.models import Ciudad, Poi, Zona, AdministrativeArea
+from apps.catastro.models import Ciudad, Poi, AdministrativeArea
 from apps.utils import data
+from apps.utils.parallel_query import parallelize
 
 
 @csrf_exempt
@@ -288,7 +289,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
         calles_fin = None
 
     # POI por los que pasa el recorrido
-    pois = Poi.objects.filter(latlng__dwithin=(recorrido_simplified, D(m=400)))
+    pois = Poi.objects.filter(latlng__dwithin=(recorrido_simplified, D(m=400))).order_by('?')[:60]
 
     # Zonas por las que pasa el recorrido
     aas = AdministrativeArea.objects \
@@ -296,13 +297,15 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
         .order_by('depth')
 
     # Horarios + paradas que tiene este recorrido
-    horarios = recorrido.horario_set.all().prefetch_related('parada')
+    horarios = recorrido.horario_set.all().prefetch_related('parada').order_by('?')[:60]
 
     template = "core/ver_recorrido.html"
     if request.GET.get("dynamic_map"):
         template = "core/ver_obj_map.html"
 
     recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_simplified)
+
+    aa, aaancestors, calles_fin, pois, aas, horarios, recorridos_similares = parallelize(aa, aaancestors, calles_fin, pois, aas, horarios, recorridos_similares)
 
     return render(
         request,

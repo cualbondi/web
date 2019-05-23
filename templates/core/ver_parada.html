@@ -74,7 +74,7 @@
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="https://cualbondi.com.ar{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">

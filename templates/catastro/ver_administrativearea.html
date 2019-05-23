@@ -53,7 +53,7 @@
     </div>
 
     <div class="thumbnail">
-        {% comment %} <a href="/mapa/{{parent.slug}}/geolocation|{{obj.latlng.0|stringformat:'f'}},{{obj.latlng.1|stringformat:'f'}},{{obj.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a> {% endcomment %}
+        <a href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
@@ -62,6 +62,7 @@
     </div>
     {% include "ad_contenido.html"%}
 
+    {% if lineas %}
     <div class="row-fluid">
         <h2>Lineas de transporte público</h2>
         {% for cols in lineas|partition_horizontal:60 %}
@@ -81,6 +82,7 @@
         {% endif %}
         {% endfor %}
     </div>
+    {% endif %}
 
 
     {% if children %}
@@ -99,7 +101,7 @@
 
 
     {% if paradas %}
-        <h2>Paradas cercanas</h2>
+        <h2>Paradas</h2>
         <ul>
             {% for p in paradas %}
             <li><a href="{{HOME_URL}}{{p.get_absolute_url}}">{{ p }}</a></li>
@@ -108,7 +110,7 @@
     {% endif %}
 
     {% if pois %}
-        <h2>Otros puntos de interés cercanos</h2>
+        <h2>Puntos de interés</h2>
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
