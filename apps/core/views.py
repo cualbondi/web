@@ -305,7 +305,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
 
     recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_simplified)
 
-    aa, aaancestors, calles_fin, pois, aas, horarios, recorridos_similares = parallelize(aa, aaancestors, calles_fin, pois, aas, horarios, recorridos_similares)
+    aaancestors, calles_fin, pois, aas, horarios, recorridos_similares = parallelize(aaancestors, calles_fin, pois, aas, horarios, recorridos_similares)
 
     return render(
         request,
