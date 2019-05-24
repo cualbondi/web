@@ -390,7 +390,7 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
 
     # recorrido
     recorridos = Recorrido.objects.filter(slug=slug_recorrido, ciudades__slug=ciudad.slug, linea__slug=lineas[0].slug)
-    if len(lineas) == 0:
+    if len(recorridos) == 0:
         raise Http404
     return redirect(recorridos[0], permanent=True)
 
