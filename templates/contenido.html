@@ -54,6 +54,7 @@
 {% block custom_scripts %}
 
     <script type="text/javascript">
+    window.addEventListener('DOMContentLoaded', function() { // this will wait for jquery defer script
         $(document).ready(function(){
             $.ajaxSetup({
                  beforeSend: function(xhr, settings) {
@@ -90,6 +91,6 @@
             })
 
         })
-
+    })
     </script>
 {% endblock %}
