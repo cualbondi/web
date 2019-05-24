@@ -393,3 +393,8 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
     if len(lineas) == 0:
         raise Http404
     return redirect(recorridos[0], permanent=True)
+
+
+def server_error(request):
+    response = render(request, '500.html', status=500)
+    return response

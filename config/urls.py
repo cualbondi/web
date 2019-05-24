@@ -74,3 +74,5 @@ if settings.DEBUG:
 urlpatterns += [
     url(r'^', include(urlpatternsCore)),
 ]
+
+handler500 = 'apps.core.views.server_error'
