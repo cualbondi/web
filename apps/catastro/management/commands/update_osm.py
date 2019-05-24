@@ -7,14 +7,15 @@ import time
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import connection
+from django.db.models import F
 from django.contrib.gis.geos import LineString, Polygon, MultiPolygon
+from django.contrib.gis.db.models.functions import MakeValid
 from django.contrib.gis.geos.error import GEOSException
 
 from apps.catastro.models import Poi, Interseccion, Calle, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog
 from apps.editor.models import RecorridoProposed
 from apps.utils.fix_way import fix_way, fix_polygon
-from apps.utils.data import argentina_simplified
 
 import osmium
 import geopandas as gpd
@@ -870,6 +871,14 @@ class Command(BaseCommand):
 
             for K in OLD_KING:
                 K.delete()
+
+            # fix invalid geometries
+            # TODO: I think these should be makeValid(ated) not here but ASAP
+            # that way we would avoid some issues around intersections that fail earlier in the process of creating the adminareas tree
+            # the makevalid function is only available in postgis (is not in a library like GEOS)
+            # in ~4000 shapes we had 10 not valid, so we can use something like `if not geom.valid: cursor.exec('SELECT ST_MAKEVALID(POLYGON('WKT text here'));')`
+            AdministrativeArea.objects.filter(geometry_simple__isvalid=False).update(geometry_simple=MakeValid(F('geometry_simple')))
+            AdministrativeArea.objects.filter(geometry__isvalid=False).update(geometry_simple=MakeValid(F('geometry')))
 
         #######################
         #  POIs de osm        #
