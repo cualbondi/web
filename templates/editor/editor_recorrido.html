@@ -27,7 +27,7 @@
             cursor: pointer;
         }
     </style>
-    
+
     <div id="fb-root"></div>
     <script>
       FBstatus = null;
@@ -43,7 +43,7 @@
 			FBstatus = e;
 		})
       };
-        
+
       (function(d, s, id){
          var js, fjs = d.getElementsByTagName(s)[0];
          if (d.getElementById(id)) {return;}
@@ -121,22 +121,35 @@
 {% endblock %}
 
 {% block custom_scripts %}
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.pack.js"></script>
+
     <script>
+    window.addEventListener('DOMContentLoaded', function() { // this will wait for jquery defer script
+    (function($){
+
         $("#alertGuardado").hide();
         function abrirAyuda(){
             $('#modalayuda').modal();
             return false;
         }
-        
+
+        $('a[title="Guardar Cambios."]').on('click', function(){
+			console.log('clickGuardar')
+		})
+
+    })(jQuery);
+    });
+
         function addAlert(message, type) {
             $('#alerts').append(
                 '<div class="alert '+ (type || '') + '">' +
                     '<button type="button" class="close" data-dismiss="alert">' +
                     '&times;</button>' + message + '</div>');
         }
-        
+
         {% include "editor/dependencias.js" %}
-        
+
         L.drawLocal.draw.toolbar.actions.title="Cancelar Dibujo"
         L.drawLocal.draw.toolbar.actions.text="Cancelar"
         L.drawLocal.draw.toolbar.buttons.polyline="Trazar un recorrido desde cero"
@@ -230,32 +243,6 @@
 
         var authenticated={{ user.is_authenticated|lower }}
 
-        function login(){
-            var u = $("#user").val();
-            var p = $("#pass").val();
-            $.ajax({
-                "method": "POST",
-                "url":"{% url "iniciar_sesion" %}",
-                "data": {
-                    "username": u,
-                    "password": p
-                    },
-                "headers": {"X-CSRFToken": $.cookie('csrftoken') }
-            }).done(function(data, textStatus, jqXHR){
-                //console.log(200)
-                // login success
-                authenticated = true
-                $.fancybox.close();
-                guardarRecorrido()
-            }).fail(function(data, textStatus, jqXHR){
-                //console.log("otro" )
-                // error login
-                $("#user").addClass("invalid-data");
-                $("#pass").addClass("invalid-data");
-                authenticated = false
-            })
-        }
-		
 		revisionParaShareEdit = {};
 		function shareEdit(revision) {
 			revision = revisionParaShareEdit;
@@ -263,9 +250,9 @@
 				method: 'feed',
 				link: 'https://cualbondi.com.ar/revision/'+revision.id+'/',
 				caption: 'Edición por jperelli del recorrido '+revision.nombre+' en <a href="http://cualbondi.com.ar/">cualbondi</a>',
-			}, function(response){ console.log(response) });		
+			}, function(response){ console.log(response) });
 		}
-        
+
         var token = null;
         function loginFB(){
             FB.login(
@@ -310,11 +297,11 @@
             );
 
         }
-        
+
         function openLogin() {
             $.fancybox({
                 content: 'Gracias por tu edición!<br /><br />Ahora solo necesitamos que realices el login via facebook para poder guardar<br /><img onclick="loginFB()" src="{{STATIC_URL}}/img/loginfb.jpg"><br /><br />No te preocupes si tu edición no es perfecta, ya que deberá ser revisada por un moderador<br />Pronto agregaremos muchas mas funcionalidades.<br /><br />Muchas gracias por tu aporte!'
-            });        
+            });
         }
 
         uuid = '';
@@ -355,18 +342,14 @@
         map.on('draw:edited', function (e) {
             if ( !authenticated ) {
                 guardarRecorrido(true)
-                openLogin()            
+                openLogin()
                 throw "not auth"
             }
             else {
                 guardarRecorrido()
             }
         });
-        
-        $('a[title="Guardar Cambios."]').on('click', function(){
-			console.log('clickGuardar')
-		})
-        
+
         linestring.on('edit', function(e) {
             console.log('lineedit')
             map.removeLayer(flechas);
@@ -377,11 +360,11 @@
             })
             flechas.addTo(map);
         })
-        
+
         map.on('draw:editstop', function (e) {
             setTimeout(enableEdit, 100);
         });
-        
+
         map.on('draw:drawstart', function (e) {
             console.log('drawstart')
         });
@@ -400,14 +383,12 @@
             }
         }
         enableEdit();
-        
-        
+
+
         // Move map to actual linestring
         map.fitBounds(drawnItems.getBounds());
 
 
     </script>
-
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.4/jquery.fancybox.pack.js"></script>
 {% include "tracking.html" %}
 {% endblock %}
