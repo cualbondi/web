@@ -33,4 +33,4 @@ Rtree==0.8.3
 osmium==2.14.3 #
 
 # warning, pinned! test before changing this one
-urllib3==1.25.2
+urllib3==1.25.3
