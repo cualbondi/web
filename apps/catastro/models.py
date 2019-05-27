@@ -132,13 +132,22 @@ class Poi(models.Model):
     """ Un "Punto de interes" es algun lugar representativo
         de una "Ciudad". Por ej: la catedral de La Plata.
     """
+    TYPE_RELATION = 'r'
+    TYPE_WAY = 'w'
+    TYPE_NODE = 'n'
+    OSM_TYPE_CHOICES = (
+        (TYPE_RELATION, 'Relation'),
+        (TYPE_WAY, 'Way'),
+        (TYPE_NODE, 'Node'),
+    )
+    osm_type = models.CharField(db_index=True, max_length=1, choices=OSM_TYPE_CHOICES)
+    osm_id = models.BigIntegerField(blank=True, null=True)
     nom_normal = models.TextField()
     nom = models.TextField()
     slug = models.SlugField(max_length=150, null=True)
     latlng = models.GeometryField(srid=4326, geography=True)
     img_panorama = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
-    osm_id = models.BigIntegerField(blank=True, null=True)
     tags = HStoreField(null=True)
     objects = GeoManager()
 
