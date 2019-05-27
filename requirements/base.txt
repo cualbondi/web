@@ -19,7 +19,7 @@ django-cors-headers==3.0.1 # https://github.com/ottoyiu/django-cors-headers
 
 django-leaflet==0.24.0 # https://github.com/makinacorpus/django-leaflet
 
-geopy==1.19.0 # https://github.com/geopy/geopy
+geopy==1.20.0 # https://github.com/geopy/geopy
 
 django-treebeard==4.3 # https://github.com/django-treebeard/django-treebeard
 
