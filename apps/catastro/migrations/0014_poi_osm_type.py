@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='poi',
             name='osm_type',
-            field=models.CharField(choices=[('r', 'Relation'), ('w', 'Way'), ('n', 'Node')], db_index=True, default=None, max_length=1),
+            field=models.CharField(choices=[('r', 'Relation'), ('w', 'Way'), ('n', 'Node')], db_index=True, default='c', max_length=1),
             preserve_default=False,
         ),
     ]
