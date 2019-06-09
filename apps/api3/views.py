@@ -169,7 +169,7 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
                 "page": self.paginator.page.number
             })
             if page is not None:
-                serializer = self.get_serializer(page, many=True)
+                serializer = serializers.RecorridoCustomSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
             else:
                 return Response([])
