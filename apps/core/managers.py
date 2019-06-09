@@ -686,6 +686,7 @@ FROM
                 r.id,
                 l.nombre || ' ' || r.nombre as nombre,
                 ST_Astext(r.ruta) as ruta_corta,
+                ST_AsGeoJSON(r.ruta) as ruta_corta_geojson,
                 l.foto as foto,
                 ST_Length(r.ruta::Geography) as long_ruta,
                 similarity(l.nombre || ' ' || r.nombre, %(q)s) as similarity
