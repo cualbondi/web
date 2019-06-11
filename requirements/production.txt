@@ -12,4 +12,4 @@ raven==6.10.0
 selenium==3.141.0
 
 # warning, pinned! test before changing this one
-chromedriver-binary==2.44.0
+chromedriver-binary==76.0.3809.12.0
