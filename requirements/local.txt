@@ -22,7 +22,7 @@ django-test-plus==1.2.0  # https://github.com/revsys/django-test-plus
 
 django-debug-toolbar==1.11  # https://github.com/jazzband/django-debug-toolbar
 
-django-extensions==2.1.7  # https://github.com/django-extensions/django-extensions
+django-extensions==2.1.9  # https://github.com/django-extensions/django-extensions
 django_coverage_plugin==1.6.0 # https://github.com/nedbat/django_coverage_plugin
 pytest-django==3.4.8  # https://github.com/pytest-dev/pytest-django
 pyOpenSSL==19.0.0

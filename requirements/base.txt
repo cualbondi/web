@@ -7,7 +7,7 @@ argon2-cffi==19.1.0  # https://github.com/hynek/argon2_cffi
 django==2.2.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 
-django-extensions==2.1.7  # https://github.com/django-extensions/django-extensions
+django-extensions==2.1.9  # https://github.com/django-extensions/django-extensions
 
 # Django REST Framework
 djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
