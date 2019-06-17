@@ -83,7 +83,6 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
         q = request.query_params.get('q', None)
         l = request.query_params.get('l', None)
         t = request.query_params.get('t', 'false')
-        c = request.query_params.get('c', None)
 
         if t == 'true':
             t = True
