@@ -63,11 +63,15 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
 
             - `l=55.3324,-55.4433,200`
             - `l=55.3324,-55.4433,200|55.1112,-55.3334,300`
-            - [live example](/api//recorridos/?l=-57.957258224487305,-34.92056351681724,200|-57.94755935668945,-34.92556010123052,200)
+            - [live example](/api/recorridos/?l=-57.957258224487305,-34.92056351681724,200|-57.94755935668945,-34.92556010123052,200)
 
          - `t` true/false: buscar con transbordo (true). `false` por defecto.
+
+
          - `q` string: para búsqueda por nombre de recorrido (fuzzy search)
-         - `c` string: ciudad-slug, requerido cuando se usa `q`
+         - `l` punto (lon,lat floats) y radio (int: metros)
+
+            - `q=129&l=55.3324,-55.4433,200`
     """
 
     serializer_class = serializers.RecorridoPureModelSerializer
@@ -79,12 +83,6 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
         q = request.query_params.get('q', None)
         l = request.query_params.get('l', None)
         t = request.query_params.get('t', 'false')
-        c = request.query_params.get('c', None)
-
-        if (q is None) == (l is None):
-            raise exceptions.ValidationError(
-                {'detail': '\'q\' or \'l\' parameter expected (but not both)'}
-            )
 
         if t == 'true':
             t = True
@@ -95,7 +93,7 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
                 {'detail': '\'t\' parameter malformed: Expected \'true\' or \'false\''}
             )
 
-        if l is not None:
+        if q is None:
             try:
                 lp = []  # lista de puntos
                 for p in l.split('|'):
@@ -155,21 +153,25 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
                 return Response([])
 
         if q is not None:
-            if c is None:
+            if l is None:
                 raise exceptions.ValidationError(
-                    {'detail': '\'c\' parameter is required when using `q` parameter'}
+                    {'detail': '\'l\' parameter is required when using `q` parameter'}
                 )
+            p = l.split(',')
+            r = int(p[2])
+            p = GEOSGeometry('POINT({} {})'.format(p[0], p[1]), srid=4326)
             page = self.paginate_queryset(list(
-                Recorrido.objects.fuzzy_like_trgm_query(q, c)
+                Recorrido.objects.fuzzy_like_trgm_query(q, p, r)
             ))
             self.update_logger_extras({
                 "q": q,
-                "c": c,
+                "p": p,
+                "r": r,
                 "count": self.paginator.page.paginator.count,
                 "page": self.paginator.page.number
             })
             if page is not None:
-                serializer = self.get_serializer(page, many=True)
+                serializer = serializers.RecorridoCustomSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
             else:
                 return Response([])

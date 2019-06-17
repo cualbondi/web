@@ -137,14 +137,15 @@ class RecorridoCustomSerializer(serializers.Serializer):
 
     def to_representation(self, obj):
         return {
-            'id': obj.id,
-            'linea_nombre': obj.linea_nombre,
-            'recorrido_nombre': obj.recorrido_nombre,
-            'osm_name': obj.osm_name,
-            'linea_id': obj.linea_id,
-            'recorrido_id': obj.recorrido_id,
-            'osm_id': obj.osm_id,
-            'ruta': obj.ruta,
+            "id": obj.id,
+            "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson))),
+            "long_bondi": obj.long_ruta,
+            "color_polilinea": obj.color_polilinea,
+            "inicio": obj.inicio,
+            "fin": obj.fin,
+            "nombre": obj.nombre,
+            "foto": obj.foto,
+            "paradas": [],
         }
 
 

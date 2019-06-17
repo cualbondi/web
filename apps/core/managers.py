@@ -679,27 +679,26 @@ FROM
         query_set = self.raw(query, params)
         return query_set
 
-    def fuzzy_like_trgm_query(self, q, ciudad):
-        params = {"q": q, "ci": ciudad}
+    def fuzzy_like_trgm_query(self, q, point, meters):
+        params = {"q": q, "point": point.ewkt, "meters": 10000}
         query = """
             SELECT
                 r.id,
-                l.nombre || ' ' || r.nombre as nombre,
+                coalesce(l.nombre || ' ', '') || r.nombre as nombre,
                 ST_Astext(r.ruta) as ruta_corta,
+                ST_AsGeoJSON(r.ruta) as ruta_corta_geojson,
                 l.foto as foto,
                 ST_Length(r.ruta::Geography) as long_ruta,
-                similarity(l.nombre || ' ' || r.nombre, %(q)s) as similarity
+                similarity(coalesce(l.nombre || ' ', '') || r.nombre, %(q)s) as similarity
             FROM
                 core_recorrido as r
-                join core_linea as l on (r.linea_id = l.id)
-                join catastro_ciudad_lineas as cl on (cl.linea_id = l.id )
-                join catastro_ciudad as c on (c.id = cl.ciudad_id)
+                left outer join core_linea as l on (r.linea_id = l.id)
             WHERE
-                (l.nombre || ' ' || r.nombre) ILIKE ('%%' || %(q)s || '%%')
-                AND c.slug = %(ci)s
+                coalesce(l.nombre || ' ', '') || r.nombre ILIKE ('%%' || %(q)s || '%%')
+                AND ST_DWithin(r.ruta::geography, %(point)s::geography, %(meters)s)
             ORDER BY
                 similarity DESC,
-                (l.nombre || ' ' || r.nombre) ASC
+                nombre ASC
             ;
         """
         query_set = self.raw(query, params)

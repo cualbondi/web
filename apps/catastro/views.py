@@ -140,7 +140,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
         pois = None
         ps = None
         if aa.geometry_simple is not None:
-            lineas, pois, ps, aaancestors, children = parallelize(
+            lineas, pois, ps, aaancestors, children, recorridos = parallelize(
                 Linea
                 .objects
                 .filter(recorridos__ruta__intersects=aa.geometry_simple)
@@ -166,7 +166,12 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
                         .annotate(count=Count('*'))
                         .values('count')
                     ), output_field=IntegerField())
-                ).filter(recorridos_count__gt=0).order_by('-recorridos_count', 'name'),
+                ).order_by('-recorridos_count', 'name'),
+                Recorrido
+                .objects
+                .filter(ruta__intersects=aa.geometry_simple, linea__isnull=True)
+                .order_by('nombre')
+                .defer('ruta')
             )
         return render(
             request,
@@ -179,6 +184,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
                 'children': children,
                 'paradas': ps,
                 'lineas': lineas,
+                'recorridos': recorridos,
                 'pois': pois
             }
         )
