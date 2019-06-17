@@ -79,7 +79,7 @@
 
     {% if obj.img_panorama %}
     <div class="thumbnail">
-	<a href="/editor/{{ obj.id }}/" class="btn btn-primary" style="position:absolute; margin:6px">Modificar recorrido</a>
+	<a href="/mapa/{{adminarea.name|slugify}}/recorridos/{{ obj.nombre }}/" class="btn btn-primary" style="position:absolute; margin:6px">Ver en mapa interactivo</a>
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
         </div>
