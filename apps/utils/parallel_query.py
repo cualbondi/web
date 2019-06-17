@@ -10,11 +10,14 @@ class PararellThread(threading.Thread):
         self.result = []
 
     def run(self):
-        from django.db import connections
-        connections['default'].inc_thread_sharing()
-        self.result = list(self.qs)
-        connections['default'].close()
-        connections['default'].dec_thread_sharing()
+        if self.qs is None:
+            self.result = None
+        else:
+            from django.db import connections
+            connections['default'].inc_thread_sharing()
+            self.result = list(self.qs)
+            connections['default'].close()
+            connections['default'].dec_thread_sharing()
 
 
 # Ideas from https://github.com/django/django/blob/ed880d92b50c641c3e7f6e8ce5741085ffe1f8fb/tests/backends/tests.py#L705
