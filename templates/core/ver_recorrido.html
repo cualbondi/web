@@ -79,7 +79,7 @@
 
     {% if obj.img_panorama %}
     <div class="thumbnail">
-	<a href="/mapa/{{adminarea.name|slugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">Ver en mapa interactivo</a>
+	<a href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">Ver en mapa interactivo</a>
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
         </div>
