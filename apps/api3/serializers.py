@@ -138,6 +138,7 @@ class RecorridoCustomSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
             "id": obj.id,
+            "osm_id": obj.osm_id,
             "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson))),
             "long_bondi": obj.long_ruta,
             "color_polilinea": obj.color_polilinea,
@@ -145,7 +146,14 @@ class RecorridoCustomSerializer(serializers.Serializer):
             "fin": obj.fin,
             "nombre": obj.nombre,
             "foto": obj.foto,
-            "paradas": [],
+            "paradas": [
+                {
+                    "latlng": p.latlng.coords[::-1],
+                    "codigo": p.codigo,
+                    "nombre": p.nombre
+                }
+                for p in obj.paradas.all()
+            ],
         }
 
 

@@ -3,6 +3,9 @@ from django.db import DatabaseError, connection
 from django.db.models import Manager as GeoManager
 
 
+# TODO evaluate remove core_linea or make it optional
+# same in the recorridos importer
+
 class RecorridoManager(GeoManager):
     """
         Contains all the search functions for Recorridos
@@ -447,7 +450,7 @@ class RecorridoManager(GeoManager):
         query = """
 SELECT
   re.id,
-  li.nombre || ' ' || re.nombre as nombre,
+  coalesce(li.nombre || ' ', '') || re.nombre as nombre,
   linea_id,
   re.slug as slug,
   li.slug as lineaslug,
@@ -462,7 +465,7 @@ SELECT
   p1,
   p2
 FROM
-  core_linea as li join
+  core_linea as li right outer join
   (
     (
     SELECT

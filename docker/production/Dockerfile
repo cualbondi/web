@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     libpq-dev \
+    osmium-tool \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install wheel
 
@@ -40,13 +41,13 @@ COPY ./requirements /requirements
 RUN pip3 install --no-cache-dir -r /requirements/production.txt \
     && rm -rf /requirements
 
-RUN echo "04 3 * * * root /usr/bin/python3 /app/manage.py update_osm --update_routes --import_osm --all_arg >> /var/log/cualbondi-update_routes.log 2>&1" > /etc/cron.d/osm-cualbondi
-RUN echo "14 3 * * * root /usr/bin/python3 /app/manage.py update_osm --cross --import_osm >> /var/log/cualbondi-cross.log 2>&1" >> /etc/cron.d/osm-cualbondi
-RUN echo "54 3 * * * root /usr/bin/python3 /app/manage.py update_osm --pois >> /var/log/cualbondi-pois.log 2>&1" >> /etc/cron.d/osm-cualbondi
-RUN echo "20 4 * * * root /usr/bin/python3 /app/manage.py calcular_envolventes >> /var/log/cualbondi-envolventes.log 2>&1" >> /etc/cron.d/osm-cualbondi
-RUN echo "30 4 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sP >> /var/log/cualbondi-thumbs_pois.log 2>&1" >> /etc/cron.d/osm-cualbondi
-RUN echo "10 5 * * * root /usr/bin/python3 /app/manage.py -f /tmp/part-all.o5m --admin_areas >> /var/log/cualbondi-adminareas.log 2>&1" >> /etc/cron.d/osm-cualbondi
-RUN echo "30 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs_catastro -s >> /var/log/cualbondi-thumbs_catastro.log 2>&1" >> /etc/cron.d/osm-cualbondi
+RUN echo "00 2 * * * root /usr/bin/python3 /app/manage.py update_osm --king=argentina --download --admin_areas --update_routes --pois >> /var/log/cualbondi-argentina.log 2>&1" > /etc/cron.d/osm-cualbondi
+RUN echo "00 3 * * * root /usr/bin/python3 /app/manage.py update_osm --king=spain --download --admin_areas --update_routes --pois >> /var/log/cualbondi-spain.log 2>&1" > /etc/cron.d/osm-cualbondi
+# TODO FIX --cross: RUN echo "00 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=argentina --cross >> /var/log/cualbondi-cross.log 2>&1" >> /etc/cron.d/osm-cualbondi
+
+RUN echo "00 4 * * * root /usr/bin/python3 /app/manage.py calcular_envolventes >> /var/log/cualbondi-envolventes.log 2>&1" >> /etc/cron.d/osm-cualbondi
+RUN echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sP >> /var/log/cualbondi-thumbs_pois.log 2>&1" >> /etc/cron.d/osm-cualbondi
+RUN echo "00 6 * * * root /usr/bin/python3 /app/manage.py crear_thumbs_catastro -s >> /var/log/cualbondi-thumbs_catastro.log 2>&1" >> /etc/cron.d/osm-cualbondi
 RUN chmod 0644 /etc/cron.d/osm-cualbondi
 
 COPY ./docker/production/gunicorn.sh /gunicorn.sh

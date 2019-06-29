@@ -171,7 +171,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
                 .objects
                 .filter(ruta__intersects=aa.geometry_simple, linea__isnull=True)
                 .order_by('nombre')
-                .defer('ruta')
+                .defer('ruta') if aa.depth > 2 else None
             )
         return render(
             request,

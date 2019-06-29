@@ -22,7 +22,7 @@ def remove_accents(input_str):
 
 class Provincia(models.Model):
     # Obligatorios
-    nombre = models.CharField(max_length=100, blank=False, null=False)
+    nombre = models.CharField(max_length=200, blank=False, null=False)
     slug = models.SlugField(max_length=120, blank=True, null=False)
 
     # Opcionales
@@ -46,7 +46,7 @@ class Provincia(models.Model):
 
 class Ciudad(models.Model):
     # Obligatorios
-    nombre = models.CharField(max_length=100, blank=False, null=False)
+    nombre = models.CharField(max_length=200, blank=False, null=False)
     slug = models.SlugField(max_length=120, blank=True, null=False)
     provincia = models.ForeignKey(Provincia, on_delete=models.CASCADE)
     activa = models.BooleanField(blank=True, null=False, default=False)
@@ -64,7 +64,7 @@ class Ciudad(models.Model):
     zoom = models.IntegerField(blank=True, null=True, default=14)
     centro = models.PointField(blank=True, null=True)
     descripcion = models.TextField(null=True, blank=True)
-    sugerencia = models.CharField(max_length=100, blank=True, null=True)
+    sugerencia = models.CharField(max_length=200, blank=True, null=True)
 
     objects = CiudadManager()
 
@@ -103,7 +103,7 @@ class ImagenCiudad(models.Model):
 
     custom_890x300 = property(_custom_890x300)
 
-    titulo = models.CharField(max_length=100, blank=True, null=True)
+    titulo = models.CharField(max_length=200, blank=True, null=True)
     descripcion = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -111,7 +111,7 @@ class ImagenCiudad(models.Model):
 
 
 class Zona(models.Model):
-    name = models.CharField(max_length=100, blank=False, null=False)
+    name = models.CharField(max_length=200, blank=False, null=False)
     geo = models.GeometryField(srid=4326, geography=True)
 
     objects = ZonaManager()
@@ -140,6 +140,7 @@ class Poi(models.Model):
         (TYPE_WAY, 'Way'),
         (TYPE_NODE, 'Node'),
     )
+    import_timestamp = models.DateTimeField(blank=True, null=True)
     osm_type = models.CharField(db_index=True, max_length=1, choices=OSM_TYPE_CHOICES)
     osm_id = models.BigIntegerField(blank=True, null=True)
     nom_normal = models.TextField()
@@ -249,6 +250,7 @@ class AdministrativeArea(MP_Node):
         (TYPE_WAY, 'Way'),
         (TYPE_NODE, 'Node'),
     )
+    import_timestamp = models.DateTimeField(blank=True, null=True)
     osm_type = models.CharField(db_index=True, max_length=1, choices=OSM_TYPE_CHOICES)
     osm_id = models.BigIntegerField(db_index=True)
     name = models.TextField()
