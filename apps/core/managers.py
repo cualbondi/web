@@ -43,98 +43,6 @@ class RecorridoManager(GeoManager):
             SELECT *
             FROM
             (
-                SELECT *,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as ruta_corta,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as ruta_corta2,
-                ST_Length(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as long_ruta,
-                ST_Length(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as long_ruta2,
-                ST_DistanceSphere(ll11, re1_ruta) as long_pata,
-                ST_DistanceSphere(ll22, re2_ruta) as long_pata2,
-                ST_DistanceSphere(ll21, ll12) as long_pata_transbordo
-            FROM (
-                SELECT
-                    re1.id as id,
-                    re1.ruta as re1_ruta,
-                    re2.ruta as re2_ruta,
-                    li1.nombre || ' ' || re1.nombre as nombre,
-                    li2.nombre || ' ' || re2.nombre as nombre2,
-                    re2.id as id2,
-                    coalesce(re1.color_polilinea, li1.color_polilinea, '#000') as color_polilinea,
-                    coalesce(re2.color_polilinea, li2.color_polilinea, '#000') as color_polilinea2,
-                    coalesce(li1.foto, 'default') as foto,
-                    coalesce(li2.foto, 'default') as foto2,
-                    re1.inicio as inicio,
-                    re2.inicio as inicio2,
-                    re1.fin as fin,
-                    re2.fin as fin2,
-                    re1.paradas_completas as re1_paradas_completas,
-                    re2.paradas_completas as re2_paradas_completas,
-                    coalesce(p11.latlng, ST_GeomFromText(%(punto_a)s)) as ll11,
-                    coalesce(p12.latlng, ST_ClosestPoint(re1.ruta, coalesce(p21.latlng, re2.ruta))) as ll12,
-                    coalesce(p21.latlng, ST_ClosestPoint(re2.ruta, coalesce(p12.latlng, re1.ruta))) as ll21,
-                    coalesce(p22.latlng, ST_GeomFromText(%(punto_b)s)) as ll22,
-                    p11.id as p11ll,
-                    p12.id as p12ll,
-                    p21.id as p21ll,
-                    p22.id as p22ll
-                FROM
-                    core_recorrido as re1
-                    join core_recorrido as re2 on (re1.id <> re2.id)
-                    join core_linea li1 on li1.id = re1.linea_id
-                    join core_linea li2 on li2.id = re2.linea_id
-                    LEFT OUTER JOIN core_horario as h11 on (h11.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_horario as h12 on (h12.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_parada  as p11 on (p11.id = h11.parada_id)
-                    LEFT OUTER JOIN core_parada  as p12 on (p12.id = h12.parada_id and p11.id <> p12.id)
-                    LEFT OUTER JOIN core_horario as h21 on (h21.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_horario as h22 on (h22.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_parada  as p21 on (p21.id = h21.parada_id)
-                    LEFT OUTER JOIN core_parada  as p22 on (p22.id = h22.parada_id and p21.id <> p22.id)
-                ) as sq
-            WHERE
-                (
-                    ST_DWithin(re1_ruta, ll11, %(rad1)s)
-                    and
-                    ST_DWithin(re2_ruta, ll22, %(rad2)s)
-                    and
-                        ST_DWithin(ll21, ll12, %(gap)s)
-                    and
-                        ST_LineLocatePoint(re1_ruta, ll11)
-                        <
-                        ST_LineLocatePoint(re1_ruta, ll12 )
-                    and
-                        ST_LineLocatePoint(re2_ruta, ll21 )
-                        <
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                    and
-                        (not re1_paradas_completas) and (not re2_paradas_completas)
-                )
-
-            UNION
             SELECT *,
                 ST_AsText(
                     ST_LineSubstring(
@@ -150,6 +58,20 @@ class RecorridoManager(GeoManager):
                         ST_LineLocatePoint(re2_ruta, ll22)
                         )::Geography
                     ) as ruta_corta2,
+                ST_AsGeoJSON(
+                    ST_LineSubstring(
+                        re1_ruta,
+                        ST_LineLocatePoint(re1_ruta, ll11),
+                        ST_LineLocatePoint(re1_ruta, ll12)
+                        )::Geography
+                    ) as ruta_corta_geojson,
+                ST_AsGeoJSON(
+                    ST_LineSubstring(
+                        re2_ruta,
+                        ST_LineLocatePoint(re2_ruta, ll21),
+                        ST_LineLocatePoint(re2_ruta, ll22)
+                        )::Geography
+                    ) as ruta_corta_geojson2,
                 ST_Length(
                     ST_LineSubstring(
                         re1_ruta,
@@ -164,17 +86,19 @@ class RecorridoManager(GeoManager):
                         ST_LineLocatePoint(re2_ruta, ll22)
                         )::Geography
                     ) as long_ruta2,
-                ST_DistanceSphere(ll11, re1_ruta) as long_pata,
-                ST_DistanceSphere(ll22, re2_ruta) as long_pata2,
+                ST_DistanceSphere(ll11, ST_GeomFromText(%(punto_a)s)) as long_pata,
+                ST_DistanceSphere(ll22, ST_GeomFromText(%(punto_b)s)) as long_pata2,
                 ST_DistanceSphere(ll21, ll12) as long_pata_transbordo
             FROM (
                 SELECT
                     re1.id as id,
+                    re2.id as id2,
+                    re1.osm_id as osm_id,
+                    re2.osm_id as osm_id2,
                     re1.ruta as re1_ruta,
                     re2.ruta as re2_ruta,
-                    li1.nombre || ' ' || re1.nombre as nombre,
-                    li2.nombre || ' ' || re2.nombre as nombre2,
-                    re2.id as id2,
+                    coalesce(li1.nombre || ' ', '') || re1.nombre as nombre,
+                    coalesce(li2.nombre || ' ', '') || re2.nombre as nombre2,
                     coalesce(re1.color_polilinea, li1.color_polilinea, '#000') as color_polilinea,
                     coalesce(re2.color_polilinea, li2.color_polilinea, '#000') as color_polilinea2,
                     coalesce(li1.foto, 'default') as foto,
@@ -185,10 +109,10 @@ class RecorridoManager(GeoManager):
                     re2.fin as fin2,
                     re1.paradas_completas as re1_paradas_completas,
                     re2.paradas_completas as re2_paradas_completas,
-                    coalesce(p11.latlng, ST_GeomFromText(%(punto_a)s)) as ll11,
-                    coalesce(p12.latlng, ST_ClosestPoint(re1.ruta, coalesce(p21.latlng, re2.ruta))) as ll12,
-                    coalesce(p21.latlng, ST_ClosestPoint(re2.ruta, coalesce(p12.latlng, re1.ruta))) as ll21,
-                    coalesce(p22.latlng, ST_GeomFromText(%(punto_b)s)) as ll22,
+                    p11.latlng as ll11,
+                    p12.latlng as ll12,
+                    p21.latlng as ll21,
+                    p22.latlng as ll22,
                     p11.id as p11ll,
                     p12.id as p12ll,
                     p21.id as p21ll,
@@ -196,227 +120,36 @@ class RecorridoManager(GeoManager):
                 FROM
                     core_recorrido as re1
                     join core_recorrido as re2 on (re1.id <> re2.id)
-                    join core_linea li1 on li1.id = re1.linea_id
-                    join core_linea li2 on li2.id = re2.linea_id
-                    LEFT OUTER JOIN core_horario as h11 on (h11.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_horario as h12 on (h12.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_parada  as p11 on (p11.id = h11.parada_id)
-                    LEFT OUTER JOIN core_parada  as p12 on (p12.id = h12.parada_id and p11.id <> p12.id)
-                    LEFT OUTER JOIN core_horario as h21 on (h21.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_horario as h22 on (h22.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_parada  as p21 on (p21.id = h21.parada_id)
-                    LEFT OUTER JOIN core_parada  as p22 on (p22.id = h22.parada_id and p21.id <> p22.id)
-                ) as sq
-            WHERE
-                (
-                    ST_DWithin(ST_GeomFromText(%(punto_a)s), ll11, %(rad1)s)
+                    left outer join core_linea li1 on li1.id = re1.linea_id
+                    left outer join core_linea li2 on li2.id = re2.linea_id
+                    JOIN core_horario as h11 on (h11.recorrido_id = re1.id)
+                    JOIN core_horario as h12 on (h12.recorrido_id = re1.id)
+                    JOIN core_parada  as p11 on (p11.id = h11.parada_id)
+                    JOIN core_parada  as p12 on (p12.id = h12.parada_id and p11.id <> p12.id)
+                    JOIN core_horario as h21 on (h21.recorrido_id = re2.id)
+                    JOIN core_horario as h22 on (h22.recorrido_id = re2.id)
+                    JOIN core_parada  as p21 on (p21.id = h21.parada_id)
+                    JOIN core_parada  as p22 on (p22.id = h22.parada_id and p21.id <> p22.id)
+                WHERE
+                    ST_DWithin(p21.latlng, p12.latlng, %(gap)s)
                     and
-                    ST_DWithin(re2_ruta, ll22, %(rad2)s)
-                    and
-                        ST_DWithin(ll21, ll12, %(gap)s)
-                    and
-                        ST_LineLocatePoint(re1_ruta, ll11)
+                        ST_LineLocatePoint(re1.ruta, p11.latlng)
                         <
-                        ST_LineLocatePoint(re1_ruta, ll12 )
+                        ST_LineLocatePoint(re1.ruta, p12.latlng)
                     and
-                        ST_LineLocatePoint(re2_ruta, ll21 )
+                        ST_LineLocatePoint(re2.ruta, p21.latlng)
                         <
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                    and
-                        re1_paradas_completas and (not re2_paradas_completas)
-                    and
-                        p11ll is not null and p12ll is not null
-                )
-            UNION
-            SELECT *,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as ruta_corta,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as ruta_corta2,
-                ST_Length(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as long_ruta,
-                ST_Length(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as long_ruta2,
-                ST_DistanceSphere(ll11, re1_ruta) as long_pata,
-                ST_DistanceSphere(ll22, re2_ruta) as long_pata2,
-                ST_DistanceSphere(ll21, ll12) as long_pata_transbordo
-            FROM (
-                SELECT
-                    re1.id as id,
-                    re1.ruta as re1_ruta,
-                    re2.ruta as re2_ruta,
-                    li1.nombre || ' ' || re1.nombre as nombre,
-                    li2.nombre || ' ' || re2.nombre as nombre2,
-                    re2.id as id2,
-                    coalesce(re1.color_polilinea, li1.color_polilinea, '#000') as color_polilinea,
-                    coalesce(re2.color_polilinea, li2.color_polilinea, '#000') as color_polilinea2,
-                    coalesce(li1.foto, 'default') as foto,
-                    coalesce(li2.foto, 'default') as foto2,
-                    re1.inicio as inicio,
-                    re2.inicio as inicio2,
-                    re1.fin as fin,
-                    re2.fin as fin2,
-                    re1.paradas_completas as re1_paradas_completas,
-                    re2.paradas_completas as re2_paradas_completas,
-                    coalesce(p11.latlng, ST_GeomFromText(%(punto_a)s)) as ll11,
-                    coalesce(p12.latlng, ST_ClosestPoint(re1.ruta, coalesce(p21.latlng, re2.ruta))) as ll12,
-                    coalesce(p21.latlng, ST_ClosestPoint(re2.ruta, coalesce(p12.latlng, re1.ruta))) as ll21,
-                    coalesce(p22.latlng, ST_GeomFromText(%(punto_b)s)) as ll22,
-                    p11.id as p11ll,
-                    p12.id as p12ll,
-                    p21.id as p21ll,
-                    p22.id as p22ll
-                FROM
-                    core_recorrido as re1
-                    join core_recorrido as re2 on (re1.id <> re2.id)
-                    join core_linea li1 on li1.id = re1.linea_id
-                    join core_linea li2 on li2.id = re2.linea_id
-                    LEFT OUTER JOIN core_horario as h11 on (h11.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_horario as h12 on (h12.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_parada  as p11 on (p11.id = h11.parada_id)
-                    LEFT OUTER JOIN core_parada  as p12 on (p12.id = h12.parada_id and p11.id <> p12.id)
-                    LEFT OUTER JOIN core_horario as h21 on (h21.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_horario as h22 on (h22.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_parada  as p21 on (p21.id = h21.parada_id)
-                    LEFT OUTER JOIN core_parada  as p22 on (p22.id = h22.parada_id and p21.id <> p22.id)
-                ) as sq
-            WHERE
-                (
-                    ST_DWithin(re1_ruta, ll11, %(rad1)s)
-                    and
-                    ST_DWithin(ST_GeomFromText(%(punto_b)s), ll22, %(rad2)s)
-                    and
-                        ST_DWithin(ll21, ll12, %(gap)s)
-                    and
-                        ST_LineLocatePoint(re1_ruta, ll11)
-                        <
-                        ST_LineLocatePoint(re1_ruta, ll12 )
-                    and
-                        ST_LineLocatePoint(re2_ruta, ll21 )
-                        <
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                    and
-                        (not re1_paradas_completas) and re2_paradas_completas
-                    and
-                        p21ll is not null and p22ll is not null
-                )
-            UNION
-            SELECT *,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as ruta_corta,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as ruta_corta2,
-                ST_Length(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as long_ruta,
-                ST_Length(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as long_ruta2,
-                ST_DistanceSphere(ll11, re1_ruta) as long_pata,
-                ST_DistanceSphere(ll22, re2_ruta) as long_pata2,
-                ST_DistanceSphere(ll21, ll12) as long_pata_transbordo
-            FROM (
-                SELECT
-                    re1.id as id,
-                    re1.ruta as re1_ruta,
-                    re2.ruta as re2_ruta,
-                    li1.nombre || ' ' || re1.nombre as nombre,
-                    li2.nombre || ' ' || re2.nombre as nombre2,
-                    re2.id as id2,
-                    coalesce(re1.color_polilinea, li1.color_polilinea, '#000') as color_polilinea,
-                    coalesce(re2.color_polilinea, li2.color_polilinea, '#000') as color_polilinea2,
-                    coalesce(li1.foto, 'default') as foto,
-                    coalesce(li2.foto, 'default') as foto2,
-                    re1.inicio as inicio,
-                    re2.inicio as inicio2,
-                    re1.fin as fin,
-                    re2.fin as fin2,
-                    re1.paradas_completas as re1_paradas_completas,
-                    re2.paradas_completas as re2_paradas_completas,
-                    coalesce(p11.latlng, ST_GeomFromText(%(punto_a)s)) as ll11,
-                    coalesce(p12.latlng, ST_ClosestPoint(re1.ruta, coalesce(p21.latlng, re2.ruta))) as ll12,
-                    coalesce(p21.latlng, ST_ClosestPoint(re2.ruta, coalesce(p12.latlng, re1.ruta))) as ll21,
-                    coalesce(p22.latlng, ST_GeomFromText(%(punto_b)s)) as ll22,
-                    p11.id as p11ll,
-                    p12.id as p12ll,
-                    p21.id as p21ll,
-                    p22.id as p22ll
-                FROM
-                    core_recorrido as re1
-                    join core_recorrido as re2 on (re1.id <> re2.id)
-                    join core_linea li1 on li1.id = re1.linea_id
-                    join core_linea li2 on li2.id = re2.linea_id
-                    LEFT OUTER JOIN core_horario as h11 on (h11.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_horario as h12 on (h12.recorrido_id = re1.id)
-                    LEFT OUTER JOIN core_parada  as p11 on (p11.id = h11.parada_id)
-                    LEFT OUTER JOIN core_parada  as p12 on (p12.id = h12.parada_id and p11.id <> p12.id)
-                    LEFT OUTER JOIN core_horario as h21 on (h21.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_horario as h22 on (h22.recorrido_id = re2.id)
-                    LEFT OUTER JOIN core_parada  as p21 on (p21.id = h21.parada_id)
-                    LEFT OUTER JOIN core_parada  as p22 on (p22.id = h22.parada_id and p21.id <> p22.id)
+                        ST_LineLocatePoint(re2.ruta, p22.latlng)
+                
                 ) as sq
             WHERE
                 (
                     ST_DWithin(ST_GeomFromText(%(punto_a)s), ll11, %(rad2)s)
                     and
                     ST_DWithin(ST_GeomFromText(%(punto_b)s), ll22, %(rad2)s)
-                    and
-                        ST_DWithin(ll21, ll12, %(gap)s)
-                    and
-                        ST_LineLocatePoint(re1_ruta, ll11)
-                        <
-                        ST_LineLocatePoint(re1_ruta, ll12 )
-                    and
-                        ST_LineLocatePoint(re2_ruta, ll21 )
-                        <
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                    and
-                        re1_paradas_completas and re2_paradas_completas
-                    and
-                        p21ll is not null and p22ll is not null
-                    and
-                        p21ll is not null and p22ll is not null
                 )
             ) as sq2
-            ORDER BY (cast(long_pata+long_pata2+long_pata_transbordo as integer)*100 + ( cast(long_ruta as integer) + cast(long_ruta2 as integer) ) ) ASC
+            ORDER BY (cast(long_pata+long_pata2+long_pata_transbordo as integer)*10 + ( cast(long_ruta as integer) + cast(long_ruta2 as integer) ) ) ASC
         ;"""
         query_set = self.raw(query, params)
         return list(query_set)
@@ -440,7 +173,7 @@ class RecorridoManager(GeoManager):
 
         with connection.cursor() as c:
             c.execute(
-                "(SELECT 1, ST_Buffer(%(punto_a)s::geography, %(radA)s)::geometry UNION SELECT 2, ST_Buffer(%(punto_b)s::geography, %(radB)s)::geometry) order by 1;",
+                "(SELECT 1, ST_Buffer(%(punto_a)s::geography, %(radA)s, 2)::geometry UNION SELECT 2, ST_Buffer(%(punto_b)s::geography, %(radB)s, 2)::geometry) order by 1;",
                 {'punto_a': punto_a.ewkt, 'radA': distancia_a, 'punto_b': punto_b.ewkt, 'radB': distancia_b}
             )
             bufferA = c.fetchone()[1]
@@ -749,6 +482,8 @@ FROM
                 fin2,
                 ST_AsText(ruta_corta) as ruta_corta,
                 ST_AsText(ruta_corta2) as ruta_corta2,
+                ST_AsGeoJSON(ruta_corta) as ruta_corta_geojson,
+                ST_AsGeoJSON(ruta_corta2) as ruta_corta_geojson2,
                 long_ruta,
                 long_ruta2,
                 long_pata,
@@ -761,10 +496,10 @@ FROM
                         core_horario     as h
                         JOIN core_parada as p on (p.id = h.parada_id)
                     WHERE
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta::Geometry, 1),4326)) < 100
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta::Geometry, 1),4326)) < 100
                         AND h.recorrido_id = subquery.id
                     ORDER BY
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta::Geometry, 1),4326)) ASC
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta::Geometry, 1),4326)) ASC
                     LIMIT 1
                     ) as p11ll,
                 (
@@ -774,10 +509,10 @@ FROM
                         core_horario     as h
                         JOIN core_parada as p on (p.id = h.parada_id)
                     WHERE
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta::Geometry, ST_NPoints(subquery.ruta_corta::Geometry)),4326)) < 100
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta::Geometry, ST_NPoints(subquery.ruta_corta::Geometry)),4326)) < 100
                         AND h.recorrido_id = subquery.id
                     ORDER BY
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta::Geometry, ST_NPoints(subquery.ruta_corta::Geometry)),4326)) ASC
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta::Geometry, ST_NPoints(subquery.ruta_corta::Geometry)),4326)) ASC
                     LIMIT 1
                     ) as p12ll,
                 (
@@ -787,10 +522,10 @@ FROM
                         core_horario     as h
                         JOIN core_parada as p on (p.id = h.parada_id)
                     WHERE
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta2::Geometry, 1),4326)) < 100
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta2::Geometry, 1),4326)) < 100
                         AND h.recorrido_id = subquery.id2
                     ORDER BY
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta2::Geometry, 1),4326)) ASC
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta2::Geometry, 1),4326)) ASC
                     LIMIT 1
                     ) as p21ll,
                 (
@@ -800,10 +535,10 @@ FROM
                         core_horario     as h
                         JOIN core_parada as p on (p.id = h.parada_id)
                     WHERE
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta2::Geometry, ST_NPoints(subquery.ruta_corta2::Geometry)),4326)) < 100
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta2::Geometry, ST_NPoints(subquery.ruta_corta2::Geometry)),4326)) < 100
                         AND h.recorrido_id = subquery.id2
                     ORDER BY
-                        ST_DistanceSphere(setsrid(p.latlng,4326), setsrid(ST_PointN(subquery.ruta_corta2::Geometry, ST_NPoints(subquery.ruta_corta2::Geometry)),4326)) ASC
+                        ST_DistanceSphere(st_setsrid(p.latlng,4326), st_setsrid(ST_PointN(subquery.ruta_corta2::Geometry, ST_NPoints(subquery.ruta_corta2::Geometry)),4326)) ASC
                     LIMIT 1
                     ) as p22ll
             FROM (
@@ -820,20 +555,16 @@ FROM
                     re2.inicio as inicio2,
                     re1.fin as fin,
                     re2.fin as fin2,
-                    ST_AsText(
-                        ST_LineSubstring(
-                            re1.ruta,
-                            ST_LineLocatePoint(re1.ruta, %(punto_a)s),
-                            ST_LineLocatePoint(re1.ruta, ST_ClosestPoint(re1.ruta, re2.ruta))
-                            )::Geography
-                        ) as ruta_corta,
-                    ST_AsText(
-                        ST_LineSubstring(
-                            re2.ruta,
-                            ST_LineLocatePoint(re2.ruta, ST_ClosestPoint(re1.ruta, re2.ruta)),
-                            ST_LineLocatePoint(re2.ruta, %(punto_b)s)
-                            )::Geography
-                        ) as ruta_corta2,
+                    ST_LineSubstring(
+                        re1.ruta,
+                        ST_LineLocatePoint(re1.ruta, %(punto_a)s),
+                        ST_LineLocatePoint(re1.ruta, ST_ClosestPoint(re1.ruta, re2.ruta))
+                    )::Geography as ruta_corta,
+                    ST_LineSubstring(
+                        re2.ruta,
+                        ST_LineLocatePoint(re2.ruta, ST_ClosestPoint(re1.ruta, re2.ruta)),
+                        ST_LineLocatePoint(re2.ruta, %(punto_b)s)
+                    )::Geography ruta_corta2,
                     ST_Length(
                         ST_LineSubstring(
                             re1.ruta,
@@ -855,8 +586,8 @@ FROM
                 FROM
                     core_recorrido as re1
                     join core_recorrido as re2 on (re1.id <> re2.id)
-                    join core_linea li1 on li1.id = re1.linea_id
-                    join core_linea li2 on li2.id = re2.linea_id
+                    left outer join core_linea li1 on li1.id = re1.linea_id
+                    left outer join core_linea li2 on li2.id = re2.linea_id
                 WHERE
                     ST_DWithin(ST_GeomFromText(%(punto_a)s), re1.ruta, %(rad1)s)
                     and
@@ -1119,8 +850,8 @@ FROM
                 FROM
                     core_recorrido as re1
                     join core_recorrido as re2 on (re1.id <> re2.id)
-                    join core_linea li1 on li1.id = re1.linea_id
-                    join core_linea li2 on li2.id = re2.linea_id
+                    left outer join core_linea li1 on li1.id = re1.linea_id
+                    left outer join core_linea li2 on li2.id = re2.linea_id
                 WHERE
                     ST_DWithin(ST_GeomFromText(%(punto_a)s), re1.ruta, %(rad1)s)
                     and

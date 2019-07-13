@@ -53,13 +53,23 @@ class RouterResultSerializer(serializers.Serializer):
                         "foto": obj.foto,
                         "p1": getParada(obj.p1),
                         "p2": getParada(obj.p2),
-                        # "url": obj.get_absolute_url()
+                        "paradas": [
+                            {
+                                "latlng": p.latlng.coords[::-1],
+                                "codigo": p.codigo,
+                                "nombre": p.nombre
+                            }
+                            for p in obj.paradas.all()
+                        ],
+                        "url": obj.get_absolute_url(),
                     }
                 ]
             }
         else:
+            obj2 = Recorrido.objects.prefetch_related('paradas').get(pk=obj.id2)
             return {
                 "id": str(obj.id) + str(obj.id2),
+                "long_pata_transbordo": obj.long_pata_transbordo,
                 "itinerario": [
                     {
                         "id": obj.id,
@@ -73,7 +83,14 @@ class RouterResultSerializer(serializers.Serializer):
                         "foto": obj.foto,
                         "p1": getParada(obj.p11ll),
                         "p2": getParada(obj.p12ll),
-                        # "url": obj.get_absolute_url(None, None, obj.slug)
+                        "paradas": [
+                            {
+                                "latlng": p.latlng.coords[::-1],
+                                "codigo": p.codigo,
+                                "nombre": p.nombre
+                            } for p in obj.paradas.all()
+                        ],
+                        "url": obj.get_absolute_url(),
                     },
                     {
                         "id": obj.id2,
@@ -87,7 +104,14 @@ class RouterResultSerializer(serializers.Serializer):
                         "foto": obj.foto2,
                         "p1": getParada(obj.p21ll),
                         "p2": getParada(obj.p22ll),
-                        # "url": obj.get_absolute_url(None, None, obj.slug2)
+                        "paradas": [
+                            {
+                                "latlng": p.latlng.coords[::-1],
+                                "codigo": p.codigo,
+                                "nombre": p.nombre
+                            } for p in obj2.paradas.all()
+                        ],
+                        "url": obj2.get_absolute_url(),
                     }
                 ]
             }

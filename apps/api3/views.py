@@ -132,8 +132,8 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
                 routerResults = Recorrido.objects.get_recorridos(lp[0]['p'], lp[1]['p'], lp[0]['r'], lp[1]['r'])
             else:
                 # con transbordo
-                routerResults = Recorrido.objects.get_recorridos_combinados_sin_paradas(lp[0]['p'], lp[1]['p'],
-                                                                                        lp[0]['r'], lp[1]['r'], 500)
+                # routerResults = Recorrido.objects.get_recorridos_combinados_sin_paradas(lp[0]['p'], lp[1]['p'], lp[0]['r'], lp[1]['r'], 500)
+                routerResults = Recorrido.objects.get_recorridos_combinados(lp[0]['p'], lp[1]['p'], lp[0]['r'], lp[1]['r'], 500)
 
             page = self.paginate_queryset(routerResults)
             self.update_logger_extras({
