@@ -92,7 +92,7 @@ LOCAL_APPS = [
     'apps.catastro.apps.CatastroConfig',
     'apps.editor.apps.EditorConfig',
     'apps.api3.apps.Api3Config',
-    'apps.commands.apps.CommandsConfig',
+    'apps.tasks.apps.TasksConfig',
     # DEPRECATED: 'apps.usuarios',
 ]
 
