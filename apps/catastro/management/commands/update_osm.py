@@ -15,16 +15,14 @@ from django.contrib.gis.geos import LineString, Polygon, MultiPolygon, Point
 from django.contrib.gis.db.models.functions import MakeValid
 from django.contrib.gis.geos.error import GEOSException
 
-from apps.catastro.models import Poi, Interseccion, AdministrativeArea
+from apps.catastro.models import Poi, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog, Parada, Horario
 from apps.editor.models import RecorridoProposed
 from apps.utils.fix_way import fix_way, fix_polygon
 
 import osmium
-import geopandas as gpd
 from datetime import datetime
 from urllib import request
-from psycopg2.extras import execute_values
 
 
 class Nonegetter():
@@ -66,25 +64,11 @@ class Command(BaseCommand):
             help='Build poi data from osm'
         )
         parser.add_argument(
-            '--cross',
-            action='store_true',
-            dest='cross',
-            default=False,
-            help='Build cross data from planet_osm_line'
-        )
-        parser.add_argument(
             '--download',
             action='store_true',
             dest='download',
             default=False,
             help='Run importer/download routine from OSM'
-        )
-        parser.add_argument(
-            '--intersections',
-            action='store_true',
-            dest='intersections',
-            default=False,
-            help='Run intersections routine'
         )
         parser.add_argument(
             '--update_routes',
@@ -399,180 +383,6 @@ class Command(BaseCommand):
         #######################
         #  recorridos de osm  #
         #######################
-
-        if options['cross']:
-
-            crs = {'init': 'epsg:4326'}
-
-            self.out1('Cross osm recorridos')
-            self.out2('Obteniendo bus routes de osm planet_osm_line')
-            bus_routes = gpd.read_postgis(
-                """
-                    # esto cambiarlo para no usar mas planet_osm_line (osm2pgsql), usar osmosis para construir las bus_routes
-                    # SELECT
-                    #     @osm_id AS osm_id, -- @=modulus operator
-                    #     name,
-                    #     ref,
-                    #     st_linemerge(st_union(way)) AS way
-                    # FROM
-                    #     planet_osm_line
-                    # WHERE
-                    #     route = 'bus'
-                    # GROUP BY
-                    #     osm_id,
-                    #     name,
-                    #     ref
-                """,
-                connection,
-                geom_col='way',
-                crs=crs
-            )
-            bus_routes.set_index('osm_id', inplace=True)
-
-            self.out2('Creando geodataframe')
-            bus_routes_buffer = gpd.GeoDataFrame({
-                'osm_id': bus_routes.index,
-                'way': bus_routes.way,
-                'way_buffer_40': bus_routes.way.buffer(0.0004),
-                'way_buffer_40_simplify': bus_routes.way.simplify(0.0001).buffer(0.0004),
-                'name': bus_routes.name
-            }, crs=crs).set_geometry('way_buffer_40_simplify')
-
-            self.out2('Obteniendo recorridos de cualbondi core_recorridos')
-            core_recorrido = gpd.read_postgis(
-                """
-                    SELECT
-                        cr.id,
-                        cr.nombre,
-                        cr.linea_id,
-                        cr.ruta,
-                        cl.nombre AS linea_nombre
-                    FROM
-                        core_recorrido cr
-                        JOIN core_linea cl ON (cr.linea_id = cl.id)
-                    --  JOIN catastro_ciudad_recorridos ccr ON (ccr.recorrido_id = cr.id)
-                    --WHERE
-                    --    ccr.ciudad_id = 1
-                    ;
-                """,
-                connection,
-                geom_col='ruta',
-                crs=crs
-            )
-            core_recorrido.set_index('id', inplace=True)
-
-            self.out2('Creando geodataframe')
-            core_recorrido_buffer = gpd.GeoDataFrame({
-                'id': core_recorrido.index,
-                'ruta': core_recorrido.ruta.simplify(0.0001),
-                'ruta_buffer_40_simplify': core_recorrido.ruta.simplify(0.0001).buffer(0.0004),
-                'nombre': core_recorrido.nombre,
-                'linea_id': core_recorrido.linea_id,
-            }, crs=crs).set_geometry('ruta')
-
-            self.out2('Generando intersecciones')
-            intersections = gpd.sjoin(core_recorrido_buffer, bus_routes_buffer, how='inner', op='intersects')
-
-            self.out2('Copiando indice, id')
-            intersections['id'] = intersections.index
-
-            self.out2('Copiando indice, osm_id')
-            intersections['osm_id'] = intersections.index_right
-
-            self.out2('Drop indice, osm_id')
-            intersections.drop('index_right', inplace=True, axis=1)
-
-            self.out2('Generando match [id, osm_id]')
-            intersections = intersections[['id', 'osm_id']]
-
-            self.out2('Generando indice de match [id, osm_id]')
-            intersections.index = range(len(intersections))
-
-            self.out2('Generando way_buffer_40_simplify')
-            way_buffer_40_simplify = gpd.GeoSeries(
-                bus_routes_buffer.loc[intersections.osm_id].way_buffer_40_simplify.values, crs=crs)
-
-            self.out2('Generando ruta_buffer_40_simplify')
-            ruta_buffer_40_simplify = gpd.GeoSeries(
-                core_recorrido_buffer.loc[intersections.id].ruta_buffer_40_simplify.values, crs=crs)
-
-            self.out2('Generando symmetric_difference')
-            diffs = ruta_buffer_40_simplify.symmetric_difference(way_buffer_40_simplify).area.values
-
-            self.out2('Generando norm_factor')
-            norm_factor = ruta_buffer_40_simplify.area.values + way_buffer_40_simplify.area.values
-
-            self.out2('Generando diffs')
-            diffs = (diffs / norm_factor).tolist()
-
-            self.out2('Pasando osm_ids a lista')
-            osm_ids = intersections.osm_id.values.tolist()
-
-            self.out2('Pasando osm_names a lista')
-            osm_names = bus_routes.loc[osm_ids].name.values.tolist()
-            # ways = bus_routes.loc[osm_ids].way.map(lambda x: x.wkb).values.tolist()
-
-            self.out2('Pasando recorrido_ids de intersections a lista')
-            recorrido_ids = intersections['id'].values.tolist()
-
-            self.out2('Pasando linea_ids a lista')
-            linea_ids = core_recorrido.loc[recorrido_ids].linea_id.values.tolist()
-            # rutas = core_recorrido.loc[recorrido_ids].ruta.map(lambda x: x.wkb).values.tolist()
-
-            self.out2('Pasando recorrido_nombres a lista')
-            recorrido_nombres = core_recorrido.loc[recorrido_ids].nombre.values.tolist()
-            # ruta_buffer_40_simplifys = ruta_buffer_40_simplify.map(lambda x: x.wkb).values.tolist()
-            # way_buffer_40_simplifys = way_buffer_40_simplify.map(lambda x: x.wkb).values.tolist()
-
-            self.out2('Pasando linea_nombres a lista')
-            linea_nombres = core_recorrido.loc[recorrido_ids].linea_nombre.values.tolist()
-
-            self.out2('DROP TABLE crossed_areas')
-            cu.execute("DROP TABLE IF EXISTS crossed_areas;")
-            cu.execute('DROP INDEX IF EXISTS crossed_areas_recorrido_id;')
-            cu.execute('DROP INDEX IF EXISTS crossed_areas_area;')
-
-            self.out2('CREATE TABLE crossed_areas')
-            cu.execute(
-                """
-                    CREATE TABLE crossed_areas (
-                        area FLOAT,
-                        linea_id INTEGER,
-                        recorrido_id INTEGER,
-                        osm_id BIGINT,
-                        linea_nombre VARCHAR(100),
-                        recorrido_nombre VARCHAR(100),
-                        osm_name TEXT
-                    );
-                """
-            )
-
-            self.out2('Preparando lista de values')
-            data = list(zip(diffs, linea_ids, recorrido_ids, osm_ids, linea_nombres, recorrido_nombres, osm_names))
-
-            self.out2('Ejecutando insert query')
-            insert_query = """
-                INSERT INTO crossed_areas (
-                    area,
-                    linea_id,
-                    recorrido_id,
-                    osm_id,
-                    linea_nombre,
-                    recorrido_nombre,
-                    osm_name
-                )
-                VALUES %s
-            """
-            execute_values(cu, insert_query, data)
-
-            self.out2('Commit insert query')
-            connection.commit()
-
-            self.out2('Generando indice crossed_areas_recorrido_id')
-            cu.execute('CREATE INDEX crossed_areas_recorrido_id ON crossed_areas (recorrido_id);')
-            cu.execute('CREATE INDEX crossed_areas_area ON crossed_areas (area);')
-
-            self.out2('LISTO!')
 
         if options['update_routes']:
             # TODO: consider also trains / trams / things that have fixed stops
@@ -965,33 +775,6 @@ class Command(BaseCommand):
             # cu.execute('CREATE INDEX catastrocalle_nomnormal_gin ON catastro_calle USING gin (nom_normal gin_trgm_ops);')
             self.out2('Generando catastro_poi')
             cu.execute('CREATE INDEX catastropoi_nomnormal_gin ON catastro_poi USING gin (nom_normal gin_trgm_ops);')
-
-        ##########################
-        #  Intersections de osm  #
-        ##########################
-
-        if options['intersections']:
-
-            self.out1('Generando Intersecciones')
-            cu.execute('delete from catastro_interseccion')
-            cu.execute('''
-                SELECT
-                    SEL1.nom || ' y ' || SEL2.nom as nom,
-                    upper(translate(SEL1.nom || ' y ' || SEL2.nom, 'áéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑàèìòùÀÈÌÒÙ', 'AEIOUAEIOUAEIOUAEIOUNNAEIOUAEIOU')) as nom_normal,
-                    ST_Intersection(SEL1.way, SEL2.way) as latlng
-                FROM
-                    catastro_calle AS SEL1
-                    join catastro_calle as SEL2 on (ST_Intersects(SEL1.way, SEL2.way) and ST_GeometryType(ST_Intersection(SEL1.way, SEL2.way):: Geometry)='ST_Point' )
-            ''')
-            self.out2('Generando slugs')
-            intersections = cu.fetchall()
-            total = len(intersections)
-            i = 0
-            for inter in intersections:
-                i = i + 1
-                Interseccion.objects.create(nom=inter[0], nom_normal=inter[1], latlng=inter[2])
-                if (i * 100.0 / total) % 1 == 0:
-                    self.out2('{:2.0f}%'.format(i * 100.0 / total))
 
         # self.out1('Eliminando tablas no usadas')
         # cu.execute('drop table planet_osm_roads;')
