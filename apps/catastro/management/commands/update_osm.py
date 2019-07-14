@@ -51,12 +51,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--ciudad',
-            action='store',
-            dest='ciudad',
-            help='Only import this ciudad slug'
-        )
-        parser.add_argument(
             '--pois',
             action='store_true',
             dest='pois',
