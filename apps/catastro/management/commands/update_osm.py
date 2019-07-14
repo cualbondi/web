@@ -360,8 +360,9 @@ class Command(BaseCommand):
                     print_tree(node, level + 1)
 
             # print_tree(tree)
-
+            self.out2('saving admin areas tree...')
             AdministrativeArea.load_bulk([tree])
+            self.out2('finished saving admin areas')
 
             for K in OLD_KING:
                 K.delete()
@@ -707,7 +708,7 @@ class Command(BaseCommand):
                             .order_by() \
                             .annotate(cond=RawSQL("ST_Intersects(ST_Buffer(%s::geography, 400, 2)::geometry, ruta)", (point.ewkb,), output_field=BooleanField())) \
                             .filter(cond=True) \
-                            .only('id')
+                            .exists()
                         if q:
                             defaults = {
                                 'tags': n.tags.__dict__,
