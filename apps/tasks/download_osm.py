@@ -1,21 +1,16 @@
-import luigi
 from urllib import request
 import os
 import sys
+from datetime import timedelta, datetime
+
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
 
 
-class ForceableTask(luigi.Task):
-
-    force = luigi.BoolParameter(significant=False, default=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # To force execution, we just remove all outputs before `complete()` is called
-        if self.force is True:
-            outputs = luigi.task.flatten(self.output())
-            for out in outputs:
-                if out.exists():
-                    os.remove(self.output().path)
+def download_osm(king):
+    filename = f'/tmp/osm-{king["name"]}.pbf'
+    url = king['url']
+    request.urlretrieve(url, filename, lambda nb, bs, fs: progress(nb, bs, fs, url))
 
 
 def progress(numblocks, blocksize, filesize, url):
@@ -29,25 +24,35 @@ def progress(numblocks, blocksize, filesize, url):
     sys.stdout.write('%-66s%3d%%' % (base, percent))
 
 
-class DownloadOSM(ForceableTask):
-    king = None
-
-    @classmethod
-    def get_filename(cls):
-        return f'/tmp/osm-{cls.king["name"]}.pbf'
-
-    def output(self):
-        return luigi.LocalTarget(self.get_filename())
-
-    def run(self):
-        url = self.king['url']
-        request.urlretrieve(url, self.get_filename(), lambda nb, bs, fs: progress(nb, bs, fs, url))
+king = {
+    'name': 'argentina',
+    'url': 'http://download.geofabrik.de/south-america/argentina-latest.osm.pbf',
+    'id': 286393,
+    'paradas_completas': False,
+}
 
 
-class DownloadOSMArgentina(DownloadOSM):
-    king = {
-        'name': 'argentina',
-        'url': 'http://download.geofabrik.de/south-america/argentina-latest.osm.pbf',
-        'id': 286393,
-        'paradas_completas': False,
-    }
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+    'start_date': datetime.today(),
+    'schedule_interval': '@once'
+    # 'queue': 'bash_queue',
+    # 'pool': 'backfill',
+    # 'priority_weight': 10,
+    # 'end_date': datetime(2016, 1, 1),
+}
+
+dag = DAG(
+    'importer', default_args=default_args)
+
+
+t1 = PythonOperator(
+    task_id='download_osm',
+    python_callable=download_osm,
+    op_kwargs={'king': king},
+    dag=dag)
