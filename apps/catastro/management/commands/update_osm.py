@@ -717,6 +717,7 @@ class Command(BaseCommand):
                     rp.import_timestamp = run_timestamp
                     rp.paradas_completas = bus['paradas_completas'] if bus['paradas_completas'] is not None else king['paradas_completas']
                     rp.type = bus['type']
+                    rp.king = king['id']
                     if not options['dry-run']:
                         rp.save(user=user_bot_osm)
 
