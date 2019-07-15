@@ -282,7 +282,7 @@ FROM
           r.linea_id,
           r.color_polilinea,
           r.ruta,
-          ST_Distance(p1.latlng, %(punto_a)s) + ST_Distance(p2.latlng, %(punto_b)s) as long_pata,
+          ST_Distance(p1.latlng::geography, %(punto_a)s) + ST_Distance(p2.latlng::geography, %(punto_b)s) as long_pata,
           p1.id as p1id,
           p2.id as p2id,
           p1.latlng as p1ll,
