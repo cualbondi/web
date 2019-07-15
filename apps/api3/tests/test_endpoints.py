@@ -45,7 +45,7 @@ class TestRecorridos(APITestCase):
     def test_recorridos_por_linea_1(self):
         "should simulate a client query based on bus name"
         response = self.client.get(
-            '/api/v3/recorridos/?q=129&c=la-plata&page=1')
+            '/api/v3/recorridos/?q=129&l=-57.968416213989265%2C-34.910780590483675%2C300&c=la-plata&page=1')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         result = response.data["results"][0]
