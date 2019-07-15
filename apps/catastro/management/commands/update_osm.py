@@ -915,6 +915,7 @@ class Command(BaseCommand):
 
                 def node(self, n):
                     self.nodes_current += 1
+                    # TODO: add 'shop' in n.tags also, more info in https://github.com/gravitystorm/openstreetmap-carto/blob/96c64fa5b0449e79c17e39626f3b8f38c96a12bb/project.mml#L1504
                     if 'amenity' in n.tags and 'name' in n.tags and len(n.tags['name']) > 2:
                         point = Point([float(n.location.x) / 10000000, float(n.location.y) / 10000000], srid=4326)
                         # this is a little slow, but it uses indexes :)
