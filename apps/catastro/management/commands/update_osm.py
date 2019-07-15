@@ -612,7 +612,7 @@ class Command(BaseCommand):
                             if m.type == 'w' and m.role in ['', 'forward', 'backward', 'alternate']:
                                 bus['ways'].append(m.ref)
                                 ways.setdefault(m.ref, []).append(r.id)
-                            if m.type == 'n' and m.role in ['stop', ]:
+                            if m.type == 'n':
                                 bus['stops'].append(m.ref)
                                 stops.setdefault(m.ref, []).append(r.id)
                         if len(bus['stops']) > 20:
@@ -633,7 +633,25 @@ class Command(BaseCommand):
 
             class NodesHandler(osmium.SimpleHandler):
                 def node(self, n):
-                    if n.id in stops:
+                    # to know what the tags are for a stop, took info from https://github.com/gravitystorm/openstreetmap-carto/blob/master/stations.mss
+                    # and from openstreetmap's wiki
+                    # essentially, what's rendered in osm map is:
+                    #  - bus and trolleybus have the highway=bus_stop tag, and is next to the higway where the bus goes
+                    #  - all other transports that use rails has nodes with public_transport=stop_position, on the rail.
+                    #  - trains actually render "stations", but that's complex because the relation is rel(route)>rel(station)>node(stop) so we use stop_position
+                    if n.id in stops and (
+                        ('highway' in n.tags and n.tags['highway'] == 'bus_stop') or
+                        (
+                            'public_transport' in n.tags and n.tags['public_transport'] == 'stop_position' and
+                            (
+                                'subway' in n.tags or
+                                'train' in n.tags or
+                                'tram' in n.tags or
+                                'light_rail' in n.tags or
+                                'monorail' in n.tags
+                            )
+                        )
+                    ):
                         stop = {
                             'osm_id': n.id,
                             'name': n.tags['name'][:200] if 'name' in n.tags else '',
