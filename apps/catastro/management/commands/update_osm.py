@@ -342,7 +342,7 @@ class Command(BaseCommand):
                     print('node.data', node['data']['name'].encode('utf-8'))
                     print('node.osm_id', node['data']['osm_id'])
                     print('node.osm_type', node['data']['osm_type'])
-                    traceback.print_exc()
+                    # traceback.print_exc()
                     raise
 
             tree = {
@@ -923,7 +923,8 @@ class Command(BaseCommand):
                             .order_by() \
                             .annotate(cond=RawSQL("ST_Intersects(ST_Buffer(%s::geography, 400, 2)::geometry, ruta)", (point.ewkb,), output_field=BooleanField())) \
                             .filter(cond=True) \
-                            .only('id')
+                            .only('id') \
+                            .exists()
                         if q:
                             defaults = {
                                 'tags': n.tags.__dict__,
