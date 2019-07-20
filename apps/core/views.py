@@ -58,10 +58,7 @@ def natural_sort_qs(qs, key):
 def index(request):
     return render(
         request,
-        'core/seleccionar_ciudad.html',
-        {
-            'ciudades': data.ciudades
-        }
+        'core/seleccionar_ciudad.html'
     )
 
 
