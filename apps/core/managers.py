@@ -40,63 +40,31 @@ class RecorridoManager(GeoManager):
         params = {'punto_a': punto_a.ewkt, 'punto_b': punto_b.ewkt,
                   'rad1': distancia_a, 'rad2': distancia_b, 'gap': gap, 'p': 0.1}
         query = """
-            SELECT *
+            SELECT
+                *
+            FROM
+            (
+            SELECT DISTINCT ON (ids)
+                *
             FROM
             (
             SELECT *,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as ruta_corta,
-                ST_AsText(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as ruta_corta2,
-                ST_AsGeoJSON(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as ruta_corta_geojson,
-                ST_AsGeoJSON(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as ruta_corta_geojson2,
-                ST_Length(
-                    ST_LineSubstring(
-                        re1_ruta,
-                        ST_LineLocatePoint(re1_ruta, ll11),
-                        ST_LineLocatePoint(re1_ruta, ll12)
-                        )::Geography
-                    ) as long_ruta,
-                ST_Length(
-                    ST_LineSubstring(
-                        re2_ruta,
-                        ST_LineLocatePoint(re2_ruta, ll21),
-                        ST_LineLocatePoint(re2_ruta, ll22)
-                        )::Geography
-                    ) as long_ruta2,
+                ST_AsGeoJSON(ruta_corta) as ruta_corta_geojson,
+                ST_AsGeoJSON(ruta_corta2) as ruta_corta_geojson2,
+                ST_Length(ruta_corta) as long_ruta,
+                ST_Length(ruta_corta2) as long_ruta2,
                 ST_DistanceSphere(ll11, ST_GeomFromText(%(punto_a)s)) as long_pata,
                 ST_DistanceSphere(ll22, ST_GeomFromText(%(punto_b)s)) as long_pata2,
                 ST_DistanceSphere(ll21, ll12) as long_pata_transbordo
             FROM (
                 SELECT
+                    re1.id::text || '-' || re2.id::text as ids,
                     re1.id as id,
                     re2.id as id2,
                     re1.osm_id as osm_id,
                     re2.osm_id as osm_id2,
-                    re1.ruta as re1_ruta,
-                    re2.ruta as re2_ruta,
+                    ST_LineSubstring( re1.ruta, ST_LineLocatePoint(re1.ruta, p11.latlng), ST_LineLocatePoint(re1.ruta, p12.latlng) )::Geography as ruta_corta,
+                    ST_LineSubstring( re2.ruta, ST_LineLocatePoint(re2.ruta, p21.latlng), ST_LineLocatePoint(re2.ruta, p22.latlng) )::Geography as ruta_corta2,
                     coalesce(li1.nombre || ' ', '') || re1.nombre as nombre,
                     coalesce(li2.nombre || ' ', '') || re2.nombre as nombre2,
                     coalesce(re1.color_polilinea, li1.color_polilinea, '#000') as color_polilinea,
@@ -149,7 +117,9 @@ class RecorridoManager(GeoManager):
                     ST_DWithin(ST_GeomFromText(%(punto_b)s), ll22, %(rad2)s)
                 )
             ) as sq2
-            ORDER BY (cast(long_pata+long_pata2+long_pata_transbordo as integer)*10 + ( cast(long_ruta as integer) + cast(long_ruta2 as integer) ) ) ASC
+            ORDER BY ids, cast(long_pata+long_pata2+long_pata_transbordo as integer)*10 + ( cast(long_ruta as integer) + cast(long_ruta2 as integer) ) ASC
+            ) as sq3
+            ORDER BY cast(long_pata+long_pata2+long_pata_transbordo as integer)*10 + ( cast(long_ruta as integer) + cast(long_ruta2 as integer) ) ASC
         ;"""
         query_set = self.raw(query, params)
         return list(query_set)
