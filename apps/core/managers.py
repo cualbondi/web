@@ -63,6 +63,8 @@ class RecorridoManager(GeoManager):
                     re2.id as id2,
                     re1.osm_id as osm_id,
                     re2.osm_id as osm_id2,
+                    ST_AsGeoJSON(re1.ruta) as ruta_larga,
+                    ST_AsGeoJSON(re2.ruta) as ruta_larga2,
                     ST_LineSubstring( re1.ruta, ST_LineLocatePoint(re1.ruta, p11.latlng), ST_LineLocatePoint(re1.ruta, p12.latlng) )::Geography as ruta_corta,
                     ST_LineSubstring( re2.ruta, ST_LineLocatePoint(re2.ruta, p21.latlng), ST_LineLocatePoint(re2.ruta, p22.latlng) )::Geography as ruta_corta2,
                     coalesce(li1.nombre || ' ', '') || re1.nombre as nombre,
