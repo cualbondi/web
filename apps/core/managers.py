@@ -53,8 +53,8 @@ class RecorridoManager(GeoManager):
                 ST_AsGeoJSON(ruta_corta2) as ruta_corta_geojson2,
                 ST_Length(ruta_corta) as long_ruta,
                 ST_Length(ruta_corta2) as long_ruta2,
-                ST_DistanceSphere(ll11, ST_GeomFromText(%(punto_a)s)) as long_pata,
-                ST_DistanceSphere(ll22, ST_GeomFromText(%(punto_b)s)) as long_pata2,
+                ST_DistanceSphere(ll11, ST_GeomFromEWKT(%(punto_a)s)) as long_pata,
+                ST_DistanceSphere(ll22, ST_GeomFromEWKT(%(punto_b)s)) as long_pata2,
                 ST_DistanceSphere(ll21, ll12) as long_pata_transbordo
             FROM (
                 SELECT
@@ -63,8 +63,8 @@ class RecorridoManager(GeoManager):
                     re2.id as id2,
                     re1.osm_id as osm_id,
                     re2.osm_id as osm_id2,
-                    ST_AsGeoJSON(re1.ruta) as ruta_larga,
-                    ST_AsGeoJSON(re2.ruta) as ruta_larga2,
+                    ST_AsGeoJSON(re1.ruta) as ruta_larga_geojson,
+                    ST_AsGeoJSON(re2.ruta) as ruta_larga_geojson2,
                     ST_LineSubstring( re1.ruta, ST_LineLocatePoint(re1.ruta, p11.latlng), ST_LineLocatePoint(re1.ruta, p12.latlng) )::Geography as ruta_corta,
                     ST_LineSubstring( re2.ruta, ST_LineLocatePoint(re2.ruta, p21.latlng), ST_LineLocatePoint(re2.ruta, p22.latlng) )::Geography as ruta_corta2,
                     coalesce(li1.nombre || ' ', '') || re1.nombre as nombre,
@@ -73,12 +73,14 @@ class RecorridoManager(GeoManager):
                     coalesce(re2.color_polilinea, li2.color_polilinea, '#000') as color_polilinea2,
                     coalesce(li1.foto, 'default') as foto,
                     coalesce(li2.foto, 'default') as foto2,
+                    re1.type as type,
+                    re2.type as type2,
                     re1.inicio as inicio,
                     re2.inicio as inicio2,
                     re1.fin as fin,
                     re2.fin as fin2,
-                    re1.paradas_completas as re1_paradas_completas,
-                    re2.paradas_completas as re2_paradas_completas,
+                    re1.paradas_completas as paradas_completas,
+                    re2.paradas_completas as paradas_completas2,
                     p11.latlng as ll11,
                     p12.latlng as ll12,
                     p21.latlng as ll21,
@@ -101,22 +103,15 @@ class RecorridoManager(GeoManager):
                     JOIN core_parada  as p21 on (p21.id = h21.parada_id)
                     JOIN core_parada  as p22 on (p22.id = h22.parada_id and p21.id <> p22.id)
                 WHERE
-                    ST_DWithin(p21.latlng, p12.latlng, %(gap)s)
-                    and
-                        ST_LineLocatePoint(re1.ruta, p11.latlng)
-                        <
-                        ST_LineLocatePoint(re1.ruta, p12.latlng)
-                    and
-                        ST_LineLocatePoint(re2.ruta, p21.latlng)
-                        <
-                        ST_LineLocatePoint(re2.ruta, p22.latlng)
-                
+                    (
+                        ST_DWithin(p12.latlng, p21.latlng, %(gap)s) and
+                        ST_LineLocatePoint(re1.ruta, p11.latlng) < ST_LineLocatePoint(re1.ruta, p12.latlng) and
+                        ST_LineLocatePoint(re2.ruta, p21.latlng) < ST_LineLocatePoint(re2.ruta, p22.latlng)
+                    )
                 ) as sq
             WHERE
                 (
-                    ST_DWithin(ST_GeomFromText(%(punto_a)s), ll11, %(rad2)s)
-                    and
-                    ST_DWithin(ST_GeomFromText(%(punto_b)s), ll22, %(rad2)s)
+                    ST_DWithin(ST_GeomFromEWKT(%(punto_a)s), ll11, %(rad1)s) and ST_DWithin(ST_GeomFromEWKT(%(punto_b)s), ll22, %(rad2)s)
                 )
             ) as sq2
             ORDER BY ids, cast(long_pata+long_pata2+long_pata_transbordo as integer)*10 + ( cast(long_ruta as integer) + cast(long_ruta2 as integer) ) ASC
@@ -161,8 +156,9 @@ SELECT
   li.slug as lineaslug,
   inicio,
   fin,
-  ST_AsText(ruta) as ruta_corta,
-  ST_AsGeoJSON(ruta) as ruta_corta_geojson,
+  type,
+  ST_AsGeoJSON(ruta_corta) as ruta_corta_geojson,
+  ST_AsGeoJSON(ruta) as ruta_larga_geojson,
   round(long_ruta::numeric, 2) as long_ruta,
   round(long_pata::numeric, 2) as long_pata,
   coalesce(re.color_polilinea, li.color_polilinea, '#000') as color_polilinea,
@@ -181,13 +177,12 @@ FROM
       fin,
       linea_id,
       color_polilinea,
-
+      type,
       ruta,
-
+      (array_agg(ruta_corta ORDER BY ST_Length(ruta_corta) DESC))[1] as ruta_corta,
       min(ST_Distance(segAgeom::geography, %(punto_a)s::geography) + ST_Distance(segBgeom::geography, %(punto_b)s::geography)) as long_pata,
       null::integer as p1,
       null::integer as p2,
-
       ST_Union(segAgeom) as segsA,
       ST_Union(segBgeom) as segsB,
       min(diff)*ST_Length(ruta::geography) as long_ruta
@@ -201,7 +196,9 @@ FROM
           fin,
           linea_id,
           color_polilinea,
+          type,
           ruta,
+          ST_LineSubstring( ruta, ST_LineLocatePoint(ruta, ST_ClosestPoint(segA.geom, %(punto_a)s)), ST_LineLocatePoint(ruta, ST_ClosestPoint(segB.geom, %(punto_b)s)) )::Geography as ruta_corta,
           ST_LineLocatePoint(ruta, ST_ClosestPoint(segB.geom, %(punto_b)s)) - ST_LineLocatePoint(ruta, ST_ClosestPoint(segA.geom, %(punto_a)s)) as diff,
           segA.geom as segAgeom,
           segB.geom as segBgeom
@@ -224,6 +221,7 @@ FROM
       fin,
       linea_id,
       color_polilinea,
+      type,
       ruta
     )
     UNION
@@ -236,7 +234,9 @@ FROM
       fin,
       linea_id,
       color_polilinea,
+      type,
       ruta,
+      ruta_corta,
       long_pata,
       p1id as p1,
       p2id as p2,
@@ -253,7 +253,9 @@ FROM
           r.fin,
           r.linea_id,
           r.color_polilinea,
+          r.type,
           r.ruta,
+          ST_LineSubstring( ruta, ST_LineLocatePoint(ruta, p1.latlng), ST_LineLocatePoint(ruta, p2.latlng) )::Geography as ruta_corta,
           ST_Distance(p1.latlng::geography, %(punto_a)s) + ST_Distance(p2.latlng::geography, %(punto_b)s) as long_pata,
           p1.id as p1id,
           p2.id as p2id,
