@@ -44,6 +44,7 @@ class RouterResultSerializer(serializers.Serializer):
                     {
                         "id": obj.id,
                         "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson))),
+                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson))),
                         "long_bondi": obj.long_ruta,
                         "long_pata": obj.long_pata,
                         "color_polilinea": obj.color_polilinea,
@@ -51,6 +52,7 @@ class RouterResultSerializer(serializers.Serializer):
                         "fin": obj.fin,
                         "nombre": obj.nombre,
                         "foto": obj.foto,
+                        "type": obj.type,
                         "p1": getParada(obj.p1),
                         "p2": getParada(obj.p2),
                         "paradas": [
@@ -74,7 +76,7 @@ class RouterResultSerializer(serializers.Serializer):
                     {
                         "id": obj.id,
                         "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson))),
-                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga))),
+                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson))),
                         "long_bondi": obj.long_ruta,
                         "long_pata": obj.long_pata,
                         "color_polilinea": obj.color_polilinea,
@@ -82,6 +84,7 @@ class RouterResultSerializer(serializers.Serializer):
                         "fin": obj.fin,
                         "nombre": obj.nombre,
                         "foto": obj.foto,
+                        "type": obj.type,
                         "p1": getParada(obj.p11ll),
                         "p2": getParada(obj.p12ll),
                         "paradas": [
@@ -96,7 +99,7 @@ class RouterResultSerializer(serializers.Serializer):
                     {
                         "id": obj.id2,
                         "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson2))),
-                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga2))),
+                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson2))),
                         "long_bondi": obj.long_ruta2,
                         "long_pata": obj.long_pata2,
                         "color_polilinea": obj.color_polilinea2,
@@ -104,6 +107,7 @@ class RouterResultSerializer(serializers.Serializer):
                         "fin": obj.fin2,
                         "nombre": obj.nombre2,
                         "foto": obj.foto2,
+                        "type": obj.type2,
                         "p1": getParada(obj.p21ll),
                         "p2": getParada(obj.p22ll),
                         "paradas": [
