@@ -919,6 +919,7 @@ class Command(BaseCommand):
                     if 'amenity' in n.tags and 'name' in n.tags and len(n.tags['name']) > 2:
                         point = Point([float(n.location.x) / 10000000, float(n.location.y) / 10000000], srid=4326)
                         # this is a little slow, but it uses indexes :)
+                        # TODO: improve this by using in-memory pandas queries like we did with the 'cross'
                         q = Recorrido.objects \
                             .order_by() \
                             .annotate(cond=RawSQL("ST_Intersects(ST_Buffer(%s::geography, 400, 2)::geometry, ruta)", (point.ewkb,), output_field=BooleanField())) \
