@@ -47,11 +47,9 @@ class RouterResultSerializer(serializers.Serializer):
                         "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson))),
                         "long_bondi": obj.long_ruta,
                         "long_pata": obj.long_pata,
-                        "color_polilinea": obj.color_polilinea,
                         "inicio": obj.inicio,
                         "fin": obj.fin,
                         "nombre": obj.nombre,
-                        "foto": obj.foto,
                         "type": obj.type,
                         "p1": getParada(obj.p1),
                         "p2": getParada(obj.p2),
@@ -79,11 +77,9 @@ class RouterResultSerializer(serializers.Serializer):
                         "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson))),
                         "long_bondi": obj.long_ruta,
                         "long_pata": obj.long_pata,
-                        "color_polilinea": obj.color_polilinea,
                         "inicio": obj.inicio,
                         "fin": obj.fin,
                         "nombre": obj.nombre,
-                        "foto": obj.foto,
                         "type": obj.type,
                         "p1": getParada(obj.p11ll),
                         "p2": getParada(obj.p12ll),
@@ -102,11 +98,9 @@ class RouterResultSerializer(serializers.Serializer):
                         "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson2))),
                         "long_bondi": obj.long_ruta2,
                         "long_pata": obj.long_pata2,
-                        "color_polilinea": obj.color_polilinea2,
                         "inicio": obj.inicio2,
                         "fin": obj.fin2,
                         "nombre": obj.nombre2,
-                        "foto": obj.foto2,
                         "type": obj.type2,
                         "p1": getParada(obj.p21ll),
                         "p2": getParada(obj.p22ll),
@@ -124,7 +118,7 @@ class RouterResultSerializer(serializers.Serializer):
 
 
 def getParada(parada_id):
-    if parada_id is None:
+    if parada_id is None or parada_id == 0:
         return None
     else:
         p = Parada.objects.get(pk=parada_id)
