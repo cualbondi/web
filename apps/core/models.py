@@ -109,13 +109,6 @@ class Recorrido(models.Model):
         # Ejecutar el SAVE original
         super(Recorrido, self).save(*args, **kwargs)
 
-        # Ver que ciudades intersecta
-        ciudades = Ciudad.objects.all()
-        for ciudad in ciudades:
-            if ciudad.poligono.intersects(self.ruta):
-                ciudad.recorridos.add(self)
-                ciudad.lineas.add(self.linea)
-
     class Meta:
         ordering = ['linea__nombre', 'nombre']
 
