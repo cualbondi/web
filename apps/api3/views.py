@@ -158,7 +158,10 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
                     {'detail': '\'l\' parameter is required when using `q` parameter'}
                 )
             p = l.split(',')
-            r = int(p[2])
+            try:
+                r = int(p[2])
+            except Exception:
+                r = 10000
             p = GEOSGeometry('POINT({} {})'.format(p[0], p[1]), srid=4326)
             page = self.paginate_queryset(list(
                 Recorrido.objects.fuzzy_like_trgm_query(q, p, r)
