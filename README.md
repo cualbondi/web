@@ -11,9 +11,18 @@
 
     docker-compose -f docker-compose-travis.yml run --rm web python3 manage.py test --noinput; docker-compose -f docker-compose-travis.yml down; docker-compose -f docker-compose-travis.yml rm -f
 
-### Import only admin areas
+### Import different parts
 
 ```
-./manage.py update_osm --all_arg --import_osm --no-o2p
-./manage.py update_osm -f /tmp/part-all.o5m --admin_areas
+./manage.py update_osm --king=argentina --download
+./manage.py update_osm --king=argentina --admin_areas
+./manage.py update_osm --king=argentina --update_routes --add_routes   # for the first time only
+./manage.py update_osm --king=argentina --update_routes
+./manage.py update_osm --king=argentina --pois
+```
+
+### Do it all together for spain
+
+```
+./manage.py update_osm --king=argentina --download --admin_areas --update_routes --add_routes --pois
 ```

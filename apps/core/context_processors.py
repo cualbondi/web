@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from django.conf import settings
-from apps.utils.data import ciudades as cs
+from apps.utils.data import ciudades as cs, ciudades_es
 
 
 def home_url(request):
@@ -12,4 +12,7 @@ def facebook_app_id(request):
 
 
 def ciudades(request):
-    return {'CIUDADES': cs}
+    return {
+        'CIUDADES': cs,
+        'CIUDADES_ES': ciudades_es,
+    }

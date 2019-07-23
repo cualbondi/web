@@ -45,11 +45,18 @@ class TestRecorridos(APITestCase):
     def test_recorridos_por_linea_1(self):
         "should simulate a client query based on bus name"
         response = self.client.get(
-            '/api/v3/recorridos/?q=129&c=la-plata&page=1')
+            '/api/v3/recorridos/?q=129&l=-57.968416213989265%2C-34.910780590483675&page=1')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 1)
         result = response.data["results"][0]
         self.assertEqual(result["nombre"], "129 (plaza) 1")
+
+    def test_recorridos_por_linea_other_location(self):
+        "should simulate a client query based on bus name in a location that doesn't find any result"
+        response = self.client.get(
+            '/api/v3/recorridos/?q=129&l=0%2C0&page=1')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
 
     def test_recorridos_por_linea_sur(self):
         "should simulate a client query based on bus name"

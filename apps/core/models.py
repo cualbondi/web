@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import HStoreField
 from django.db.models import Manager as GeoManager
 from django.template.defaultfilters import slugify
 from django.urls import reverse
@@ -10,7 +11,8 @@ from .managers import RecorridoManager
 
 
 class Linea(models.Model):
-    nombre = models.CharField(max_length=100)
+    import_timestamp = models.DateTimeField(blank=True, null=True)
+    nombre = models.CharField(max_length=200)
     slug = models.SlugField(max_length=120, blank=True, null=False)
     descripcion = models.TextField(blank=True, null=True)
     foto = models.CharField(max_length=20, blank=True, null=True)
@@ -49,16 +51,18 @@ class Linea(models.Model):
 
 
 class Recorrido(models.Model):
+    import_timestamp = models.DateTimeField(blank=True, null=True)
     uuid = models.UUIDField(default=uuid.uuid4)
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=200)
     img_panorama = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
-    linea = models.ForeignKey(Linea, related_name='recorridos', on_delete=models.CASCADE)
+    linea = models.ForeignKey(Linea, related_name='recorridos', on_delete=models.CASCADE, null=True)
     ruta = models.LineStringField()
-    sentido = models.CharField(max_length=100, blank=True, null=False)
+    ruta_simple = models.LineStringField(null=True)
+    sentido = models.CharField(max_length=200, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=False)
-    inicio = models.CharField(max_length=100, blank=True, null=False)
-    fin = models.CharField(max_length=100, blank=True, null=False)
+    inicio = models.CharField(max_length=200, blank=True, null=True)
+    fin = models.CharField(max_length=200, blank=True, null=True)
     semirrapido = models.BooleanField(default=False)
     color_polilinea = models.CharField(max_length=20, blank=True, null=True)
     horarios = models.TextField(blank=True, null=True)
@@ -71,8 +75,12 @@ class Recorrido(models.Model):
     # este recorrido en la tabla paradas+horarios (horarios puede ser null),
     # y se puede utilizar en la busqueda usando solo las paradas.
     paradas_completas = models.BooleanField(default=False)
+    type = models.CharField(max_length=30, blank=True, null=True)
+    king = models.BigIntegerField(blank=True, null=True, default=286393)  # default = argentina osm_id
 
     objects = RecorridoManager()
+
+    paradas = models.ManyToManyField('core.Parada', related_name='recorridos', through='core.Horario', blank=True)
 
     @property
     def ciudades(self):
@@ -84,24 +92,22 @@ class Recorrido(models.Model):
 
     def save(self, *args, **kwargs):
         # Generar el SLUG a partir del origen y destino del recorrido
-        self.slug = slugify(self.nombre + " desde " + self.inicio + " hasta " + self.fin)
+        try:
+            self.slug = slugify(self.nombre + " desde " + self.inicio + " hasta " + self.fin)
+        except Exception:
+            self.slug = slugify(self.nombre)
 
-        # Asegurarse de que no haya 'inicio' y/o 'fin' invalidos
-        assert (
-            self.inicio != self.fin
-            and self.inicio != ''
-            and self.fin != ''
-        ), "Los campos 'inicio' y 'fin' no pueden ser vacios y/o iguales"
+        self.ruta_simple = self.ruta.simplify(0.0001, True)
+
+        # # Asegurarse de que no haya 'inicio' y/o 'fin' invalidos
+        # assert (
+        #     self.inicio != self.fin
+        #     and self.inicio != ''
+        #     and self.fin != ''
+        # ), "Los campos 'inicio' y 'fin' no pueden ser vacios y/o iguales"
 
         # Ejecutar el SAVE original
         super(Recorrido, self).save(*args, **kwargs)
-
-        # Ver que ciudades intersecta
-        ciudades = Ciudad.objects.all()
-        for ciudad in ciudades:
-            if ciudad.poligono.intersects(self.ruta):
-                ciudad.recorridos.add(self)
-                ciudad.lineas.add(self.linea)
 
     class Meta:
         ordering = ['linea__nombre', 'nombre']
@@ -130,7 +136,7 @@ class Posicion(models.Model):
         verbose_name_plural = 'Posiciones'
 
     recorrido = models.ForeignKey(Recorrido, on_delete=models.CASCADE)
-    dispositivo_uuid = models.CharField(max_length=100, blank=True, null=True)
+    dispositivo_uuid = models.CharField(max_length=200, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
     latlng = models.PointField()
 
@@ -145,16 +151,20 @@ class Posicion(models.Model):
 
 
 class Comercio(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=200)
     latlng = models.PointField()
     ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE)
     objects = GeoManager()
 
 
 class Parada(models.Model):
+    import_timestamp = models.DateTimeField(blank=True, null=True)
+    osm_id = models.BigIntegerField(blank=True, null=True, db_index=True)
+    tags = HStoreField(null=True)
     codigo = models.CharField(max_length=15, blank=True, null=True)
-    nombre = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=200, blank=True, null=True)
     latlng = models.PointField()
+
     objects = GeoManager()
 
     def __str__(self):
@@ -211,6 +221,7 @@ class ImporterLog(models.Model):
     accepted = models.BooleanField()
     proposed_reason = models.TextField(blank=True, null=True)
     accepted_reason = models.TextField(blank=True, null=True)
+    king = models.TextField(blank=True, null=True)
 
     # additional info to show log context and be able to search on something
     osm_administrative = models.TextField(blank=True, null=True)

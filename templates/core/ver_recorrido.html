@@ -29,15 +29,17 @@
             </a>
             <span class="divider">&gt;</span>
         </li>
+        {% if linea %}
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
             <a href="{{HOME_URL}}{{linea.get_absolute_url}}" itemprop="url">
                 <span itemprop="title">{{linea.nombre}}</span>
             </a>
             <span class="divider">&gt;</span>
         </li>
+        {% endif %}
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
             <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{obj.nombre}} {% if obj.inicio and obj.fin %}(de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
+                <span itemprop="title">{{obj.nombre}}{% if obj.inicio and obj.fin %} (de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
             </a>
         </li>
     </ul>

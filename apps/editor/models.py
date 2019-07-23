@@ -21,16 +21,17 @@ MODERATION_CHOICES = (
 
 
 class RecorridoProposed(models.Model):
+    import_timestamp = models.DateTimeField(blank=True, null=True)
     uuid = models.UUIDField(default=uuid4)
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=200)
     img_panorama = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
-    linea = models.ForeignKey('core.Linea', on_delete=models.CASCADE)
+    linea = models.ForeignKey('core.Linea', on_delete=models.CASCADE, null=True)
     ruta = models.LineStringField()
-    sentido = models.CharField(max_length=100, blank=True, null=True)
+    sentido = models.CharField(max_length=200, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
-    inicio = models.CharField(max_length=100, blank=True, null=True)
-    fin = models.CharField(max_length=100, blank=True, null=True)
+    inicio = models.CharField(max_length=200, blank=True, null=True)
+    fin = models.CharField(max_length=200, blank=True, null=True)
     semirrapido = models.BooleanField(default=False)
     color_polilinea = models.CharField(max_length=20, blank=True, null=True)
     horarios = models.TextField(blank=True, null=True)
@@ -38,11 +39,13 @@ class RecorridoProposed(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     paradas_completas = models.BooleanField(default=False)
     ruta_last_updated = models.DateTimeField(default=datetime.now)
+    type = models.CharField(max_length=30, blank=True, null=True)
+    king = models.BigIntegerField(blank=True, null=True, default=286393)  # default = argentina osm_id
 
     osm_id = models.BigIntegerField(blank=True, null=True)
     osm_version = models.BigIntegerField(blank=True, null=True)
 
-    recorrido = models.ForeignKey('core.Recorrido', on_delete=models.CASCADE)
+    recorrido = models.ForeignKey('core.Recorrido', on_delete=models.CASCADE, null=True)
     parent = models.UUIDField(null=True)
     current_status = models.CharField(max_length=1, choices=MODERATION_CHOICES, default='E')
 
@@ -75,7 +78,7 @@ class RecorridoProposed(models.Model):
         logmoderacion__newStatus = kwargs.pop('logmoderacion__newStatus', None)
         super(RecorridoProposed, self).save(*args, **kwargs)
         mod = self.get_moderacion_last()
-        if mod is None or ( user is not None and user != mod.created_by ):
+        if mod is None or (user is not None and user != mod.created_by):
             if logmoderacion__newStatus:
                 self.logmoderacion_set.create(created_by=user, newStatus=logmoderacion__newStatus)
             else:
@@ -130,7 +133,8 @@ class RecorridoProposed(models.Model):
         return str(self.linea) + " - " + self.nombre
 
     def aprobar(self, user):
-        r = self.recorrido
+        recorrido_model = apps.get_app_config('core').get_model("Recorrido")
+        r = self.recorrido if self.recorrido is not None else recorrido_model()
         parent = list(RecorridoProposed.objects.filter(uuid=self.parent))
         # Esto lo hago en una migration para todos y listo
         # if not r.uuid or not parent.exists():
@@ -141,15 +145,18 @@ class RecorridoProposed(models.Model):
         #     self.parent = parent.uuid
         #     self.save()
 
-        recorrido_model = apps.get_app_config('core').get_model("Recorrido")
         fields = [f.column for f in recorrido_model._meta.get_fields() if hasattr(f, 'column')]
         rp_dict = r.__dict__.copy()
         rp_dict.pop('_state')
         rp_dict.pop('id')
+        rp_dict.pop('ruta_simple')
         for (k, v) in list(rp_dict.items()):
             if k in fields:
                 setattr(r, k, getattr(self, k))
         r.save()
+        if self.recorrido is None:
+            self.recorrido = r
+            self.save()
 
         if parent:
             parent[0].logmoderacion_set.create(created_by=user, newStatus='R')
@@ -158,7 +165,7 @@ class RecorridoProposed(models.Model):
             rp.logmoderacion_set.create(created_by=user, newStatus='R')
         self.logmoderacion_set.create(created_by=user, newStatus='S')
 
-        #call_command('crear_thumbs', recorrido_id=self.recorrido.id)
+        # call_command('crear_thumbs', recorrido_id=self.recorrido.id)
 
         # Notificacion por facebook
         # token = urllib2.urlopen('https://graph.facebook.com/oauth/access_token?client_id='+settings.FACEBOOK_APP_ID+'&client_secret='+settings.FACEBOOK_API_SECRET+'&grant_type=client_credentials').read().split('access_token=')[1]

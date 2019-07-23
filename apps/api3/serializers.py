@@ -44,57 +44,81 @@ class RouterResultSerializer(serializers.Serializer):
                     {
                         "id": obj.id,
                         "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson))),
+                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson))),
                         "long_bondi": obj.long_ruta,
                         "long_pata": obj.long_pata,
-                        "color_polilinea": obj.color_polilinea,
                         "inicio": obj.inicio,
                         "fin": obj.fin,
                         "nombre": obj.nombre,
-                        "foto": obj.foto,
+                        "type": obj.type,
                         "p1": getParada(obj.p1),
                         "p2": getParada(obj.p2),
-                        # "url": obj.get_absolute_url()
+                        "paradas": [
+                            {
+                                "latlng": p.latlng.coords[::-1],
+                                "codigo": p.codigo,
+                                "nombre": p.nombre
+                            }
+                            for p in obj.paradas.all()
+                        ],
+                        "url": obj.get_absolute_url(),
                     }
                 ]
             }
         else:
+            obj2 = Recorrido.objects.prefetch_related('paradas').get(pk=obj.id2)
             return {
                 "id": str(obj.id) + str(obj.id2),
+                "long_pata_transbordo": obj.long_pata_transbordo,
                 "itinerario": [
                     {
                         "id": obj.id,
                         "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson))),
+                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson))),
                         "long_bondi": obj.long_ruta,
                         "long_pata": obj.long_pata,
-                        "color_polilinea": obj.color_polilinea,
                         "inicio": obj.inicio,
                         "fin": obj.fin,
                         "nombre": obj.nombre,
-                        "foto": obj.foto,
+                        "type": obj.type,
                         "p1": getParada(obj.p11ll),
                         "p2": getParada(obj.p12ll),
-                        # "url": obj.get_absolute_url(None, None, obj.slug)
+                        "paradas": [
+                            {
+                                "latlng": p.latlng.coords[::-1],
+                                "codigo": p.codigo,
+                                "nombre": p.nombre
+                            } for p in obj.paradas.all()
+                        ],
+                        "url": obj.get_absolute_url(),
                     },
                     {
                         "id": obj.id2,
                         "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson2))),
+                        "ruta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_larga_geojson2))),
                         "long_bondi": obj.long_ruta2,
                         "long_pata": obj.long_pata2,
-                        "color_polilinea": obj.color_polilinea2,
                         "inicio": obj.inicio2,
                         "fin": obj.fin2,
                         "nombre": obj.nombre2,
-                        "foto": obj.foto2,
+                        "type": obj.type2,
                         "p1": getParada(obj.p21ll),
                         "p2": getParada(obj.p22ll),
-                        # "url": obj.get_absolute_url(None, None, obj.slug2)
+                        "paradas": [
+                            {
+                                "latlng": p.latlng.coords[::-1],
+                                "codigo": p.codigo,
+                                "nombre": p.nombre
+                            } for p in obj2.paradas.all()
+                        ],
+                        "url": obj2.get_absolute_url(),
                     }
                 ]
             }
 
 
 def getParada(parada_id):
-    if parada_id is None:
+    if parada_id is None or parada_id == 0:
         return None
     else:
         p = Parada.objects.get(pk=parada_id)
@@ -138,6 +162,7 @@ class RecorridoCustomSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
             "id": obj.id,
+            "osm_id": obj.osm_id,
             "ruta_corta": base64.b64encode(geobuf.encode(json.loads(obj.ruta_corta_geojson))),
             "long_bondi": obj.long_ruta,
             "color_polilinea": obj.color_polilinea,
@@ -145,7 +170,14 @@ class RecorridoCustomSerializer(serializers.Serializer):
             "fin": obj.fin,
             "nombre": obj.nombre,
             "foto": obj.foto,
-            "paradas": [],
+            "paradas": [
+                {
+                    "latlng": p.latlng.coords[::-1],
+                    "codigo": p.codigo,
+                    "nombre": p.nombre
+                }
+                for p in obj.paradas.all()
+            ],
         }
 
 

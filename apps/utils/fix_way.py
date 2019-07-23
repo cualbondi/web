@@ -243,10 +243,8 @@ def fix_polygon(way, tolerance=0):
                     # print('SAFE tolerance!')
                     return tolerated_sorted, '3b: broken, sort + tolerance'
 
-            # print(len(way))
-            # print(way.ewkt)
-
-        return None, '4: broken'
+                # this is probably a multipolygon
+                return tolerated_sorted, '6: maybe multipolygon'
 
     except Exception as e:
         # import traceback
