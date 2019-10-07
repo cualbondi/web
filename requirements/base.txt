@@ -30,7 +30,7 @@ Shapely==1.6.4.post2
 Rtree==0.8.3
 
 # warning, pinned! test before changing this one
-osmium==2.14.3 #
+osmium==2.15.3 #
 
 # warning, pinned! test before changing this one
 urllib3==1.25.2
