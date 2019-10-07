@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from apps.commands.street_intersections import StreetIntersectionsTask
+from apps.tasks.tasks.street_intersections import StreetIntersectionsTask
 
 
 class Command(BaseCommand):

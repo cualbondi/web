@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from apps.commands.cross_areas import CrossAreasTask
+from apps.tasks.tasks.cross_areas import CrossAreasTask
 
 
 class Command(BaseCommand):

@@ -35,4 +35,4 @@ osmium==2.14.3 #
 # warning, pinned! test before changing this one
 urllib3==1.25.2
 
-apache-airflow==1.10.3  # https://airflow.apache.org/start.html
+prefect
