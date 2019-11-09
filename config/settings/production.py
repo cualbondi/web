@@ -81,13 +81,14 @@ INSTALLED_APPS += []  # noqa F405
 
 # Gunicorn
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ['gunicorn']  # noqa F405
+# INSTALLED_APPS += ['gunicorn']  # noqa F405
 
 
 
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
+COLLECTFAST_STRATEGY = 'collectfast.strategies.filesystem.FileSystemStrategy'
 INSTALLED_APPS = ['collectfast'] + INSTALLED_APPS  # noqa F405
 AWS_PRELOAD_METADATA = True
 

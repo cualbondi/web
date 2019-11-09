@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libbz2-dev \
     gcc \
     g++ \
+    git \
     make \
     libpq-dev \
   && rm -rf /var/lib/apt/lists/* \
