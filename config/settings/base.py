@@ -76,7 +76,6 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'corsheaders',
-    'leaflet',
     'imagekit',
     'django_extensions',
 
@@ -350,7 +349,7 @@ SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id, name, email'
 }
-SOCIAL_AUTH_URL_NAMESPACE = 'social'
+DRFSO2_URL_NAMESPACE = 'social'
 
 SHELL_PLUS_PRINT_SQL = True
 

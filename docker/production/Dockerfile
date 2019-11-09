@@ -15,8 +15,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-setuptools \
     python3-pip \
-    osm2pgsql \
-    osmctools \
     libgeos-dev \
     gdal-bin \
     libspatialindex-dev \
@@ -29,7 +27,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     libpq-dev \
-    osmium-tool \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install wheel
 
