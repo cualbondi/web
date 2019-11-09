@@ -1,4 +1,4 @@
-FROM ubuntu:disco
+FROM ubuntu:eoan
 
 ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libbz2-dev \
     gcc \
     g++ \
+    make \
     libpq-dev \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install wheel
@@ -47,24 +48,8 @@ RUN echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sP >> /v
 RUN echo "00 6 * * * root /usr/bin/python3 /app/manage.py crear_thumbs_catastro -s >> /var/log/cualbondi-thumbs_catastro.log 2>&1" >> /etc/cron.d/osm-cualbondi
 RUN chmod 0644 /etc/cron.d/osm-cualbondi
 
-COPY ./docker/production/gunicorn.sh /gunicorn.sh
-RUN sed -i 's/\r//' /gunicorn.sh
-RUN chmod +x /gunicorn.sh
-RUN chown django /gunicorn.sh
-
-COPY ./docker/production/entrypoint.sh /entrypoint.sh
-RUN sed -i 's/\r//' /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-RUN chown django /entrypoint.sh
-
-COPY ./docker/production/entrypoint+cron.sh /entrypoint+cron.sh
-RUN sed -i 's/\r//' /entrypoint+cron.sh
-RUN chmod +x /entrypoint+cron.sh
-RUN chown django /entrypoint+cron.sh
-
-COPY . /app
-
-RUN chown -R django /app
+COPY --chown=django ./docker/production/uvicorn.sh ./docker/production/gunicorn.sh ./docker/production/entrypoint.sh ./docker/production/entrypoint+cron.sh /
+COPY --chown=django . /app
 
 #USER django
 

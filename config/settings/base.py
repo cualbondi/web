@@ -350,6 +350,7 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id, name, email'
 }
 DRFSO2_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 SHELL_PLUS_PRINT_SQL = True
 
