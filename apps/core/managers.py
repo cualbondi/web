@@ -294,10 +294,18 @@ class RecorridoManager(GeoManager):
                                 left outer join core_linea li2 on li2.id = re2.linea_id
                             WHERE
                                 not re1.paradas_completas and not re2.paradas_completas and
+
+                                -- This should be a best option but it does not always work. (sometimes throws ERROR: 2nd arg must be smaller then 3rd arg)
+                                -- sample url to throw the error https://localhost:8080/api/v3/recorridos/?l=-57.957944869995124,-34.899940591293,300|-57.98480987548829,-34.90388257474793,300&page=1&t=true
                                 -- ST_DWithin(ST_ClosestPoint(re2.ruta, re1.ruta)::geometry, ST_ClosestPoint(re1.ruta, re2.ruta)::geometry, %(gap)s) and
+                                -- ST_LineLocatePoint(re1.ruta, ST_GeomFromEWKT(%(punto_a)s)) < ST_LineLocatePoint(re1.ruta, ST_ClosestPoint(re1.ruta, re2.ruta)) and
+                                -- ST_LineLocatePoint(re2.ruta, ST_ClosestPoint(re2.ruta, re1.ruta)) < ST_LineLocatePoint(re2.ruta, ST_GeomFromEWKT(%(punto_b)s))
+
+                                -- this option is worst (does not take the gap into account) but it seems to work always
                                 ST_Intersects(re2.ruta, re1.ruta) and
-                                ST_LineLocatePoint(re1.ruta, ST_GeomFromEWKT(%(punto_a)s)) < ST_LineLocatePoint(re1.ruta, ST_ClosestPoint(re1.ruta, re2.ruta)) and
-                                ST_LineLocatePoint(re2.ruta, ST_ClosestPoint(re2.ruta, re1.ruta)) < ST_LineLocatePoint(re2.ruta, ST_GeomFromEWKT(%(punto_b)s))
+                                ST_GeometryType(ST_Intersection(re1.ruta, re2.ruta)) = 'ST_Point' and
+                                ST_LineLocatePoint(re1.ruta, ST_GeomFromEWKT(%(punto_a)s)) < ST_LineLocatePoint(re1.ruta, ST_Intersection(re1.ruta, re2.ruta)) and
+                                ST_LineLocatePoint(re2.ruta, ST_Intersection(re1.ruta, re2.ruta)) < ST_LineLocatePoint(re2.ruta, ST_GeomFromEWKT(%(punto_b)s))
                             ) as sq
                         WHERE
                             ST_DWithin(ST_GeomFromEWKT(%(punto_a)s), re1_ruta, %(rad1)s) and ST_DWithin(ST_GeomFromEWKT(%(punto_b)s), re2_ruta, %(rad2)s)
@@ -308,6 +316,11 @@ class RecorridoManager(GeoManager):
             ORDER BY cast(long_pata+long_pata2+long_pata_transbordo as integer)*10 + ( cast(long_ruta as integer) + cast(long_ruta2 as integer) ) ASC
         ;"""
         query_set = self.raw(query, params)
+        # this commented code is to be able to see the query in django_debug_toolbar, even when it errors
+        # try:
+        #     return list(query_set)
+        # except Exception as e:
+        #     return []
         return list(query_set)
 
     def get_recorridos(self, punto_a, punto_b, distancia_a, distancia_b):
