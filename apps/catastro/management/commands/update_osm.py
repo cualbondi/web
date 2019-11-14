@@ -209,7 +209,7 @@ class Command(BaseCommand):
                             'ways': ways,
                             'admin_level': admin_level,
                             'name': r.tags['name'],  # .encode('utf-8').strip(),
-                            'tags': r.tags.__dict__,
+                            'tags': {k:v for k,v in r.tags},
                         }
                         # this.out2(f"REL {r.id} {r.tags['name'].encode('utf-8').strip()}")
 
@@ -232,7 +232,7 @@ class Command(BaseCommand):
                                     'geometry_simple': poly.simplify(0.01, True),
                                     'admin_level': int(w.tags['admin_level']),
                                     'name': w.tags['name'],  # .encode('utf-8').strip(),
-                                    'tags': w.tags.__dict__,
+                                    'tags': {k:v for k,v in w.tags},
                                 })
 
                     # fill relations that are admin areas
@@ -738,7 +738,7 @@ class Command(BaseCommand):
                                         'import_timestamp': run_timestamp,
                                         'nombre': s['name'],
                                         'latlng': s['point'],
-                                        'tags': s['tags'].__dict__,
+                                        'tags': {k:v for k,v in s['tags']},
                                     }
                                 )
                                 if created:
@@ -928,7 +928,7 @@ class Command(BaseCommand):
                             .exists()
                         if q:
                             defaults = {
-                                'tags': n.tags.__dict__,
+                                'tags': {k:v for k,v in n.tags},
                                 'nom': n.tags['name'][:200],
                                 'nom_normal': Substr(Trim(Upper(Unaccent(Value(n.tags['name'])))), 1, 200),
                                 'latlng': point,
