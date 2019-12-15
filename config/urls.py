@@ -60,7 +60,7 @@ urlpatterns = [
 
     url(r'^api/v3/', include(api3Urls)),
     url(r'^v3/', include(api3Urls)),
-    url(r'^auth/', include('rest_framework_social_oauth2.urls')),
+    url(r'^auth/', include('rest_framework_social_oauth2.urls', namespace='drfsocial')),
     url('', include('social_django.urls', namespace='social'))
 ]
 
