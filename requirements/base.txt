@@ -29,6 +29,7 @@ Rtree==0.8.3
 
 # warning, pinned! test before changing this one
 osmium==2.15.3 #
+pyosmptparser==1.0.0
 
 # warning, pinned! test before changing this one
 urllib3==1.25.2

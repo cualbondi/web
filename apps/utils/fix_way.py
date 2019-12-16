@@ -1,4 +1,3 @@
-from django.contrib.gis.geos import GEOSGeometry, MultiLineString, LineString, Point
 from functools import lru_cache
 import math
 
@@ -19,7 +18,7 @@ def first_pass(ways):
         prev_way = ordered_ways[-1][:]
         # if its the first segment on the linestring,
         # try reversing it if it matches with the second
-        if ordered_ways[-1] == ways[i-1]:
+        if ordered_ways[-1] == ways[i - 1]:
             if way[0] == prev_way[0] or way[-1] == prev_way[0]:
                 ordered_ways[-1] = prev_way[::-1]
                 prev_way = ordered_ways[-1]
@@ -144,9 +143,11 @@ def dist_haversine(P1, P2):
     radius = 6371000  # meters
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
-    a = (math.sin(dlat / 2) * math.sin(dlat / 2) +
-         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
-         math.sin(dlon / 2) * math.sin(dlon / 2))
+    a = (
+        math.sin(dlat / 2) * math.sin(dlat / 2) +
+        math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * 
+        math.sin(dlon / 2) * math.sin(dlon / 2)
+    )
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     d = radius * c
     return d

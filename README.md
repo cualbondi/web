@@ -24,5 +24,5 @@
 ### Do it all together for spain
 
 ```
-./manage.py update_osm --king=argentina --download --admin_areas --update_routes --add_routes --pois
+./manage.py update_osm --king=spain --download --admin_areas --update_routes --add_routes --pois
 ```

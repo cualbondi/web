@@ -584,102 +584,13 @@ class Command(BaseCommand):
             # https://wiki.openstreetmap.org/w/index.php?oldid=625726
             # https://wiki.openstreetmap.org/wiki/Buses
 
-            buses = {}  # pasar a self.buses { relation_id: { name: name, fixed_way: GEOSGeom, ways: { way_id: { name: name, nodes: { node_id: { lat: lat, lng: lng } } } } } }
-            ways = {}  # aux structure { way_id: [ relation_id ] }
-            stops = {}  # aux structure { node_id: [ relation_id ] }
-
-            route_id_only = int(options['osm-id']) if options['osm-id'] else ''
-
-            class RelsHandler(osmium.SimpleHandler):
-                def relation(self, r):
-                    routetypes_stops = ['train', 'subway', 'monorail', 'tram', 'light_rail']
-                    routetypes = routetypes_stops + ['bus', 'trolleybus']
-                    if ((not route_id_only or r.id == route_id_only) and 'route' in r.tags and r.tags['route'] in routetypes and 'name' in r.tags):
-                        paradas_completas = None
-                        if r.tags['route'] in routetypes_stops:
-                            paradas_completas = True
-                        bus = {
-                            'name': r.tags['name'][:200],
-                            'ways': [],
-                            'stops': [],
-                            'timestamp': r.timestamp,
-                            'version': r.version,
-                            'paradas_completas': paradas_completas,
-                            'type': r.tags['route'],
-                        }
-                        for m in r.members:
-                            # forward / backward / alternate are deprecated in PTv2, add warning
-                            if m.type == 'w' and m.role in ['', 'forward', 'backward', 'alternate']:
-                                bus['ways'].append(m.ref)
-                                ways.setdefault(m.ref, []).append(r.id)
-                            if m.type == 'n':
-                                bus['stops'].append(m.ref)
-                                stops.setdefault(m.ref, []).append(r.id)
-                        if len(bus['stops']) > 20:
-                            bus['paradas_completas'] = True
-                        buses[r.id] = bus
-
-            class WaysHandler(osmium.SimpleHandler):
-                def way(self, w):
-                    if w.id in ways:
-                        linestring = []
-                        for node in w.nodes:
-                            linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
-
-                        for rel_id in ways[w.id]:
-                            for i, wid in enumerate(buses[rel_id]['ways']):
-                                if wid == w.id:
-                                    buses[rel_id]['ways'][i] = linestring
-
-            class NodesHandler(osmium.SimpleHandler):
-                def node(self, n):
-                    # to know what the tags are for a stop, took info from https://github.com/gravitystorm/openstreetmap-carto/blob/master/stations.mss
-                    # and from openstreetmap's wiki
-                    # essentially, what's rendered in osm map is:
-                    #  - bus and trolleybus have the highway=bus_stop tag, and is next to the higway where the bus goes
-                    #  - all other transports that use rails has nodes with public_transport=stop_position, on the rail.
-                    #  - trains actually render "stations", but that's complex because the relation is rel(route)>rel(station)>node(stop) so we use stop_position
-                    if n.id in stops and (
-                        ('highway' in n.tags and n.tags['highway'] == 'bus_stop') or
-                        (
-                            'public_transport' in n.tags and n.tags['public_transport'] == 'stop_position' and
-                            (
-                                'subway' in n.tags or
-                                'train' in n.tags or
-                                'tram' in n.tags or
-                                'light_rail' in n.tags or
-                                'monorail' in n.tags
-                            )
-                        )
-                    ):
-                        stop = {
-                            'osm_id': n.id,
-                            'name': n.tags['name'][:200] if 'name' in n.tags else '',
-                            'point': Point([float(n.location.x) / 10000000, float(n.location.y) / 10000000]),
-                            'tags': n.tags,
-                        }
-
-                        for rel_id in stops[n.id]:
-                            for i, nid in enumerate(buses[rel_id]['stops']):
-                                if nid == n.id:
-                                    buses[rel_id]['stops'][i] = stop
-
-            self.out2('relations')
-            h = RelsHandler()
-            h.apply_file(inputfile)
-            self.out2('ways')
-            h = WaysHandler()
-            h.apply_file(inputfile, locations=True)
-            self.out2('nodes (stops)')
-            h = NodesHandler()
-            h.apply_file(inputfile)
-
-            self.out2('fixer routine')
+            p = pyosmptparser.Parser(inputfile)
+            pts = p.get_public_transports(150)
 
             counters = {}
-            for bus_id, bus in buses.items():
+            for pt in pts:
                 self.out2(bus_id, end=': ')
-                way, status = fix_way(bus['ways'], 150)
+                way = pt.geometry
                 buses[bus_id]['way'] = LineString(way) if way else None
                 buses[bus_id]['status'] = status
                 counters.setdefault(status, 0)
