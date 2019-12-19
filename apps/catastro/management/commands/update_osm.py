@@ -304,9 +304,9 @@ class Command(BaseCommand):
                                     p_fixed, status = fix_polygon(p, 1000)
                                     if p_fixed:
                                         try:
-                                            mp.append(Polygon(p_fixed))
+                                            mp.append(Polygon(p_fixed + [p_fixed[0]]))
                                         except Exception as e3:
-                                            self.out2(f" {e3} {status}, skipping fragment")
+                                            self.out2(f" {e3} {status}, skipping fragment. ({len(p_fixed)} nodes) [{status}]")
                                 poly = MultiPolygon(mp)
                                 v['geometry'] = poly
                                 v['geometry_simple'] = poly.simplify(0.01, True)
