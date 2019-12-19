@@ -13,7 +13,6 @@ from rest_framework.mixins import UpdateModelMixin
 from apps.catastro.models import Ciudad, PuntoBusqueda
 from apps.core.models import Linea, Recorrido, ImporterLog
 from . import serializers
-from .mixins import LoggingMixin
 
 
 class CiudadesViewSet(viewsets.ReadOnlyModelViewSet):
@@ -54,7 +53,7 @@ class IsStaffOrReadOnly(BasePermission):
         )
 
 
-class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin):
+class RecorridosViewSet(viewsets.GenericViewSet, UpdateModelMixin):
     """
         Parametros querystring
 
@@ -180,7 +179,7 @@ class RecorridosViewSet(LoggingMixin, viewsets.GenericViewSet, UpdateModelMixin)
                 return Response([])
 
 
-class GeocoderViewSet(LoggingMixin, viewsets.GenericViewSet):
+class GeocoderViewSet(viewsets.GenericViewSet):
     """
         Parámetros querystring
 
