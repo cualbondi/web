@@ -1,4 +1,3 @@
-from django.contrib.gis.geos import GEOSGeometry, MultiLineString, LineString, Point
 from functools import lru_cache
 import math
 
