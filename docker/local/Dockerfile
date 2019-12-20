@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
     git \
     make \
+    osmium-tool \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install wheel
 

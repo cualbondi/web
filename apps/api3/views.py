@@ -110,16 +110,6 @@ class RecorridosViewSet(viewsets.GenericViewSet, UpdateModelMixin):
             if len(lp) == 1:
                 qs = Recorrido.objects.filter(ruta__distance_lte=(lp[0]['p'], D(m=lp[0]['r'])))
                 page = self.paginate_queryset(qs)
-                self.update_logger_extras({
-                    "point1": "{},{}".format(lp[0]['p'].y, lp[0]['p'].x),
-                    # "lat,lon" https://www.elastic.co/guide/en/elasticsearch/reference/1.3/mapping-geo-point-type.html
-                    "rad1": lp[0]['r'],
-                    "point2": None,
-                    "rad2": None,
-                    "t": False,
-                    "count": self.paginator.page.paginator.count,
-                    "page": self.paginator.page.number
-                })
                 if page is not None:
                     serializer = self.get_serializer(page, many=True)
                     return self.get_paginated_response(serializer.data)
@@ -135,16 +125,6 @@ class RecorridosViewSet(viewsets.GenericViewSet, UpdateModelMixin):
                 routerResults = Recorrido.objects.get_recorridos_combinados(lp[0]['p'], lp[1]['p'], lp[0]['r'], lp[1]['r'], 500)
 
             page = self.paginate_queryset(routerResults)
-            self.update_logger_extras({
-                "point1": "{},{}".format(lp[0]['p'].y, lp[0]['p'].x),
-                # "lat,lon" https://www.elastic.co/guide/en/elasticsearch/reference/1.3/mapping-geo-point-type.html
-                "rad1": lp[0]['r'],
-                "point2": "{},{}".format(lp[1]['p'].y, lp[1]['p'].x),
-                "rad2": lp[1]['r'],
-                "t": t,
-                "count": self.paginator.page.paginator.count,
-                "page": self.paginator.page.number
-            })
             if page is not None:
                 ser = serializers.RouterResultSerializer(page, many=True)
                 return self.get_paginated_response(ser.data)
@@ -165,13 +145,6 @@ class RecorridosViewSet(viewsets.GenericViewSet, UpdateModelMixin):
             page = self.paginate_queryset(list(
                 Recorrido.objects.fuzzy_like_trgm_query(q, p, r)
             ))
-            self.update_logger_extras({
-                "q": q,
-                "p": p,
-                "r": r,
-                "count": self.paginator.page.paginator.count,
-                "page": self.paginator.page.number
-            })
             if page is not None:
                 serializer = serializers.RecorridoCustomSerializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
