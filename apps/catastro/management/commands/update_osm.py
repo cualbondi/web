@@ -368,8 +368,11 @@ class Command(BaseCommand):
             for li in admin_areas:
                 # aa = admin area
                 for aa in li:
-                    if not aa['geometry'].intersects(KING_GEOM_BUFF):
-                        continue
+                    try:
+                        if not aa['geometry'].intersects(KING_GEOM_BUFF):
+                            continue
+                    except GEOSException as e:
+                        self.out2(f'{str(e)}\n{aa["osm_id"]} {aa["name"].encode("utf-8")}')
                     try:
                         parent_aa = get_parent_aa(tree, aa['geometry'])
                         aa.pop('admin_level')
