@@ -656,24 +656,23 @@ class Command(BaseCommand):
                         count_created = 0
                         count_associated = 0
                         for s in bus['pt'].stops:
-                            if isinstance(s, dict):
-                                parada, created = Parada.objects.update_or_create(
-                                    osm_id=s.id,
-                                    defaults={
-                                        'import_timestamp': run_timestamp,
-                                        'nombre': s.tags['name'],
-                                        'latlng': Point(s.lon, s.lat),
-                                        'tags': s.tags,
-                                    }
-                                )
-                                if created:
-                                    count_created = count_created + 1
-                                horario, created = Horario.objects.update_or_create(
-                                    recorrido=rp.recorrido,
-                                    parada=parada,
-                                )
-                                if created:
-                                    count_associated = count_associated + 1
+                            parada, created = Parada.objects.update_or_create(
+                                osm_id=s.id,
+                                defaults={
+                                    'import_timestamp': run_timestamp,
+                                    'nombre': s.tags['name'] if 'name' in s.tags else f'{s.lon}, {s.lat}',
+                                    'latlng': Point(s.lon, s.lat),
+                                    'tags': s.tags,
+                                }
+                            )
+                            if created:
+                                count_created = count_created + 1
+                            horario, created = Horario.objects.update_or_create(
+                                recorrido=rp.recorrido,
+                                parada=parada,
+                            )
+                            if created:
+                                count_associated = count_associated + 1
                         self.out2(f'CREATED STOPS {count_created}, ASSOCIATED {count_associated}')
 
             else:
