@@ -174,7 +174,7 @@ class Command(BaseCommand):
         if (not skip) or (not (obj.img_cuadrada and obj.img_panorama)):
             for size in [(500, 500), (880, 300)]:
                 def fn(prefix, obj, size):
-                    fname = f'/media/{prefix}/{prefix}-{getattr(obj, "osm_id", obj.osm_id)}.{size[0]}x{size[1]}.png'
+                    fname = f'{settings.MEDIA_ROOT}/{prefix}/{prefix}-{getattr(obj, "osm_id", obj.osm_id)}.{size[0]}x{size[1]}.png'
                     print(f'  > Getting image size: {size} ')
                     params = {
                         'geojson': obj.geoJSON,
