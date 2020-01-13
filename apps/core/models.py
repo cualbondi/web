@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from apps.catastro.models import Ciudad
 from .managers import RecorridoManager
+from django.core.serializers import serialize
 
 
 class Linea(models.Model):
@@ -26,6 +27,15 @@ class Linea(models.Model):
     telefono = models.CharField(max_length=200, blank=True, null=True)
     envolvente = models.PolygonField(blank=True, null=True)
     osm_id = models.BigIntegerField(blank=True, null=True)
+
+    @property
+    def geoJSON(self):
+        return serialize(
+            'geojson',
+            [self],
+            geometry_field='envolvente',
+            fields=('nombre',)
+        )
 
     def __str__(self):
         return self.nombre
@@ -77,6 +87,15 @@ class Recorrido(models.Model):
     paradas_completas = models.BooleanField(default=False)
     type = models.CharField(max_length=30, blank=True, null=True)
     king = models.BigIntegerField(blank=True, null=True, default=286393)  # default = argentina osm_id
+
+    @property
+    def geoJSON(self):
+        return serialize(
+            'geojson',
+            [self],
+            geometry_field='ruta',
+            fields=('nombre',)
+        )
 
     objects = RecorridoManager()
 

@@ -12,6 +12,7 @@ from .managers import (
     ZonaManager,
     PuntoBusquedaManager
 )
+from django.core.serializers import serialize
 
 
 # de http://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string/517974#517974
@@ -152,6 +153,15 @@ class Poi(models.Model):
     tags = HStoreField(null=True)
     objects = GeoManager()
 
+    @property
+    def geoJSON(self):
+        return serialize(
+            'geojson',
+            [self],
+            geometry_field='latlng',
+            fields=('nom',)
+        )
+
     def save(self, *args, **kwargs):
         slug = slugify(self.nom)
         self.slug = slug
@@ -259,6 +269,15 @@ class AdministrativeArea(MP_Node):
     tags = HStoreField()
     img_panorama = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
+
+    @property
+    def geoJSON(self):
+        return serialize(
+            'geojson',
+            [self],
+            geometry_field='geometry',
+            fields=('name',)
+        )
 
     node_order_by = ['name']
 

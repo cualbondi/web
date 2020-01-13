@@ -136,13 +136,9 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
         aa = None
         aaancestors = None
 
-    template = "core/ver_linea.html"
-    if (request.GET.get("dynamic_map")):
-        template = "core/ver_obj_map.html"
-
     return render(
         request,
-        template,
+        "core/ver_linea.html",
         {
             'obj': linea,
             'recorridos': recorridos,
@@ -296,17 +292,13 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     # Horarios + paradas que tiene este recorrido
     horarios = recorrido.horario_set.all().prefetch_related('parada').order_by('?')[:60]
 
-    template = "core/ver_recorrido.html"
-    if request.GET.get("dynamic_map"):
-        template = "core/ver_obj_map.html"
-
     recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_simplified)
 
     aaancestors, calles_fin, pois, aas, horarios, recorridos_similares = parallelize(aaancestors, calles_fin, pois, aas, horarios, recorridos_similares)
 
     return render(
         request,
-        template,
+        "core/ver_recorrido.html",
         {
             'obj': recorrido,
             'linea': recorrido.linea,

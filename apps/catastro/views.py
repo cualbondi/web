@@ -97,10 +97,6 @@ def poiORint(request, slug=None):
         .order_by('depth') \
         .reverse()
 
-    template = 'catastro/ver_poi.html'
-    if (request.GET.get("dynamic_map")):
-        template = 'core/ver_obj_map.html'
-
     try:
         amenity = amenities[poi.tags['amenity']]
     except KeyError:
@@ -108,7 +104,7 @@ def poiORint(request, slug=None):
 
     return render(
         request,
-        template,
+        'catastro/ver_poi.html',
         {
             'obj': poi,
             'amenity': amenity,
@@ -133,9 +129,6 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
         # Redirect with slug
         return HttpResponsePermanentRedirect(aa.get_absolute_url())
     else:
-        template = 'catastro/ver_administrativearea.html'
-        if (request.GET.get("dynamic_map")):
-            template = 'core/ver_obj_map.html'
         lineas = None
         pois = None
         ps = None
@@ -175,7 +168,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
             )
         return render(
             request,
-            template,
+            'catastro/ver_administrativearea.html',
             {
                 'obj': aa,
                 'adminarea': aa,

@@ -7,15 +7,6 @@ RUN \
     apt-get update \
 && \
     apt-get install -y --no-install-recommends \
-        curl \
-        gnupg \
-        ca-certificates \
-&& \
-    curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
-    apt-get update \
-&& \
-    apt-get install -y --no-install-recommends \
         python3 \
         python3-setuptools \
         python3-pip \
@@ -23,8 +14,6 @@ RUN \
         gdal-bin \
         libspatialindex-dev \
         postgresql-client \
-        libjpeg-dev pngcrush \
-        libtiff5-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev google-chrome-stable \
         cron \
         libboost-python-dev \
         libbz2-dev \
@@ -51,8 +40,7 @@ RUN \
     echo "00 3 * * * root /usr/bin/python3 /app/manage.py update_osm --king=spain --download --admin_areas --update_routes --pois >> /var/log/cualbondi-spain.log 2>&1" > /etc/cron.d/osm-cualbondi && \
     # TODO FIX --cross: RUN echo "00 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=argentina --cross >> /var/log/cualbondi-cross.log 2>&1" >> /etc/cron.d/osm-cualbondi
     echo "00 4 * * * root /usr/bin/python3 /app/manage.py calcular_envolventes >> /var/log/cualbondi-envolventes.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
-    echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sP >> /var/log/cualbondi-thumbs_pois.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
-    echo "00 6 * * * root /usr/bin/python3 /app/manage.py crear_thumbs_catastro -s >> /var/log/cualbondi-thumbs_catastro.log 2>&1" >> /etc/cron.d/osm-cualbondi \
+    echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sF >> /var/log/cualbondi-thumbs.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
 && \
     chmod 0644 /etc/cron.d/osm-cualbondi
 

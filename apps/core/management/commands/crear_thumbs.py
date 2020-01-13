@@ -1,59 +1,42 @@
 from django.core.management.base import BaseCommand
-from apps.catastro.models import Ciudad, Poi
+from apps.catastro.models import Ciudad, Poi, AdministrativeArea
 from apps.core.models import Recorrido, Linea
 from django.conf import settings
-
-from multiprocessing import Process
+from urllib import request
+import json
 import os
 from django.core.files import File
-from subprocess import call
-import shutil
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-from time import sleep
-import chromedriver_binary
+from concurrent.futures import ThreadPoolExecutor
 
-
-def pngcrush(fname):
-    call('pngcrush -q -rem gAMA -rem cHRM -rem iCCP -rem sRGB -rem alla -rem text -reduce -brute {0} {1}.min'.format(fname, fname).split())
-    os.remove(fname)
-    shutil.move('{0}.min'.format(fname), fname)
-
+def run_io_tasks_in_parallel(tasks):
+    with ThreadPoolExecutor() as executor:
+        running_tasks = [executor.submit(*task) for task in tasks]
+        for running_task in running_tasks:
+            running_task.result()
 
 class Command(BaseCommand):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.chrome_options = webdriver.ChromeOptions()
-        self.chrome_options.add_argument('--headless')
-        self.chrome_options.add_argument('--no-sandbox')
-        self.chrome_options.add_argument('--user-data-dir=/tmp/chromecache')
-        self.chrome_options.add_argument('--disk-cache-size=2147483648')
-        self.driver = None
-
     def add_arguments(self, parser):
         parser.add_argument(
-            '--ciudad_slug',
+            '--administrativearea_id',
             action  = 'store',
-            dest    = 'ciudad_slug',
+            dest    = 'administrativearea_id',
             default = '',
-            help    = 'Rehacer thumb de una ciudad (buscar por slug)'
+            help    = 'Rehacer thumb de una administrativearea (buscar por id)'
         )
         parser.add_argument(
-            '--ciudad_id',
+            '--administrativearea_osm_id',
             action  = 'store',
-            dest    = 'ciudad_id',
+            dest    = 'administrativearea_osm_id',
             default = '',
-            help    = 'Rehacer thumb de una ciudad (buscar por id)'
+            help    = 'Rehacer thumb de una administrativearea (buscar por osm_id)'
         )
         parser.add_argument(
-            '--linea_slug',
+            '--linea_osm_id',
             action  = 'store',
-            dest    = 'linea_slug',
+            dest    = 'linea_osm_id',
             default = '',
-            help    = 'Rehacer thumb de una linea (buscar por slug)'
+            help    = 'Rehacer thumb de una linea (buscar por osm_id)'
         )
         parser.add_argument(
             '--linea_id',
@@ -63,11 +46,11 @@ class Command(BaseCommand):
             help    = 'Rehacer thumb de una linea (buscar por id)'
         )
         parser.add_argument(
-            '--recorrido_slug',
+            '--recorrido_osm_id',
             action  = 'store',
-            dest    = 'recorrido_slug',
+            dest    = 'recorrido_osm_id',
             default = '',
-            help    = 'Rehacer thumb de un recorrido (buscar por slug)'
+            help    = 'Rehacer thumb de un recorrido (buscar por osm_id)'
         )
         parser.add_argument(
             '--recorrido_id',
@@ -77,11 +60,25 @@ class Command(BaseCommand):
             help    = 'Rehacer thumb de un recorrido (buscar por id)'
         )
         parser.add_argument(
-            '-C',
+            '--poi_slug',
+            action  = 'store',
+            dest    = 'poi_slug',
+            default = '',
+            help    = 'Rehacer thumb de un poi (buscar por osm_id)'
+        )
+        parser.add_argument(
+            '--poi_id',
+            action  = 'store',
+            dest    = 'poi_id',
+            default = '',
+            help    = 'Rehacer thumb de un poi (buscar por id)'
+        )
+        parser.add_argument(
+            '-A',
             action  = 'store_true',
-            dest    = 'ciudades',
+            dest    = 'administrativeareas',
             default = False,
-            help    = 'Rehacer thumbs de todas las ciudades'
+            help    = 'Rehacer thumbs de todas las administrative areas'
         )
         parser.add_argument(
             '-L',
@@ -105,19 +102,19 @@ class Command(BaseCommand):
             help    = 'Rehacer thumbs de todos los puntos de interes POI'
         )
         parser.add_argument(
-            '-A',
+            '-F',
             action  = 'store_true',
-            dest    = 'todas',
+            dest    = 'full',
             default = False,
-            help    = 'Rehacer todas las thumbs (igual a -rC)'
+            help    = 'Rehacer todas las thumbs (igual a -ALRP)'
         )
-        parser.add_argument(
-            '-r',
-            action  = 'store_true',
-            dest    = 'recursivo',
-            default = False,
-            help    = 'Recursivo, dada una ciudad, rehacer las thumb de todas sus lineas y recorridos. Para una linea, rehacer la thumb de la linea mas las thumb de cada uno de los recorridos que contiene esa linea'
-        )
+        # parser.add_argument(
+        #     '-r',
+        #     action  = 'store_true',
+        #     dest    = 'recursivo',
+        #     default = False,
+        #     help    = 'Recursivo, dada una administrativearea, rehacer las thumb de todas sus lineas y recorridos. Para una linea, rehacer la thumb de la linea mas las thumb de cada uno de los recorridos que contiene esa linea'
+        # )
         parser.add_argument(
             '-s',
             action  = 'store_true',
@@ -153,11 +150,11 @@ class Command(BaseCommand):
 
 
     def save_img(self, path, name, prefix, obj, img_field):
-        fname = "{}{}".format(path.format(prefix), name.format(prefix, obj.slug))
-        print("a punto de grabar ", fname)
+        fname = "{}{}".format(path.format(prefix), name.format(prefix, getattr(obj, 'osm_id', obj.osm_id)))
+        print("  > a punto de grabar ", fname)
         try:
             with open(fname, 'rb') as f:
-                getattr(obj, img_field).save(name.format(prefix, obj.slug), File(f))
+                getattr(obj, img_field).save(name.format(prefix, getattr(obj, 'osm_id', obj.osm_id)), File(f))
                 try:
                     obj.save()
                 except Exception as e:
@@ -170,128 +167,89 @@ class Command(BaseCommand):
                 str(obj), ". No habia sido creada.")
             print(str(e))
 
-    def ghost_make_map_img(self, obj, prefix, ciudad=None, skip=False):
-        print(obj,)
+    def make_map_img(self, obj, skip=False):
+        prefix = obj._meta.label_lower.split('.')[-1]
+        print(obj.get_absolute_url())
+        tasks = []
         if (not skip) or (not (obj.img_cuadrada and obj.img_panorama)):
-            try:
-                if ciudad is None:
-                    print(settings.HOME_URL)
-                    url = '{0}{1}?dynamic_map=True'.format(
-                        settings.HOME_URL, obj.get_absolute_url())
-                else:
-                    url = '{0}{1}?dynamic_map=True'.format(
-                        settings.HOME_URL, obj.get_absolute_url(ciudad.slug))
-            except Exception as e:
-                print(e)
-                return 0
-            print(">>> " + url)
             for size in [(500, 500), (880, 300)]:
-                fname = '/media/{0}/{0}-{1}.{2}x{3}.png'.format(
-                    prefix, obj.slug, size[0], size[1])
-                print("  >- Size: ", size)
-                print("   - Rendering HTML...")
-                self.create_screenshot(url, fname, size)
-                # optimizamos la imagen si tenemos pngcrush
-                print("   - pngcrushing it")
-                try:
-                    # proc = Process(target=pngcrush, args=(fname,))
-                    # proc.start()
-                    #pngcrush(fname)
-                    pass
-                except OSError as e:
-                    print("pngcrush no instalado o no se encuentra en el PATH")
+                def fn(prefix, obj, size):
+                    fname = f'/media/{prefix}/{prefix}-{getattr(obj, "osm_id", obj.osm_id)}.{size[0]}x{size[1]}.png'
+                    print(f'  > Getting image size: {size} ')
+                    params = {
+                        'geojson': obj.geoJSON,
+                        'attribution': 'cualbondi.com.ar & openstreetmap contributors',
+                        'vectorserverUrl': 'https://tiles.cualbondi.com.ar/styles/osm-bright/style.json',
+                        'imagemin': 'true',
+                        'width': size[0],
+                        'height': size[1],
+                        'maxZoom': 16,
+                    }
+                    if prefix == 'recorrido':
+                        params['arrows'] = 'true'
+                    req = request.Request(
+                        'http://osm-static-maps:3000/',
+                        data=json.dumps(params).encode('utf8'),
+                        headers={'content-type': 'application/json'},
+                        method='POST'
+                    )
+                    try:
+                        image = request.urlopen(req)
+                        with open(fname, "wb") as f:
+                            f.write(image.read())
+                    except Exception as e:
+                        print(e)
+                        print(e.read())
+                        print(params['geojson'])
+                tasks.append((fn, prefix, obj, size,))
+            run_io_tasks_in_parallel(tasks)
             self.save_img('/media/{0}/', '{0}-{1}.500x500.png', prefix, obj, 'img_cuadrada')
             self.save_img('/media/{0}/', '{0}-{1}.880x300.png', prefix, obj, 'img_panorama')
         else:
-            print("WARNING: Salteando objeto porque utilizaste el parametro -s y el objeto ya tiene ambas thumbs precalculadas")
-
-    def ciudad_recursiva(self, c, skip=False):
-        for l in c.lineas.all():
-            self.ghost_make_map_img(l, 'linea', c, skip)
-            for r in l.recorridos.all():
-                self.ghost_make_map_img(r, 'recorrido', c, skip)
-
-    def foto_de_linea(self, l, recursiva=False, skip=False):
-        try:
-            c = l.ciudades.all()[0]
-        except l.ciudades.DoesNotExist:
-            print("ERROR: Salteando linea {0}. No se pudo encontrar la url porque la linea no tiene ninguna ciudad asociada [linea_id={1}]".format(
-                l.slug, l.id))
-        else:
-            self.ghost_make_map_img(l, 'linea', c, skip)
-            if recursiva:
-                for r in l.recorrido_set.all():
-                    self.ghost_make_map_img(r, 'recorrido', c, skip)
+            print("  > WARNING: Salteando objeto porque utilizaste el parametro -s y el objeto ya tiene ambas thumbs precalculadas")
 
     def handle(self, *args, **options):
 
-        self.driver = webdriver.Chrome(
-            chrome_options=self.chrome_options,
-            service_args=[
-                '--verbose',
-                '--log-path=/tmp/chromedriver.log'
-            ]
-        )
+        # lineas
+        lineas = []
+        if options['lineas'] or options['full']:
+            lineas = Linea.objects.all()
+        elif options['linea_osm_id']:
+            lineas = [Linea.objects.get(osm_id=options['linea_osm_id'])]
+        elif options['linea_id']:
+            lineas = [Linea.objects.get(id=options['linea_id'])]
+        for linea in lineas:
+            self.make_map_img(linea, skip=options['skip'])
 
-        #ciudad
-        if (options['ciudades'] and options['recursivo'] ) or options['todas']:
-            for ciudad in Ciudad.objects.all():
-                self.ghost_make_map_img(ciudad, 'ciudad', skip=options['skip'])
-                self.ciudad_recursiva(ciudad, skip=options['skip'])
-            return 0
-
-        if options['ciudades']:
-            for ciudad in Ciudad.objects.all():
-                self.ghost_make_map_img(ciudad, 'ciudad', skip=options['skip'])
-        elif options['ciudad_slug'] or options['ciudad_id']:
-            if options['ciudad_slug']:
-                c = Ciudad.objects.get(slug=options['ciudad_slug'])
-            else:
-                c = Ciudad.objects.get(slug=options['ciudad_id'])
-            self.ghost_make_map_img(c, 'ciudad', skip=options['skip'])
-            if options['recursivo']:
-                self.ciudad_recursiva(c, skip=options['skip'])
-
-        #linea
-        if options['lineas'] and options['recursivo']:
-            for l in Linea.objects.all():
-                self.foto_de_linea(l, True, skip=options['skip'])
-            return 0
-
-        if options['lineas']:
-            for l in Linea.objects.all():
-                self.foto_de_linea(l, skip=options['skip'])
-
-        elif options['linea_slug'] or options['linea_id']:
-            if options['linea_slug']:
-                l = Linea.objects.get(slug=options['linea_slug'])
-            else:
-                l = Linea.objects.get(id=options['linea_id'])
-            self.foto_de_linea(l, skip=options['skip'])
-            if options['recursivo']:
-                self.foto_de_linea(l, recursiva=options['recursivo'], skip=options['skip'])
-
-        #recorrido
-        rs=[]
-        if options['recorridos']:
-            rs = Recorrido.objects.all()
-        elif options['recorrido_slug']:
-            rs = [Recorrido.objects.get(slug=options['recorrido_slug'])]
+        # recorridos
+        recorridos = []
+        if options['recorridos'] or options['full']:
+            recorridos = Recorrido.objects.all()
+        elif options['recorrido_osm_id']:
+            recorridos = [Recorrido.objects.get(osm_id=options['recorrido_osm_id'])]
         elif options['recorrido_id']:
-            rs = [Recorrido.objects.get(id=options['recorrido_id'])]
-
-        for r in rs:
-            try:
-                c = r.linea.ciudades.all()[0]
-            except DoesNotExist:
-                print("ERROR: Salteando recorrido {0}. No se pudo encontrar la url porque el recorrido no tiene ninguna ciudad asociada [recorrido_id={1}]".format(r.slug, r.id))
-            else:
-                self.ghost_make_map_img(r, 'recorrido', ciudad=c, skip=options['skip'])
+            recorridos = [Recorrido.objects.get(id=options['recorrido_id'])]
+        for recorrido in recorridos:
+            self.make_map_img(recorrido, skip=options['skip'])
 
         # pois
-        if options['pois']:
+        pois = []
+        if options['pois'] or options['full']:
             pois = Poi.objects.all()
-            for p in pois:
-                self.ghost_make_map_img(p, 'poi', skip=options['skip'])
+        elif options['poi_slug']:
+            pois = [Poi.objects.get(slug=options['poi_slug'])]
+        elif options['poi_id']:
+            pois = [Poi.objects.get(id=options['poi_id'])]
+        for poi in pois:
+            self.make_map_img(poi, skip=options['skip'])
 
-        self.driver.close()
+        # administrativearea
+        administrativeareas = []
+        if options['administrativeareas'] or options['full']:
+            administrativeareas = AdministrativeArea.objects.all()
+        elif options['administrativearea_osm_id']:
+            administrativeareas = [AdministrativeArea.objects.get(osm_id=options['administrativearea_osm_id'])]
+        elif options['administrativearea_id']:
+            administrativeareas = [AdministrativeArea.objects.get(id=options['administrativearea_id'])]
+        for administrativearea in administrativeareas:
+            self.make_map_img(administrativearea, skip=options['skip'])
