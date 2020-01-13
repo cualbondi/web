@@ -203,8 +203,8 @@ class Command(BaseCommand):
                         print(params['geojson'])
                 tasks.append((fn, prefix, obj, size,))
             run_io_tasks_in_parallel(tasks)
-            self.save_img('/media/{0}/', '{0}-{1}.500x500.png', prefix, obj, 'img_cuadrada')
-            self.save_img('/media/{0}/', '{0}-{1}.880x300.png', prefix, obj, 'img_panorama')
+            self.save_img(settings.MEDIA_ROOT + '/{0}/', '{0}-{1}.500x500.png', prefix, obj, 'img_cuadrada')
+            self.save_img(settings.MEDIA_ROOT + '/{0}/', '{0}-{1}.880x300.png', prefix, obj, 'img_panorama')
         else:
             print("  > WARNING: Salteando objeto porque utilizaste el parametro -s y el objeto ya tiene ambas thumbs precalculadas")
 
