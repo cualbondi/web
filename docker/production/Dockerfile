@@ -40,7 +40,7 @@ RUN \
     echo "00 3 * * * root /usr/bin/python3 /app/manage.py update_osm --king=spain --download --admin_areas --update_routes --pois >> /var/log/cualbondi-spain.log 2>&1" > /etc/cron.d/osm-cualbondi && \
     # TODO FIX --cross: RUN echo "00 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=argentina --cross >> /var/log/cualbondi-cross.log 2>&1" >> /etc/cron.d/osm-cualbondi
     echo "00 4 * * * root /usr/bin/python3 /app/manage.py calcular_envolventes >> /var/log/cualbondi-envolventes.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
-    echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sF >> /var/log/cualbondi-thumbs.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
+    echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sF >> /var/log/cualbondi-thumbs.log 2>&1" >> /etc/cron.d/osm-cualbondi \
 && \
     chmod 0644 /etc/cron.d/osm-cualbondi
 
