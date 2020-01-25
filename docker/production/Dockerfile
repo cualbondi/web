@@ -26,7 +26,7 @@ RUN \
 && \
     rm -rf /var/lib/apt/lists/* \
 && \
-    pip3 install wheel \
+    pip3 install --upgrade wheel pip \
 && \
     groupadd django && \
     useradd django -s /bin/bash -m -g django -G django
