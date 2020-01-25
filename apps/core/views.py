@@ -353,12 +353,12 @@ def ver_parada(request, id=None):
 def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorrido=None):
     """
     # v1
-    cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/
-    cualbondi.com.ar/cordoba/recorridos/T%20(Transversal)/Central/IDA/
+    cualbondi.org/la-plata/recorridos/Norte/10/IDA/
+    cualbondi.org/cordoba/recorridos/T%20(Transversal)/Central/IDA/
     # v2
-    cualbondi.com.ar/la-plata/norte/10-desde-x-hasta-y
+    cualbondi.org/la-plata/norte/10-desde-x-hasta-y
     # v3
-    cualbondi.com.ar/r/c123/asdasd
+    cualbondi.org/r/c123/asdasd
     """
     ciudades = data.ciudades
     ciudad = next((c for c in ciudades if c.slug == slug_ciudad), False)

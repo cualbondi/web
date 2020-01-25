@@ -177,7 +177,7 @@ class RecorridoProposed(models.Model):
             #    from facebook import GraphAPI
             #    fb_uid = fb[0].uid
             #    graph = GraphAPI(token)
-            #    graph.request("/"+fb_uid+"/notifications/", post_args={"template":'Felicitaciones! Un moderador aceptó tu edición en cualbondi', "href":"https://cualbondi.com.ar/revision/" + str(self.id) + "/"})
+            #    graph.request("/"+fb_uid+"/notifications/", post_args={"template":'Felicitaciones! Un moderador aceptó tu edición en cualbondi', "href":"https://cualbondi.org/revision/" + str(self.id) + "/"})
 
     def get_absolute_url(self):
         url = reverse('revision_externa',

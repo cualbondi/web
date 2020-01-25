@@ -10,7 +10,7 @@ STATICFILES_DIRS = []
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['cualbondi.com.ar', 'api3.cualbondi.com.ar', 'api.cualbondi.com.ar', 'www.cualbondi.com.ar'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['cualbondi.org', '*.cualbondi.org', 'cualbondi.com.ar', '*.cualbondi.com.ar'])
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -136,6 +136,7 @@ LOGGING = {
 # https://github.com/ottoyiu/django-cors-headers/#configuration
 CORS_ORIGIN_WHITELIST = [
     'https://cualbondi.com.ar',
+    'https://cualbondi.org',
 ]
 
 

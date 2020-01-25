@@ -41,10 +41,10 @@ class PuntoBusquedaManager:
         arcgis_args = {}
         if settings.ARCGIS_USER:
             arcgis_args['username'] = settings.ARCGIS_USER
-            arcgis_args['referer'] = 'cualbondi.com.ar'
+            arcgis_args['referer'] = 'cualbondi.org'
         if settings.ARCGIS_PASS:
             arcgis_args['password'] = settings.ARCGIS_PASS
-            arcgis_args['referer'] = 'cualbondi.com.ar'
+            arcgis_args['referer'] = 'cualbondi.org'
         self.geolocator = ArcGIS(**arcgis_args)
         self.suggestor = ArcGISSuggest(**arcgis_args)
         super().__init__(*args, **kwargs)
