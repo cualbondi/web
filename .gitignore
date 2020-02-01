@@ -277,3 +277,5 @@ web/media/
 
 # pbf osm data
 osm/*.pbf
+/notebooks
+

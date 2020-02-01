@@ -10,7 +10,7 @@ STATICFILES_DIRS = []
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['cualbondi.com.ar', 'api3.cualbondi.com.ar', 'api.cualbondi.com.ar', 'www.cualbondi.com.ar'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['cualbondi.org', 'api.cualbondi.org', 'cualbondi.com.ar', 'api3.cualbondi.com.ar', 'api.cualbondi.com.ar', 'www.cualbondi.com.ar'])
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ CSRF_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
 # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
-SECURE_HSTS_SECONDS = 60
+SECURE_HSTS_SECONDS = 518400
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True)
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
@@ -136,6 +136,7 @@ LOGGING = {
 # https://github.com/ottoyiu/django-cors-headers/#configuration
 CORS_ORIGIN_WHITELIST = [
     'https://cualbondi.com.ar',
+    'https://cualbondi.org',
 ]
 
 
