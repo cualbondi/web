@@ -9,30 +9,33 @@
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:linea" />
-    <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
+    <meta property="og:url"    content="{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="Línea {{obj.nombre|title}}" />
     <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
-    <ul class="breadcrumb">
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}" itemprop="url">
-                <span itemprop="title">Inicio</span>
+    <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/">
+                <span itemprop="name">Inicio</span>
             </a>
+            <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
         </li>
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}{{adminarea.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{adminarea.name}}</span>
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{adminarea.get_absolute_url}}">
+                <span itemprop="name">{{adminarea.name}}</span>
             </a>
+            <meta itemprop="position" content="2" />
             <span class="divider">&gt;</span>
         </li>
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{obj.nombre}}</span>
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{obj.get_absolute_url}}">
+                <span itemprop="name">{{obj.nombre}}</span>
             </a>
+            <meta itemprop="position" content="3" />
         </li>
     </ul>
 
@@ -51,7 +54,7 @@
         <h2>Lugares que transita</h2>
         <ul>
             {% for a in adminareas %}
-            <li><a href="{{HOME_URL}}{{a.get_absolute_url}}">{{ a.name }}</a></li>
+            <li><a href="{{a.get_absolute_url}}">{{ a.name }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}

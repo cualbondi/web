@@ -89,10 +89,6 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
     elif osm_type == 'r':
         linea = get_object_or_404(linea_q, osm_id=osm_id)
 
-    if slug is None or slug != slugify(linea.nombre):
-        # Redirect with correct slug
-        return HttpResponsePermanentRedirect(linea.get_absolute_url())
-
     linea__envolvente = linea.envolvente.simplify(0.001, True)
 
     recorridos = natural_sort_qs(linea.recorridos.all().defer('ruta'), 'slug')
@@ -124,17 +120,25 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
     #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea.envolvente))) \
     #     .order_by('symdiff_area')
 
-    # Zonas por las que pasa el recorrido
-    aas = AdministrativeArea.objects \
-        .filter(geometry_simple__intersects=linea__envolvente, depth__gt=3) \
-        .order_by('depth', 'name')
-
     if aa:
         aa = aa[0]
         aaancestors = aa.get_ancestors().reverse()
     else:
         aa = None
         aaancestors = None
+
+    # linea found, check if url is ok
+    correct_url = linea.get_absolute_url()
+    if aaancestors:
+        aarootname = aaancestors[0].name
+        correct_url = linea.get_absolute_url(aarootname == 'Argentina')
+    if request.build_absolute_uri() != correct_url:
+        return HttpResponsePermanentRedirect(correct_url)
+
+    # Zonas por las que pasa el recorrido
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=linea__envolvente, depth__gt=3) \
+        .order_by('depth', 'name')
 
     return render(
         request,
@@ -166,10 +170,6 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     elif osm_type == 'w':
         recorrido = get_object_or_404(recorrido_q, osm_id=osm_id)
 
-    if slug is None or slug != recorrido.slug:
-        # Redirect with correct slug
-        return HttpResponsePermanentRedirect(recorrido.get_absolute_url())
-
     recorrido_simplified = recorrido.ruta.simplify(0.00005)
     recorrido_buffer = recorrido_simplified.buffer(0.0001)
 
@@ -191,6 +191,14 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     else:
         aa = None
         aaancestors = None
+
+    # recorrido found, check if url is ok
+    correct_url = recorrido.get_absolute_url()
+    if aaancestors:
+        aarootname = aaancestors[0].name
+        correct_url = recorrido.get_absolute_url(aarootname == 'Argentina')
+    if request.build_absolute_uri() != correct_url:
+        return HttpResponsePermanentRedirect(correct_url)
 
     # Calles por las que pasa el recorrido
     """
@@ -317,6 +325,20 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
 @require_GET
 def ver_parada(request, id=None):
     p = get_object_or_404(Parada, id=id)
+
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=p.latlng) \
+        .order_by('depth') \
+        .reverse()
+
+    # p found, check if url is ok
+    correct_url = p.get_absolute_url()
+    if aas:
+        aarootname = aas[0].name
+        correct_url = p.get_absolute_url(aarootname == 'Argentina')
+    if request.build_absolute_uri() != correct_url:
+        return HttpResponsePermanentRedirect(correct_url)
+
     recorridosn = Recorrido.objects \
         .filter(ruta__dwithin=(p.latlng, 0.00111)) \
         .select_related('linea') \
@@ -338,7 +360,7 @@ def ver_parada(request, id=None):
         request,
         "core/ver_parada.html",
         {
-            'ciudad_actual': Ciudad.objects.filter(poligono__intersects=p.latlng),
+            'adminareas': aas,
             'parada': p,
             'paradas': ps,
             'recorridosn': recorridosn,

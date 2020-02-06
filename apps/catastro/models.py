@@ -1,18 +1,18 @@
 import unicodedata
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import HStoreField
+from django.core.serializers import serialize
 from django.db.models import Manager as GeoManager
 from django.template.defaultfilters import slugify
-from django.urls import reverse
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from treebeard.mp_tree import MP_Node
+from ..utils.reverse import reverse
 from .managers import (
     CiudadManager,
     ZonaManager,
     PuntoBusquedaManager
 )
-from django.core.serializers import serialize
 
 
 # de http://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string/517974#517974
@@ -171,8 +171,14 @@ class Poi(models.Model):
             suffix = suffix + 1
         super(Poi, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse('poi_old', kwargs={'slug': self.slug})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'poi_old',
+            kwargs={
+                'slug': self.slug
+            },
+            argentina=argentina
+        )
 
 
 class Interseccion(models.Model):
@@ -195,8 +201,14 @@ class Interseccion(models.Model):
             suffix = suffix + 1
         super(Interseccion, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse('interseccion', kwargs={'slug': self.slug})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'interseccion',
+            kwargs={
+                'slug': self.slug
+            },
+            argentina=argentina
+        )
 
 
 class Poicb(models.Model):
@@ -284,5 +296,13 @@ class AdministrativeArea(MP_Node):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse('administrativearea', kwargs={'osm_type': self.osm_type, 'osm_id': self.osm_id, 'slug': slugify(self.name)})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'administrativearea',
+            kwargs={
+                'osm_type': self.osm_type,
+                'osm_id': self.osm_id,
+                'slug': slugify(self.name)
+            },
+            argentina=argentina
+        )

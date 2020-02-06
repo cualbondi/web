@@ -14,7 +14,7 @@
 {% block bloque_izquierda %}
     <div itemscope itemtype="http://schema.org/Place">
         <h1>¿Cómo llegar a <span itemprop="name">{{interseccion.nom}}</span>?</h1>
-        <link itemprop="url" content="{{HOME_URL}}{{interseccion.get_absolute_url}}" />
+        <link itemprop="url" content="{{interseccion.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
             <meta itemprop="latitude" content="{{interseccion.latlng.1|stringformat:"f"}}" />
             <meta itemprop="longitude" content="{{interseccion.latlng.0|stringformat:"f"}}" />
@@ -73,7 +73,7 @@
         <ul>
             {% for p in interseccions %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{p.get_absolute_url}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">

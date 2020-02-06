@@ -81,6 +81,20 @@ def poiORint(request, slug=None):
         pois = fuzzy_like_query(slug)
         slug = slug.replace('-', ' ')
         return render(request, 'catastro/ver_poi-404.html', {'slug': slug, 'pois': pois}, status=404)
+
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=poi.latlng) \
+        .order_by('depth') \
+        .reverse()
+
+    # poi found, check if url is ok
+    correct_url = poi.get_absolute_url()
+    if aas:
+        aarootname = aas[0].name
+        correct_url = poi.get_absolute_url(aarootname == 'Argentina')
+    if request.build_absolute_uri() != correct_url:
+        return HttpResponsePermanentRedirect(correct_url)
+
     # TODO: resolver estas queries en 4 threads
     #       ver https://stackoverflow.com/a/12542927/912450
     recorridos = Recorrido.objects \
@@ -91,11 +105,6 @@ def poiORint(request, slug=None):
         .defer('linea__envolvente', 'ruta')
     near_pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
-
-    aas = AdministrativeArea.objects \
-        .filter(geometry_simple__intersects=poi.latlng) \
-        .order_by('depth') \
-        .reverse()
 
     try:
         amenity = amenities[poi.tags['amenity']]
@@ -125,9 +134,10 @@ class Simplify(GeoFunc):
 def administrativearea(request, osm_type=None, osm_id=None, slug=None):
     qs = AdministrativeArea.objects.defer('geometry')
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
-    if slug is None or slug != slugify(aa.name):
-        # Redirect with slug
-        return HttpResponsePermanentRedirect(aa.get_absolute_url())
+    aarootname = aa.get_root().name
+    correct_url = aa.get_absolute_url(aarootname == 'Argentina')
+    if request.build_absolute_uri() != correct_url:
+        return HttpResponsePermanentRedirect(correct_url)
     else:
         lineas = None
         pois = None

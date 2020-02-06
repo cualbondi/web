@@ -12,6 +12,32 @@
 {% endblock %}
 
 {% block bloque_izquierda %}
+
+    <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/">
+                <span itemprop="name">Inicio</span>
+            </a>
+            <meta itemprop="position" content="1" />
+            <span class="divider">&gt;</span>
+        </li>
+        {% for a in adminareas reversed %}
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{a.get_absolute_url}}">
+                <span itemprop="name">{{a.name}}</span>
+            </a>
+            <meta itemprop="position" content="{{forloop.counter|add:"1"}}" />
+            <span class="divider">&gt;</span>
+        </li>
+        {% endfor %}
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{parada.get_absolute_url}}">
+                <span itemprop="name">{{parada}}</span>
+            </a>
+            <meta itemprop="position" content="{{adminareas|length|add:"2"}}" />
+        </li>
+    </ul>
+
     <div>
         <h1>Parada {{ parada }}</h1>
     </div>
@@ -74,7 +100,7 @@
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{p.get_absolute_url}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">

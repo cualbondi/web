@@ -3,6 +3,8 @@ import logging
 from .base import *  # noqa
 from .base import env
 
+ENVIRONMENT = 'production'
+
 DEBUG = env.bool('DJANGO_DEBUG', False)
 STATICFILES_DIRS = []
 # GENERAL

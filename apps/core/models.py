@@ -1,14 +1,15 @@
 import uuid
 from datetime import datetime
+
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import HStoreField
 from django.db.models import Manager as GeoManager
 from django.template.defaultfilters import slugify
-from django.urls import reverse
+from django.core.serializers import serialize
 
 from apps.catastro.models import Ciudad
+from ..utils.reverse import reverse
 from .managers import RecorridoManager
-from django.core.serializers import serialize
 
 
 class Linea(models.Model):
@@ -44,7 +45,7 @@ class Linea(models.Model):
         self.slug = slugify(self.nombre)
         super(Linea, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self, argentina=None):
         sid = self.osm_id
         tid = 'r'
         if self.osm_id is None:
@@ -56,7 +57,8 @@ class Linea(models.Model):
                 'osm_type': tid,
                 'osm_id': sid,
                 'slug': self.slug,
-            }
+            },
+            argentina=argentina
         )
 
 
@@ -131,7 +133,7 @@ class Recorrido(models.Model):
     class Meta:
         ordering = ['linea__nombre', 'nombre']
 
-    def get_absolute_url(self):
+    def get_absolute_url(self, argentina=None):
         sid = self.osm_id
         tid = 'w'
         if self.osm_id is None:
@@ -143,7 +145,8 @@ class Recorrido(models.Model):
                 'osm_type': tid,
                 'osm_id': sid,
                 'slug': self.slug,
-            }
+            },
+            argentina=argentina
         )
 
 
@@ -189,8 +192,14 @@ class Parada(models.Model):
     def __str__(self):
         return self.nombre or self.codigo or "{}, {}".format(self.latlng.x, self.latlng.y)
 
-    def get_absolute_url(self):
-        return reverse('ver_parada', kwargs={'id': self.id})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'ver_parada',
+            kwargs={
+                'id': self.id
+            },
+            argentina=argentina
+        )
 
 
 class Horario(models.Model):

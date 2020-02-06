@@ -9,38 +9,41 @@
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:punto_de_interes" />
-    <meta property="og:url"    content="{{HOME_URL}}{{ poi.get_absolute_url }}" />
+    <meta property="og:url"    content="{{ poi.get_absolute_url }}" />
     <meta property="og:title"  content="Como llegar a {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
     <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
     {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ poi.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
-    <ul class="breadcrumb">
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}" itemprop="url">
-                <span itemprop="title">Inicio</span>
+    <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/">
+                <span itemprop="name">Inicio</span>
             </a>
+            <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
         </li>
         {% for a in adminareas reversed %}
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}{{a.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{a.name}}</span>
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{a.get_absolute_url}}">
+                <span itemprop="name">{{a.name}}</span>
             </a>
+            <meta itemprop="position" content="{{forloop.counter|add:"1"}}" />
             <span class="divider">&gt;</span>
         </li>
         {% endfor %}
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{obj.nombre}} {% if obj.inicio and obj.fin %}(de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{poi.get_absolute_url}}">
+                <span itemprop="name">{{poi.nom}}</span>
             </a>
+            <meta itemprop="position" content="{{adminareas|length|add:"2"}}" />
         </li>
     </ul>
 
     <div itemscope itemtype="http://schema.org/Place">
         <h1>¿Cómo llegar a <span itemprop="name">{{poi.nom}}</span>?</h1>
-        <link itemprop="url" content="{{HOME_URL}}{{poi.get_absolute_url}}" />
+        <link itemprop="url" content="{{poi.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
             <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:"f"}}" />
             <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:"f"}}" />
@@ -115,7 +118,7 @@
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{p.get_absolute_url}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
