@@ -130,7 +130,7 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
     # linea found, check if url is ok
     correct_url = linea.get_absolute_url()
     if aaancestors:
-        aarootname = aaancestors[0].name
+        aarootname = aaancestors.reverse()[0].name
         correct_url = linea.get_absolute_url(aarootname == 'Argentina')
     if request.build_absolute_uri() != correct_url:
         return HttpResponsePermanentRedirect(correct_url)
@@ -195,7 +195,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     # recorrido found, check if url is ok
     correct_url = recorrido.get_absolute_url()
     if aaancestors:
-        aarootname = aaancestors[0].name
+        aarootname = aaancestors.reverse()[0].name
         correct_url = recorrido.get_absolute_url(aarootname == 'Argentina')
     if request.build_absolute_uri() != correct_url:
         return HttpResponsePermanentRedirect(correct_url)
@@ -328,8 +328,7 @@ def ver_parada(request, id=None):
 
     aas = AdministrativeArea.objects \
         .filter(geometry_simple__intersects=p.latlng) \
-        .order_by('depth') \
-        .reverse()
+        .order_by('depth')
 
     # p found, check if url is ok
     correct_url = p.get_absolute_url()

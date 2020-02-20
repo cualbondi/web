@@ -84,8 +84,7 @@ def poiORint(request, slug=None):
 
     aas = AdministrativeArea.objects \
         .filter(geometry_simple__intersects=poi.latlng) \
-        .order_by('depth') \
-        .reverse()
+        .order_by('depth')
 
     # poi found, check if url is ok
     correct_url = poi.get_absolute_url()
