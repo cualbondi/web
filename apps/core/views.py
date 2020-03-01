@@ -9,6 +9,7 @@ from django.contrib.gis.measure import D, A
 from django.contrib.gis.db.models.functions import SymDifference, Area, Intersection
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.postgres.search import TrigramSimilarity
 
 from apps.core.models import Linea, Recorrido, Parada
 from apps.catastro.models import Ciudad, Poi, AdministrativeArea
