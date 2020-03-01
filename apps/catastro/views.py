@@ -1,12 +1,12 @@
-from django.shortcuts import (get_object_or_404, render)
-from django.http import HttpResponsePermanentRedirect
-from django.views.decorators.http import require_GET
-from django.db.models import Prefetch, Count, OuterRef, Subquery, IntegerField
-from django.contrib.gis.db.models.functions import GeoFunc, Cast, Value
+from django.contrib.gis.db.models.functions import Cast, GeoFunc, Value
+from django.db.models import Count, IntegerField, OuterRef, Prefetch, Subquery
+from django.http import Http404, HttpResponsePermanentRedirect
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import slugify
+from django.views.decorators.http import require_GET
 
-from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
-from apps.core.models import Recorrido, Parada, Linea
+from apps.catastro.models import AdministrativeArea, Ciudad, Interseccion, Poi
+from apps.core.models import Linea, Parada, Recorrido
 from apps.utils.parallel_query import parallelize
 
 
@@ -87,11 +87,12 @@ def poiORint(request, slug=None):
         .order_by('depth')
 
     # poi found, check if url is ok
-    correct_url = poi.get_absolute_url()
     if aas:
         aarootname = aas[0].name
         correct_url = poi.get_absolute_url(aarootname == 'Argentina')
-    if request.build_absolute_uri() != correct_url:
+    else:
+        raise Http404
+    if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
     # TODO: resolver estas queries en 4 threads
@@ -135,7 +136,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None):
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
     aarootname = aa.get_root().name
     correct_url = aa.get_absolute_url(aarootname == 'Argentina')
-    if request.build_absolute_uri() != correct_url:
+    if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
     else:
         lineas = None

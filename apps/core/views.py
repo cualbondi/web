@@ -133,7 +133,7 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
     if aaancestors:
         aarootname = aaancestors.reverse()[0].name
         correct_url = linea.get_absolute_url(aarootname == 'Argentina')
-    if request.build_absolute_uri() != correct_url:
+    if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
     # Zonas por las que pasa el recorrido
@@ -204,7 +204,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     if aaancestors:
         aarootname = aaancestors.reverse()[0].name
         correct_url = recorrido.get_absolute_url(aarootname == 'Argentina')
-    if request.build_absolute_uri() != correct_url:
+    if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
     # Calles por las que pasa el recorrido
@@ -342,7 +342,7 @@ def ver_parada(request, id=None):
     if aas:
         aarootname = aas[0].name
         correct_url = p.get_absolute_url(aarootname == 'Argentina')
-    if request.build_absolute_uri() != correct_url:
+    if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
     recorridosn = Recorrido.objects \

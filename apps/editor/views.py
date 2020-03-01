@@ -1,16 +1,16 @@
-from django.shortcuts import get_object_or_404, render
-from apps.core.models import Recorrido
-from apps.editor.models import RecorridoProposed, LogModeracion
-from django.contrib.gis.geos import GEOSGeometry
-from django.http import HttpResponse, HttpResponseRedirect
-from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
-from django.contrib.auth.decorators import permission_required
-from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Prefetch
-
 import json
 
-from django.views.decorators.http import require_http_methods, require_GET
+from django.contrib.auth.decorators import permission_required
+from django.contrib.gis.geos import GEOSGeometry
+from django.db.models import Prefetch
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import (csrf_exempt, csrf_protect,
+                                          ensure_csrf_cookie)
+from django.views.decorators.http import require_GET, require_http_methods
+from django.core.exceptions import ValidationError
+from apps.core.models import Recorrido
+from apps.editor.models import LogModeracion, RecorridoProposed
 
 
 @ensure_csrf_cookie
@@ -129,22 +129,25 @@ def moderar_ediciones_uuid(request, uuid=None):
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def revision(request, id_revision=None):
-    revision = RecorridoProposed.objects.get(uuid=id_revision)
-    original = RecorridoProposed.objects.get(uuid=revision.parent)
-    diffa = revision.ruta.difference(original.ruta)
-    diffb = original.ruta.difference(revision.ruta)
-    intersection = original.ruta.intersection(revision.ruta)
-    return render(
-        request,
-        'editor/revision.html',
-        {
-            'revision': revision,
-            'original': original,
-            'diffa': diffa,
-            'diffb': diffb,
-            'intersection': intersection
-        }
-    )
+    try:
+        revision = RecorridoProposed.objects.get(uuid=id_revision)
+        original = RecorridoProposed.objects.get(uuid=revision.parent)
+        diffa = revision.ruta.difference(original.ruta)
+        diffb = original.ruta.difference(revision.ruta)
+        intersection = original.ruta.intersection(revision.ruta)
+        return render(
+            request,
+            'editor/revision.html',
+            {
+                'revision': revision,
+                'original': original,
+                'diffa': diffa,
+                'diffb': diffb,
+                'intersection': intersection
+            }
+        )
+    except (ValidationError, RecorridoProposed.DoesNotExist) as e:
+        raise Http404
 
 
 @permission_required('editor.moderate_recorridos', login_url="/usuarios/login/", raise_exception=True)

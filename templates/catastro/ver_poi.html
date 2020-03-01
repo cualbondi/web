@@ -24,7 +24,7 @@
             <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
         </li>
-        {% for a in adminareas reversed %}
+        {% for a in adminareas %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{a.get_absolute_url}}">
                 <span itemprop="name">{{a.name}}</span>

@@ -178,7 +178,7 @@ class Command(BaseCommand):
                     print(f'  > Getting image size: {size} ')
                     params = {
                         'geojson': obj.geoJSON,
-                        'attribution': 'cualbondi.com.ar & openstreetmap contributors',
+                        'attribution': 'cualbondi.org & openstreetmap contributors',
                         'vectorserverUrl': 'https://tiles.cualbondi.com.ar/styles/osm-bright/style.json',
                         'imagemin': 'true',
                         'width': size[0],
