@@ -168,7 +168,13 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     if osm_type == 'c':
         recorrido = get_object_or_404(recorrido_q, id=osm_id)
     elif osm_type == 'w':
-        recorrido = get_object_or_404(recorrido_q, osm_id=osm_id)
+        # there can be multiple with the same id, so we filter using the most approximate slug
+        recorridos = Recorrido.objects.filter(osm_id=osm_id).annotate(similarity=TrigramSimilarity('slug', slug or '')).order_by('-similarity')
+        if recorridos:
+            recorrido = recorridos[0]
+        else:
+            raise Http404
+
 
     recorrido_simplified = recorrido.ruta.simplify(0.00005)
     recorrido_buffer = recorrido_simplified.buffer(0.0001)
@@ -381,7 +387,7 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
     # v3
     cualbondi.com.ar/r/c123/asdasd
     """
-    ciudades = data.ciudades
+    ciudades = data.ciudades + data.ciudades_es
     ciudad = next((c for c in ciudades if c.slug == slug_ciudad), False)
     if not ciudad:
         raise Http404
