@@ -28,6 +28,7 @@ class Linea(models.Model):
     telefono = models.CharField(max_length=200, blank=True, null=True)
     envolvente = models.PolygonField(blank=True, null=True)
     osm_id = models.BigIntegerField(blank=True, null=True)
+    country_code = models.TextField(null=True)
 
     @property
     def geoJSON(self):
@@ -54,11 +55,11 @@ class Linea(models.Model):
         return reverse(
             'ver_linea',
             kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
                 'osm_type': tid,
                 'osm_id': sid,
                 'slug': self.slug,
             },
-            argentina=argentina
         )
 
 
@@ -89,6 +90,7 @@ class Recorrido(models.Model):
     paradas_completas = models.BooleanField(default=False)
     type = models.CharField(max_length=30, blank=True, null=True)
     king = models.BigIntegerField(blank=True, null=True, default=286393)  # default = argentina osm_id
+    country_code = models.TextField(null=True)
 
     @property
     def geoJSON(self):
@@ -142,11 +144,11 @@ class Recorrido(models.Model):
         return reverse(
             'ver_recorrido',
             kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
                 'osm_type': tid,
                 'osm_id': sid,
                 'slug': self.slug,
             },
-            argentina=argentina
         )
 
 
@@ -172,6 +174,7 @@ class Posicion(models.Model):
         )
 
 
+# deprecated
 class Comercio(models.Model):
     nombre = models.CharField(max_length=200)
     latlng = models.PointField()
@@ -186,6 +189,7 @@ class Parada(models.Model):
     codigo = models.CharField(max_length=15, blank=True, null=True)
     nombre = models.CharField(max_length=200, blank=True, null=True)
     latlng = models.PointField()
+    country_code = models.TextField(null=True)
 
     objects = GeoManager()
 
@@ -196,9 +200,9 @@ class Parada(models.Model):
         return reverse(
             'ver_parada',
             kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
                 'id': self.id
             },
-            argentina=argentina
         )
 
 

@@ -21,6 +21,7 @@ def remove_accents(input_str):
     return "".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
 
+# deprecated
 class Provincia(models.Model):
     # Obligatorios
     nombre = models.CharField(max_length=200, blank=False, null=False)
@@ -45,6 +46,7 @@ class Provincia(models.Model):
         return self.nombre
 
 
+# deprecated
 class Ciudad(models.Model):
     # Obligatorios
     nombre = models.CharField(max_length=200, blank=False, null=False)
@@ -82,6 +84,7 @@ class Ciudad(models.Model):
         return reverse('ver_ciudad', kwargs={'nombre_ciudad': self.slug})
 
 
+# deprecated
 class ImagenCiudad(models.Model):
     ciudad = models.ForeignKey(Ciudad, blank=False, null=False, on_delete=models.CASCADE)
     original = models.ImageField(
@@ -111,6 +114,7 @@ class ImagenCiudad(models.Model):
         return self.original.name + " (" + self.ciudad.nombre + ")"
 
 
+# deprecated
 class Zona(models.Model):
     name = models.CharField(max_length=200, blank=False, null=False)
     geo = models.GeometryField(srid=4326, geography=True)
@@ -151,6 +155,7 @@ class Poi(models.Model):
     img_panorama = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     tags = HStoreField(null=True)
+    country_code = models.TextField(null=True)
     objects = GeoManager()
 
     @property
@@ -175,9 +180,9 @@ class Poi(models.Model):
         return reverse(
             'poi_old',
             kwargs={
-                'slug': self.slug
+                **({'country_code': self.country_code} if self.country_code else {}),
+                'slug': self.slug,
             },
-            argentina=argentina
         )
 
 
@@ -190,6 +195,7 @@ class Interseccion(models.Model):
     latlng = models.GeometryField(srid=4326, geography=True)
     osm_id1 = models.BigIntegerField(blank=True, null=True)
     osm_id2 = models.BigIntegerField(blank=True, null=True)
+    country_code = models.TextField(null=True)
     objects = GeoManager()
 
     def save(self, *args, **kwargs):
@@ -205,12 +211,13 @@ class Interseccion(models.Model):
         return reverse(
             'interseccion',
             kwargs={
-                'slug': self.slug
+                **({'country_code': self.country_code} if self.country_code else {}),
+                'slug': self.slug,
             },
-            argentina=argentina
         )
 
 
+# deprecated
 class Poicb(models.Model):
     """ Un "Punto de interes" pero que pertenece a cualbondi.
         Cualquier poi que agreguemos para nosotros, tiene
@@ -281,6 +288,7 @@ class AdministrativeArea(MP_Node):
     tags = HStoreField()
     img_panorama = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
+    country_code = models.TextField(null=True)
 
     @property
     def geoJSON(self):
@@ -300,9 +308,9 @@ class AdministrativeArea(MP_Node):
         return reverse(
             'administrativearea',
             kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
                 'osm_type': self.osm_type,
                 'osm_id': self.osm_id,
-                'slug': slugify(self.name)
+                'slug': slugify(self.name),
             },
-            argentina=argentina
         )

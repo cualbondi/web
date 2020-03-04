@@ -68,7 +68,7 @@ def poi(request, osm_type, osm_id, slug):
         return HttpResponsePermanentRedirect(poi.get_absolute_url())
 
 
-def poiORint(request, slug=None):
+def poiORint(request, slug=None, country_code=None):
     poi = None
     pois = Poi.objects.filter(slug=slug)
 
@@ -87,11 +87,9 @@ def poiORint(request, slug=None):
         .order_by('depth')
 
     # poi found, check if url is ok
-    if aas:
-        aarootname = aas[0].name
-        correct_url = poi.get_absolute_url(aarootname == 'Argentina')
-    else:
+    if not aas:
         raise Http404
+    correct_url = poi.get_absolute_url()
     if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
@@ -131,11 +129,10 @@ class Simplify(GeoFunc):
         super().__init__(expression, tolerance, **extra)
 
 
-def administrativearea(request, osm_type=None, osm_id=None, slug=None):
+def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_code=None):
     qs = AdministrativeArea.objects.defer('geometry')
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
-    aarootname = aa.get_root().name
-    correct_url = aa.get_absolute_url(aarootname == 'Argentina')
+    correct_url = aa.get_absolute_url()
     if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
     else:

@@ -40,18 +40,50 @@ kings = {
         'url': 'http://download.geofabrik.de/south-america/argentina-latest.osm.pbf',
         'id': 286393,
         'paradas_completas': False,
+        'country_code': 'ar',
     },
     'spain': {
         'name': 'spain',
         'url': 'http://download.geofabrik.de/europe/spain-latest.osm.pbf',
         'id': 1311341,
         'paradas_completas': True,
+        'country_code': 'es',
     },
     'uruguay': {
         'name': 'uruguay',
         'url': 'http://download.geofabrik.de/south-america/uruguay-latest.osm.pbf',
         'id': 287072,
         'paradas_completas': False,
+        'country_code': 'uy',
+    },
+    'ecuador': {
+        'name': 'ecuador',
+        'url': 'http://download.geofabrik.de/south-america/ecuador-latest.osm.pbf',
+        'id': 108089,
+        'paradas_completas': False,
+        'country_code': 'ec',
+    },
+    'peru': {
+        'name': 'peru',
+        'url': 'http://download.geofabrik.de/south-america/peru-latest.osm.pbf',
+        'id': 288247,
+        'paradas_completas': False,
+        'country_code': 'pe',
+    },
+    'cuba': {
+        'name': 'cuba',
+        'url': 'http://download.geofabrik.de/south-america/cuba-latest.osm.pbf',
+        'id': 288247,
+        'paradas_completas': False,
+        'country_code': 'cu',
+    },
+    'brazil': {
+        'id': None,
+        'country_code': 'br',
+    },
+    'ivorycoast': {
+        'id': None,
+        'country_code': 'ci',
     },
 }
 

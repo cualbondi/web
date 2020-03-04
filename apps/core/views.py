@@ -12,6 +12,7 @@ from django.contrib.flatpages.models import FlatPage
 from django.contrib.postgres.search import TrigramSimilarity
 
 from apps.core.models import Linea, Recorrido, Parada
+from apps.catastro.management.commands.update_osm import kings
 from apps.catastro.models import Ciudad, Poi, AdministrativeArea
 from apps.utils import data
 from apps.utils.parallel_query import parallelize
@@ -76,7 +77,7 @@ def redirect_sockjs_dev(request):
 
 @csrf_exempt
 @require_GET
-def ver_linea(request, osm_type=None, osm_id=None, slug=None):
+def ver_linea(request, osm_type=None, osm_id=None, slug=None, country_code=None):
     """
         osm_type =
             - 'c': cualbondi recorrido, usar id de la tabla directamente
@@ -130,9 +131,6 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
 
     # linea found, check if url is ok
     correct_url = linea.get_absolute_url()
-    if aaancestors:
-        aarootname = aaancestors.reverse()[0].name
-        correct_url = linea.get_absolute_url(aarootname == 'Argentina')
     if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
@@ -156,7 +154,7 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
 
 @csrf_exempt
 @require_GET
-def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
+def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=None):
     """
         osm_type =
             - 'c': cualbondi recorrido, usar id de la tabla directamente
@@ -201,9 +199,6 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
 
     # recorrido found, check if url is ok
     correct_url = recorrido.get_absolute_url()
-    if aaancestors:
-        aarootname = aaancestors.reverse()[0].name
-        correct_url = recorrido.get_absolute_url(aarootname == 'Argentina')
     if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
@@ -330,7 +325,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
 
 @csrf_exempt
 @require_GET
-def ver_parada(request, id=None):
+def ver_parada(request, id=None, country_code=None):
     p = get_object_or_404(Parada, id=id)
 
     aas = AdministrativeArea.objects \
@@ -339,9 +334,6 @@ def ver_parada(request, id=None):
 
     # p found, check if url is ok
     correct_url = p.get_absolute_url()
-    if aas:
-        aarootname = aas[0].name
-        correct_url = p.get_absolute_url(aarootname == 'Argentina')
     if correct_url not in request.build_absolute_uri():
         return HttpResponsePermanentRedirect(correct_url)
 
@@ -378,7 +370,7 @@ def ver_parada(request, id=None):
 
 @csrf_exempt
 @require_GET
-def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorrido=None):
+def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorrido=None, country_code=None):
     """
     # v1
     cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/
@@ -391,7 +383,11 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
     ciudades = data.ciudades + data.ciudades_es
     ciudad = next((c for c in ciudades if c.slug == slug_ciudad), False)
     if not ciudad:
-        raise Http404
+        country = next((v for k,v in kings.items() if v['country_code'] == country_code), False)
+        if country:
+            return redirect(get_object_or_404(AdministrativeArea, osm_id=str(country['id'])), permanent=True)
+        else:
+            raise Http404
 
     # ciudad
     if not slug_linea:

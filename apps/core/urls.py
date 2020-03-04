@@ -5,8 +5,6 @@ from apps.catastro.views import administrativearea
 
 
 urlpatterns = [
-    url(r'^$', index, name='index'),
-
     url(r'^a/(?P<osm_type>[^\d])(?P<osm_id>[^/]+)/(?P<slug>[^/]+)/$', administrativearea, name='administrativearea'),
     url(r'^a/(?P<osm_type>[^\d])(?P<osm_id>[^/]+)', administrativearea, name='administrativearea_redirect'),
 
@@ -23,7 +21,8 @@ urlpatterns = [
     url(r'^(?P<slug_ciudad>[\w-]+)/$', redirect_nuevas_urls),
     url(r'^(?P<slug_ciudad>[\w-]+)/(?P<slug_linea>[\w-]+)/$', redirect_nuevas_urls),
     url(r'^(?P<slug_ciudad>[\w-]+)/(?P<slug_linea>[\w-]+)/(?P<slug_recorrido>[\w-]+)/$', redirect_nuevas_urls),
+    url(r'^$', redirect_nuevas_urls),
 
     # only for local dev / debugging purposes
-    url(r'mapa/(?P<administrativearea_slug>[^/]+)/$', ver_mapa_ciudad, name='ver_mapa_ciudad'),
+    # url(r'mapa/(?P<administrativearea_slug>[^/]+)/$', ver_mapa_ciudad, name='ver_mapa_ciudad'),
 ]
