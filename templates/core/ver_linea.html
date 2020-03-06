@@ -1,8 +1,9 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load i18n %}
 
-{% block title %}Línea {{obj.nombre|title}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
+{% block title %}{% blocktrans %}Línea{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}en{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}que pasa por{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -10,8 +11,8 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:linea" />
     <meta property="og:url"    content="{{ obj.get_absolute_url }}" />
-    <meta property="og:title"  content="Línea {{obj.nombre|title}}" />
-    <meta property="og:description"  content="Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea {{obj.nombre|title}} que pasa por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
+    <meta property="og:title"  content="{% blocktrans %}Línea{% endblocktrans %} {{obj.nombre|title}}" />
+    <meta property="og:description"  content="{% blocktrans %}Toda la información sobre ramales, recorridos, paradas, horarios y tarifas de la línea{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}que pasa por{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
@@ -19,7 +20,7 @@
     <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="/">
-                <span itemprop="name">Inicio</span>
+                <span itemprop="name">{% blocktrans %}Inicio{% endblocktrans %}</span>
             </a>
             <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
@@ -40,18 +41,18 @@
     </ul>
 
     <div>
-        <h1 style="display:inline;">Linea {{obj.nombre}}</h1>
+        <h1 style="display:inline;">{% blocktrans %}Linea{% endblocktrans %} {{obj.nombre}}</h1>
         <div style="vertical-align: super;margin-left: 10px;" class="fb-like" data-layout="button" data-action="like" data-show-faces="false" data-share="false"></div>
     </div>
 
     {% if obj.info_empresa and obj.info_terminal %}
-        <h2>Información de la empresa</h2>
+        <h2>{% blocktrans %}Información de la empresa{% endblocktrans %}</h2>
         <div>{{obj.info_empresa}}</div>
         <div>{{obj.info_terminal}}</div>
     {% endif %}
 
     {% if adminareas %}
-        <h2>Lugares que transita</h2>
+        <h2>{% blocktrans %}Lugares que transita{% endblocktrans %}</h2>
         <ul>
             {% for a in adminareas %}
             <li><a href="{{a.get_absolute_url}}">{{ a.name }}</a></li>
@@ -60,7 +61,7 @@
     {% endif %}
 
     <div class="row-fluid">
-        <h2>Recorridos de la linea {{obj.nombre}}</h2>
+        <h2>{% blocktrans %}Recorridos de la linea{% endblocktrans %} {{obj.nombre}}</h2>
         {% for cols in recorridos|partition_horizontal:48 %}
             {% for columna in cols|dividir_columnas:3 %}
                 <div class="span4">
@@ -70,7 +71,7 @@
                             <a href={{recorrido.get_absolute_url}}>
                                 {{recorrido.nombre}}
                                 {% if recorrido.inicio and recorrido.fin %}
-                                    <span class="light">de {{recorrido.inicio}} a {{recorrido.fin}}</span>
+                                    <span class="light">{% blocktrans %}de{% endblocktrans %} {{recorrido.inicio}} {% blocktrans %}a{% endblocktrans %} {{recorrido.fin}}</span>
                                 {% endif %}
                             </a>
                         </li>
@@ -91,7 +92,7 @@
     {% if obj.img_panorama %}
     <div class="thumbnail">
         <div id="map" style="background:lightblue;">
-            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Cobertura de transporte público de la línea {{ obj.nombre }} en {{ adminarea.name }}." />
+            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="{% blocktrans %}Cobertura de transporte público de la línea{% endblocktrans %} {{ obj.nombre }} {% blocktrans %}en{% endblocktrans %} {{ adminarea.name }}." />
         </div>
     </div>
     {% endif %}

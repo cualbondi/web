@@ -28,7 +28,10 @@ LANGUAGE_CODE = 'es-ar'
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 # SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
-USE_I18N = False
+USE_I18N = True
+LOCALE_PATHS = [
+    str(ROOT_DIR.path('locale')),
+]
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
 USE_L10N = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
@@ -156,7 +159,8 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'apps.core.middleware.AuthenticationMiddleware',
+    'apps.core.middlewares.auth.AuthenticationMiddleware',
+    'apps.core.middlewares.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'apps.core.middleware.WhodidMiddleware',

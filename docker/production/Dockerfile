@@ -23,6 +23,7 @@ RUN \
         make \
         libpq-dev \
         osmium-tool \
+        gettext \
 && \
     rm -rf /var/lib/apt/lists/* \
 && \

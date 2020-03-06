@@ -1,0 +1,313 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-06 22:16+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: templates/404.html:5
+msgid "Uups! La página no pudo ser encontrada..."
+msgstr ""
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "Volver al"
+msgstr ""
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "inicio"
+msgstr ""
+
+#: templates/500.html:5
+msgid "Uups! Algo anduvo mal..."
+msgstr ""
+
+#: templates/base.html:9
+msgid "Buscador de recorridos de bondis, colectivos, micros"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:5
+msgid "Transporte publico en"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:6
+msgid "Cómo moverse en"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:6
+msgid "y qué líneas de recorridos de micros y ómnibus y buses pasan por"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:14
+msgid "Como moverse en"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/catastro/ver_poi.html:15
+msgid "Listado de todos los medios de transporte publico que pasan por"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/catastro/ver_poi.html:15
+msgid "Entra para ver como llegar desde donde estes ahora"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:23
+#: templates/catastro/ver_poi.html:23 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:23
+msgid "Inicio"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:69
+msgid "Lineas de transporte público"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:91
+msgid "Recorridos de transporte público"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:121
+msgid "Lugares"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:135
+#: templates/core/ver_recorrido.html:150
+msgid "Paradas"
+msgstr ""
+
+#: templates/catastro/ver_administrativearea.html:144
+msgid "Puntos de interés"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:5
+#: templates/catastro/ver_poi.html:6
+msgid "Cómo llegar a"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:5
+#: templates/catastro/ver_poi.html:6 templates/catastro/ver_poi.html:14
+#: templates/catastro/ver_poi.html:15 templates/core/ver_linea.html:5
+#: templates/core/ver_linea.html:95 templates/core/ver_parada.html:5
+#: templates/core/ver_parada.html:6 templates/core/ver_recorrido.html:5
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+msgid "en"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:46
+msgid "¿Cómo llegar a"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:46
+msgid "?"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:43
+msgid "Recorridos de transporte público que pasan por esta intersección"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:105
+msgid "de"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:105
+msgid "a"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:64
+#: templates/catastro/ver_poi.html:109
+msgid "Paradas cercanas"
+msgstr ""
+
+#: templates/catastro/ver_interseccion.html:73
+#: templates/catastro/ver_poi.html:118
+msgid "Otros puntos de interés cercanos"
+msgstr ""
+
+#: templates/catastro/ver_poi-404.html:7
+msgid "No pudimos encontrar"
+msgstr ""
+
+#: templates/catastro/ver_poi-404.html:12
+msgid "Pero hicimos todo lo posible por encontrar lugares similares"
+msgstr ""
+
+#: templates/catastro/ver_poi.html:14
+msgid "Como llegar a"
+msgstr ""
+
+#: templates/catastro/ver_poi.html:57
+msgid "Ir al sitio web"
+msgstr ""
+
+#: templates/catastro/ver_poi.html:62
+msgid "Telefono"
+msgstr ""
+
+#: templates/catastro/ver_poi.html:77 templates/core/ver_recorrido.html:89
+msgid "Ver en mapa interactivo"
+msgstr ""
+
+#: templates/catastro/ver_poi.html:88
+msgid "Recorridos de transporte público que pasan por este lugar"
+msgstr ""
+
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
+msgid "Línea"
+msgstr ""
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid ""
+"Toda la información sobre ramales, recorridos, paradas, horarios y tarifas "
+"de la línea"
+msgstr ""
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid "que pasa por"
+msgstr ""
+
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
+msgid "Linea"
+msgstr ""
+
+#: templates/core/ver_linea.html:49
+msgid "Información de la empresa"
+msgstr ""
+
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:61
+msgid "Lugares que transita"
+msgstr ""
+
+#: templates/core/ver_linea.html:64
+msgid "Recorridos de la linea"
+msgstr ""
+
+#: templates/core/ver_linea.html:95
+msgid "Cobertura de transporte público de la línea"
+msgstr ""
+
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_parada.html:43
+msgid "Parada"
+msgstr ""
+
+#: templates/core/ver_parada.html:6
+msgid ""
+"y qué líneas de recorridos de micros y ómnibus y buses pasan por la parada"
+msgstr ""
+
+#: templates/core/ver_parada.html:62
+msgid "Recorridos de transporte público que paran en esta parada"
+msgstr ""
+
+#: templates/core/ver_parada.html:79
+msgid ""
+"Recorridos de transporte público que pasan cerca de esta parada (no paran "
+"aquí)"
+msgstr ""
+
+#: templates/core/ver_parada.html:100
+msgid "Puntos de interés cercanos"
+msgstr ""
+
+#: templates/core/ver_parada.html:117
+msgid "Barrios cercanos"
+msgstr ""
+
+#: templates/core/ver_parada.html:126
+msgid "Otras paradas cercanas"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:54
+msgid "Recorrido"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:56
+msgid "desde"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:56
+msgid "hasta"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:5
+msgid "de la linea"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:6
+msgid "Toda la información sobre paradas, horarios y tarifas del recorrido"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:6
+msgid "de la línea"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+msgid "Descripción del recorrido de colectivo, micro, bus"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:15
+msgid "Ramal"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:15
+msgid "Recorrido desde"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:70 templates/core/ver_recorrido.html:80
+msgid "Calles que componen este recorrido"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:99
+msgid "Recorridos similares"
+msgstr ""
+
+#: templates/core/ver_recorrido.html:121
+msgid "Puntos de interés por donde pasa"
+msgstr ""
+
+#: templates/leaflet/admin/widget.html:29
+msgid "Reset view"
+msgstr ""
+
+#: templates/navbar.html:26
+msgid "Ir al buscador"
+msgstr ""
+
+#: templates/navbar.html:35
+msgid "Login"
+msgstr ""
+
+#: templates/navbar.html:39
+msgid "Usuarios estrella"
+msgstr ""
+
+#: templates/navbar.html:40
+msgid "Encuesta"
+msgstr ""

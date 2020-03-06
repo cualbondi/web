@@ -1,8 +1,9 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load i18n %}
 
-{% block title %}Recorrido {{obj.nombre|title}} {% if obj.inicio and obj.fin %} desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} de la linea {{linea.nombre|title}}, en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}Toda la información sobre paradas, horarios y tarifas del recorrido {{obj.nombre|title}} de la línea {{linea.nombre|title}} desde {{obj.inicio}} hasta {{obj.fin}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}: Descripción del recorrido de colectivo, micro, bus.{% endblock %}
+{% block title %}{% blocktrans %}Recorrido{% endblocktrans %} {{obj.nombre|title}} {% if obj.inicio and obj.fin %} {% blocktrans %}desde{% endblocktrans %} {{obj.inicio}} {% blocktrans %}hasta{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}de la linea{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}en{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}Toda la información sobre paradas, horarios y tarifas del recorrido{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}de la línea{% endblocktrans %} {{linea.nombre|title}} {% blocktrans %}desde{% endblocktrans %} {{obj.inicio}} {% blocktrans %}hasta{% endblocktrans %} {{obj.fin}} {% blocktrans %}en{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}: {% blocktrans %}Descripción del recorrido de colectivo, micro, bus{% endblocktrans %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -11,7 +12,7 @@
     <meta property="og:type"   content="cualbondi:recorrido" />
     <meta property="og:url"    content="{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="{{linea.nombre|title}} - {{obj.nombre|title}}" />
-    <meta property="og:description"  content="Linea {{linea.nombre|title}}, Ramal {{obj.nombre|title}} en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, Recorrido desde {{obj.inicio}} hasta {{obj.fin}} {% endif %} en {{adminarea.name|title}}: Descripción del recorrido de colectivo, micro, bus" />
+    <meta property="og:description"  content="{% blocktrans %}Linea{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}Ramal{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}en{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, {% blocktrans %}Recorrido desde{% endblocktrans %} {{obj.inicio}} {% blocktrans %}hasta{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}en{% endblocktrans %} {{adminarea.name|title}}: {% blocktrans %}Descripción del recorrido de colectivo, micro, bus{% endblocktrans %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
@@ -19,7 +20,7 @@
     <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="/">
-                <span itemprop="name">Inicio</span>
+                <span itemprop="name">{% blocktrans %}Inicio{% endblocktrans %}</span>
             </a>
             <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
@@ -42,7 +43,7 @@
         {% endif %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{obj.get_absolute_url}}">
-                <span itemprop="name">{{obj.nombre}}{% if obj.inicio and obj.fin %} (de {{obj.inicio}} a {{obj.fin}}){% endif %}</span>
+                <span itemprop="name">{{obj.nombre}}{% if obj.inicio and obj.fin %} ({% blocktrans %}de{% endblocktrans %} {{obj.inicio}} {% blocktrans %}a{% endblocktrans %} {{obj.fin}}){% endif %}</span>
             </a>
             <meta itemprop="position" content="{% if linea %}4{% else %}3{% endif %}" />
         </li>
@@ -50,14 +51,14 @@
 
     <div>
         <h1>
-            Recorrido {{linea.nombre}} {{obj.nombre}}
+            {% blocktrans %}Recorrido{% endblocktrans %} {{linea.nombre}} {{obj.nombre}}
             <span style="margin-left:5px;" class="fb-like" data-layout="button_count" data-action="like" data-colorscheme="light" data-show-faces="false" data-share="false"></span>
-            {% if obj.inicio and obj.fin %}<small>desde {{obj.inicio}} hasta {{obj.fin}}</small>{% endif %}
+            {% if obj.inicio and obj.fin %}<small>{% blocktrans %}desde{% endblocktrans %} {{obj.inicio}} {% blocktrans %}hasta{% endblocktrans %} {{obj.fin}}</small>{% endif %}
         </h1>
     </div>
 
     {% if adminareas %}
-        <h2>Lugares que transita</h2>
+        <h2>{% blocktrans %}Lugares que transita{% endblocktrans %}</h2>
         <ul>
             {% for a in adminareas %}
             <li><a href="{{a.get_absolute_url}}">{{ a.name }}</a></li>
@@ -66,7 +67,7 @@
     {% endif %}
 
     {% if calles %}
-        <h2>Calles que componen este recorrido</h2>
+        <h2>{% blocktrans %}Calles que componen este recorrido{% endblocktrans %}</h2>
         <ol>
             {% for c in calles %}
             <li style="color:gray">
@@ -76,7 +77,7 @@
         </ol>
     {% else %}
         {% if obj.descripcion %}
-            <h2>Calles que componen este recorrido</h2>
+            <h2>{% blocktrans %}Calles que componen este recorrido{% endblocktrans %}</h2>
             <div>{{ obj.descripcion }}</div>
         {% endif %}
     {% endif %}
@@ -85,7 +86,7 @@
 
     {% if obj.img_panorama %}
     <div class="thumbnail">
-	<a href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">Ver en mapa interactivo</a>
+	<a href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}Ver en mapa interactivo{% endblocktrans %}</a>
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
         </div>
@@ -95,13 +96,13 @@
 
     {% if recorridos_similares %}
         <div class="row-fluid">
-            <h2>Recorridos similares</h2>
+            <h2>{% blocktrans %}Recorridos similares{% endblocktrans %}</h2>
             {% for cols in recorridos_similares|partition_horizontal:48 %}
                 {% for columna in cols|dividir_columnas:3 %}
                     <div class="span4">
                         <ul class="nav nav-pills nav-stacked">
                         {% for rs in columna %}
-                            <li><a href="{{rs.get_absolute_url}}">{{rs.linea_nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+                            <li><a href="{{rs.get_absolute_url}}">{{rs.linea_nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}de{% endblocktrans %} {{rs.inicio}} {% blocktrans %}a{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -117,7 +118,7 @@
 
     {% if pois %}
         <div class="row-fluid">
-            <h2>Puntos de interés por donde pasa</h2>
+            <h2>{% blocktrans %}Puntos de interés por donde pasa{% endblocktrans %}</h2>
             {% for cols in pois|partition_horizontal:48 %}
                 {% for columna in cols|dividir_columnas:3 %}
                     <div class="span4">
@@ -146,7 +147,7 @@
     {% endif %}
 
     {% if horarios %}
-        <h2>Paradas:</h2>
+        <h2>{% blocktrans %}Paradas{% endblocktrans %}:</h2>
         <ul>
         {% for h in horarios %}
             <li><a href="{{h.parada.get_absolute_url}}">{{ h.parada }}</a></li>

@@ -26,3 +26,10 @@
 ```
 ./manage.py update_osm --king=argentina --download --admin_areas --update_routes --add_routes --pois
 ```
+
+### Translation
+
+```
+docker-compose -f docker-compose.dev.yml run --rm web ./manage.py makemessages -l pt -l en -l fr
+docker-compose -f docker-compose.dev.yml run --rm web ./manage.py compilemessages
+```

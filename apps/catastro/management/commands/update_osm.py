@@ -41,6 +41,7 @@ kings = {
         'id': 286393,
         'paradas_completas': False,
         'country_code': 'ar',
+        'lang': 'es_AR',
     },
     'spain': {
         'name': 'spain',
@@ -48,6 +49,7 @@ kings = {
         'id': 1311341,
         'paradas_completas': True,
         'country_code': 'es',
+        'lang': 'es_ES',
     },
     'uruguay': {
         'name': 'uruguay',
@@ -55,6 +57,7 @@ kings = {
         'id': 287072,
         'paradas_completas': False,
         'country_code': 'uy',
+        'lang': 'es_UY',
     },
     'ecuador': {
         'name': 'ecuador',
@@ -62,6 +65,7 @@ kings = {
         'id': 108089,
         'paradas_completas': False,
         'country_code': 'ec',
+        'lang': 'es_EC',
     },
     'peru': {
         'name': 'peru',
@@ -69,6 +73,7 @@ kings = {
         'id': 288247,
         'paradas_completas': False,
         'country_code': 'pe',
+        'lang': 'es_PE',
     },
     'cuba': {
         'name': 'cuba',
@@ -76,14 +81,23 @@ kings = {
         'id': 288247,
         'paradas_completas': False,
         'country_code': 'cu',
+        'lang': 'es_CU',
     },
     'brazil': {
-        'id': None,
+        'name': 'brasil',
+        'url': 'https://download.geofabrik.de/south-america/brazil-latest.osm.pbf',
+        'id': 59470,
+        'paradas_completas': False,
         'country_code': 'br',
+        'lang': 'pt_BR',
     },
     'ivorycoast': {
-        'id': None,
+        'name': 'cotedivoire',
+        'url': 'https://download.geofabrik.de/africa/ivory-coast-latest.osm.pbf',
+        'id': 192779,
+        'paradas_completas': False,
         'country_code': 'ci',
+        'lang': 'fr_CI',
     },
 }
 

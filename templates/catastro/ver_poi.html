@@ -1,8 +1,9 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load i18n %}
 
-{% block title %}Cómo llegar a {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}Cómo llegar a {{poi.nom|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}.{% endblock %}
+{% block title %}{% blocktrans %}Cómo llegar a{% endblocktrans %} {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %} {% blocktrans %}en{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}Cómo llegar a{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}y qué líneas de recorridos de micros y ómnibus y buses pasan por{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}en{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -10,8 +11,8 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:punto_de_interes" />
     <meta property="og:url"    content="{{ poi.get_absolute_url }}" />
-    <meta property="og:title"  content="Como llegar a {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
-    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{poi.nom|title}} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
+    <meta property="og:title"  content="{% blocktrans %}Como llegar a{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}en{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
+    <meta property="og:description"  content="{% blocktrans %}Listado de todos los medios de transporte publico que pasan por{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}en{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. {% blocktrans %}Entra para ver como llegar desde donde estes ahora{% endblocktrans %}" />
     {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ poi.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
@@ -19,7 +20,7 @@
     <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="/">
-                <span itemprop="name">Inicio</span>
+                <span itemprop="name">{% blocktrans %}Inicio{% endblocktrans %}</span>
             </a>
             <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
@@ -42,7 +43,7 @@
     </ul>
 
     <div itemscope itemtype="http://schema.org/Place">
-        <h1>¿Cómo llegar a <span itemprop="name">{{poi.nom}}</span>?</h1>
+        <h1>{% blocktrans %}¿Cómo llegar a{% endblocktrans %} <span itemprop="name">{{poi.nom}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
         <link itemprop="url" content="{{poi.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
             <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:"f"}}" />
@@ -53,12 +54,12 @@
                 <span style="float:right" class="label label-default">{{amenity}}</span>
             {% endif %}
             {% if poi.tags.website %}
-                <a href="{{poi.tags.website}}" target="_blank">Ir al sitio web</a>
+                <a href="{{poi.tags.website}}" target="_blank">{% blocktrans %}Ir al sitio web{% endblocktrans %}</a>
             {% endif %}
         </div>
         <div>
             {% if poi.tags.phone %}
-                <span>Telefono: <a href="tel:{{poi.tags.phone}}">{{poi.tags.phone}}</a></span>
+                <span>{% blocktrans %}Telefono{% endblocktrans %}: <a href="tel:{{poi.tags.phone}}">{{poi.tags.phone}}</a></span>
             {% endif %}
             {% if poi.tags.email %}
                 <a href="mailto:{{poi.tags.email}}">{{poi.tags.email}}</div>
@@ -73,7 +74,7 @@
     </div>
 
     <div class="thumbnail">
-        <a href="/mapa/{{adminareas.0.name|slugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
+        <a href="/mapa/{{adminareas.0.name|slugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}Ver en mapa interactivo{% endblocktrans %}</a>
         {% if poi.img_panorama %}
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />
@@ -84,13 +85,13 @@
 
     {% if recorridos %}
         <div class="row-fluid">
-            <h2>Recorridos de transporte público que pasan por este lugar</h2>
+            <h2>{% blocktrans %}Recorridos de transporte público que pasan por este lugar{% endblocktrans %}</h2>
             {% for cols in recorridos|partition_horizontal:48 %}
                 {% for columna in cols|dividir_columnas:3 %}
                 <div class="span4">
                     <ul class="nav nav-pills nav-stacked">
                     {% for rs in columna %}
-                        <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+                        <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}de{% endblocktrans %} {{rs.inicio}} {% blocktrans %}a{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
                     {% endfor %}
                     </ul>
                 </div>
@@ -105,7 +106,7 @@
     {% endif %}
 
     {% if paradas %}
-        <h2>Paradas cercanas</h2>
+        <h2>{% blocktrans %}Paradas cercanas{% endblocktrans %}</h2>
         <ul>
             {% for p in paradas %}
             <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>
@@ -114,7 +115,7 @@
     {% endif %}
 
     {% if pois %}
-        <h2>Otros puntos de interés cercanos</h2>
+        <h2>{% blocktrans %}Otros puntos de interés cercanos{% endblocktrans %}</h2>
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
