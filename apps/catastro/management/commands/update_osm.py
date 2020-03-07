@@ -264,6 +264,7 @@ class Command(BaseCommand):
                             'admin_level': admin_level,
                             'name': r.tags['name'],  # .encode('utf-8').strip(),
                             'tags': {k:v for k,v in r.tags},
+                            'country_code': king['country_code'],
                         }
                         # this.out2(f"REL {r.id} {r.tags['name'].encode('utf-8').strip()}")
 
@@ -287,6 +288,7 @@ class Command(BaseCommand):
                                     'admin_level': int(w.tags['admin_level']),
                                     'name': w.tags['name'],  # .encode('utf-8').strip(),
                                     'tags': {k:v for k,v in w.tags},
+                                    'country_code': king['country_code'],
                                 })
 
                     # fill relations that are admin areas
@@ -409,6 +411,7 @@ class Command(BaseCommand):
                     'osm_type': KING['osm_type'],
                     'name': KING['name'],
                     'tags': KING['tags'],
+                    'country_code': king['country_code'],
                 }
             }
             for li in admin_areas:
@@ -689,6 +692,7 @@ class Command(BaseCommand):
                     rp.paradas_completas = bus['paradas_completas']
                     rp.type = bus['pt'].tags['route']
                     rp.king = king['id']
+                    rp.country_code = king['country_code']
                     if not options['dry-run']:
                         rp.save(user=user_bot_osm)
 
@@ -709,6 +713,7 @@ class Command(BaseCommand):
                                     'nombre': s.tags['name'] if 'name' in s.tags else f'{s.lon}, {s.lat}',
                                     'latlng': Point(s.lon, s.lat),
                                     'tags': s.tags,
+                                    'country_code': king['country_code'],
                                 }
                             )
                             if created:
@@ -902,6 +907,7 @@ class Command(BaseCommand):
                                 'nom': n.tags['name'][:200],
                                 'nom_normal': Substr(Trim(Upper(Unaccent(Value(n.tags['name'])))), 1, 200),
                                 'latlng': point,
+                                'country_code': king['country_code'],
                             }
                             Poi.objects.update_or_create(
                                 osm_id=n.id,
@@ -931,6 +937,7 @@ class Command(BaseCommand):
                         'nom': aa.name,
                         'nom_normal': Substr(Trim(Upper(Unaccent(Value(aa.name)))), 1, 200),
                         'latlng': aa.geometry.centroid,
+                        'country_code': king['country_code'],
                     }
                 )
 

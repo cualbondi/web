@@ -9,7 +9,8 @@
     <ul class="nav">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="">
-                <i class="icon-picture icon-white"></i> Ciudad
+                <i class="icon-picture icon-white"></i>
+                {% blocktrans %}City{% endblocktrans %}
                 <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
@@ -23,7 +24,7 @@
             </ul>
         </li>
         {% if ciudad_actual %}
-            <li><a href="/mapa/{{ciudad_actual.slug}}"><i class="icon-search icon-white"></i> {% blocktrans %}Ir al buscador{% endblocktrans %}</a></li>
+            <li><a href="/mapa/{{ciudad_actual.slug}}"><i class="icon-search icon-white"></i> {% blocktrans %}Go to the search engine{% endblocktrans %}</a></li>
         {% endif %}
     </ul>
     <ul class="nav pull-right">
@@ -36,7 +37,7 @@
                 </a>
             </li>
         {% endif %}
-        <li><a href="{% url "agradecimientos" %}"><i class="icon-star icon-white"></i> {% blocktrans %}Usuarios estrella{% endblocktrans %}</a></li>
-        <li><a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dFJERlREQjUyaE1iSkFDYnhOa2Nnbmc6MQ+"><i class="icon-pencil icon-white"></i> {% blocktrans %}Encuesta{% endblocktrans %}</a></li>
+        <li><a href="{% url "agradecimientos" %}"><i class="icon-star icon-white"></i> {% blocktrans %}Star users{% endblocktrans %}</a></li>
+        <li><a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dFJERlREQjUyaE1iSkFDYnhOa2Nnbmc6MQ+"><i class="icon-pencil icon-white"></i> {% blocktrans %}Poll{% endblocktrans %}</a></li>
     </ul>
 </div>

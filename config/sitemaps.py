@@ -90,3 +90,23 @@ sitemaps = {
         'queryset': AdministrativeArea.objects.defer('geometry', 'geometry_simple'),
     }, priority=0.6),
 }
+
+def getsitemaps(cc):
+    return {
+        # 'flatpages': FlatPageSitemap,
+        'lineas': CBSitemap({
+            'queryset': Linea.objects.defer('envolvente').filter(country_code=cc),
+        }, priority=0.6),
+        'recorridos': CBSitemap({
+            'queryset': Recorrido.objects.defer('ruta').filter(country_code=cc),
+        }, priority=0.6),
+        'paradas': CBSitemap({
+            'queryset': Parada.objects.defer('latlng').filter(country_code=cc),
+        }, priority=0.4),
+        'pois': CBSitemap({
+            'queryset': Poi.objects.defer('latlng').filter(country_code=cc),
+        }, priority=0.6),
+        'administrativeareas': CBSitemap({
+            'queryset': AdministrativeArea.objects.defer('geometry', 'geometry_simple').filter(country_code=cc),
+        }, priority=0.6),
+    }

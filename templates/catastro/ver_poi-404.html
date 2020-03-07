@@ -4,12 +4,12 @@
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block bloque_izquierda %}
-    <h1>{% blocktrans %}No pudimos encontrar{% endblocktrans %} {{ slug }}</h1>
+    <h1>{% blocktrans %}Could not find{% endblocktrans %} {{ slug }}</h1>
 
     {% include "ad_contenido.html"%}
 
     {% if pois %}
-        <h2>{% blocktrans %}Pero hicimos todo lo posible por encontrar lugares similares{% endblocktrans %}</h2>
+        <h2>{% blocktrans %}But we did everything possible to find similar places{% endblocktrans %}</h2>
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
@@ -24,7 +24,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <h1>{% blocktrans %}Volver al{% endblocktrans %} <a href="/">{% blocktrans %}inicio{% endblocktrans %}</a></h1>
+        <h1>{% blocktrans %}Go back to{% endblocktrans %} <a href="/">{% blocktrans %}home{% endblocktrans %}</a></h1>
         <br />
         <br />
         <br />

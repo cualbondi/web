@@ -2,8 +2,8 @@
 {% load bootstrap_tags %}
 {% load i18n %}
 
-{% block title %}{% blocktrans %}Transporte publico en{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}{% blocktrans %}Cómo moverse en{% endblocktrans %} {{adminarea.name|title}} {% blocktrans %}y qué líneas de recorridos de micros y ómnibus y buses pasan por{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
+{% block title %}{% blocktrans %}Public transportation in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea.name|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -11,8 +11,8 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:administrative_area" />
     <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
-    <meta property="og:title"  content="{% blocktrans %}Como moverse en{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
-    <meta property="og:description"  content="{% blocktrans %}Listado de todos los medios de transporte publico que pasan por{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% blocktrans %}Entra para ver como llegar desde donde estes ahora{% endblocktrans %}" />
+    <meta property="og:title"  content="{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
+    <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
@@ -20,7 +20,7 @@
     <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="/">
-                <span itemprop="name">{% blocktrans %}Inicio{% endblocktrans %}</span>
+                <span itemprop="name">{% blocktrans %}Home{% endblocktrans %}</span>
             </a>
             <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
@@ -55,7 +55,13 @@
     </div>
 
     <div class="thumbnail">
-        <a href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
+        <a
+            href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}"
+            class="btn btn-primary"
+            style="z-index:1;position:absolute; margin:6px"
+        >
+            {% blocktrans %}See in interactive map{% endblocktrans %}
+        </a>
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
@@ -66,7 +72,7 @@
 
     {% if lineas %}
     <div class="row-fluid">
-        <h2>{% blocktrans %}Lineas de transporte público{% endblocktrans %}</h2>
+        <h2>{% blocktrans %}Lines of public transport{% endblocktrans %}</h2>
         {% for cols in lineas|partition_horizontal:60 %}
         {% for columna in cols|dividir_columnas:6 %}
         <div class="span2">
@@ -88,7 +94,7 @@
 
     {% if recorridos %}
     <div class="row-fluid">
-        <h2>{% blocktrans %}Recorridos de transporte público{% endblocktrans %}</h2>
+        <h2>{% blocktrans %}Routes of public transport{% endblocktrans %}</h2>
         {% for cols in recorridos|partition_horizontal:48 %}
             {% for columna in cols|dividir_columnas:3 %}
                 <div class="span4">
@@ -118,7 +124,7 @@
 
     {% if children %}
         <div class="row-fluid">
-            <h2>{% blocktrans %}Lugares{% endblocktrans %}</h2>
+            <h2>{% blocktrans %}Places{% endblocktrans %}</h2>
             <ul>
                 {% for child in children %}
                 <li>
@@ -132,7 +138,7 @@
 
 
     {% if paradas %}
-        <h2>{% blocktrans %}Paradas{% endblocktrans %}</h2>
+        <h2>{% blocktrans %}Stops{% endblocktrans %}</h2>
         <ul>
             {% for p in paradas %}
             <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>
@@ -141,7 +147,7 @@
     {% endif %}
 
     {% if pois %}
-        <h2>{% blocktrans %}Puntos de interés{% endblocktrans %}</h2>
+        <h2>{% blocktrans %}Points of interest{% endblocktrans %}</h2>
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">

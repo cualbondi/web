@@ -11,98 +11,97 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 22:16+0000\n"
-"PO-Revision-Date: 2020-03-06 22:12+0000\n"
+"POT-Creation-Date: 2020-03-06 23:57+0000\n"
+"PO-Revision-Date: 2020-03-07 00:17+0000\n"
 "Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
-"Language-Team: English (https://www.transifex.com/cualbondi/teams/107940/en/)\n"
+"Language-Team: Spanish (https://www.transifex.com/cualbondi/teams/107940/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
+"Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: templates/404.html:5
-msgid "Uups! La página no pudo ser encontrada..."
-msgstr "Oops! The page could not be found..."
+msgid "Oops! The page could not be found..."
+msgstr "Uups! La página no pudo ser encontrada..."
 
 #: templates/404.html:6 templates/500.html:6
 #: templates/catastro/ver_poi-404.html:27
-msgid "Volver al"
-msgstr "Go back to"
+msgid "Go back to"
+msgstr "Volver al"
 
 #: templates/404.html:6 templates/500.html:6
 #: templates/catastro/ver_poi-404.html:27
-msgid "inicio"
-msgstr "home"
+msgid "home"
+msgstr "inicio"
 
 #: templates/500.html:5
-msgid "Uups! Algo anduvo mal..."
-msgstr "Oops! Something went wrong..."
+msgid "Oops! Something went wrong..."
+msgstr "Uups! Algo anduvo mal..."
 
 #: templates/base.html:9
-msgid "Buscador de recorridos de bondis, colectivos, micros"
-msgstr "Search engine of public transportation bus, train,  subway, tram."
+msgid "Search engine of public transportation bus, train,  subway, tram."
+msgstr "Buscador de recorridos de bondis, colectivos, micros"
 
 #: templates/catastro/ver_administrativearea.html:5
-msgid "Transporte publico en"
-msgstr "Public transportation in"
+msgid "Public transportation in"
+msgstr "Transporte público en"
 
 #: templates/catastro/ver_administrativearea.html:6
-msgid "Cómo moverse en"
-msgstr "How to get around in"
+#: templates/catastro/ver_administrativearea.html:14
+msgid "How to get around in"
+msgstr "Cómo moverse en"
 
 #: templates/catastro/ver_administrativearea.html:6
 #: templates/catastro/ver_interseccion.html:6
 #: templates/catastro/ver_poi.html:6
-msgid "y qué líneas de recorridos de micros y ómnibus y buses pasan por"
-msgstr "and what lines and routes of buses go through"
-
-#: templates/catastro/ver_administrativearea.html:14
-msgid "Como moverse en"
-msgstr "How to get around in"
+msgid "and what lines and routes of buses go through"
+msgstr "y qué lneas de recorridos de micros y ómnibus y buses pasan por"
 
 #: templates/catastro/ver_administrativearea.html:15
 #: templates/catastro/ver_poi.html:15
-msgid "Listado de todos los medios de transporte publico que pasan por"
-msgstr "List of all the public transport that go through"
+msgid "List of all the public transport that go through"
+msgstr "Listado de todos los medios de transporte público que pasan por"
 
 #: templates/catastro/ver_administrativearea.html:15
 #: templates/catastro/ver_poi.html:15
-msgid "Entra para ver como llegar desde donde estes ahora"
-msgstr "See how to get from where you are"
+msgid "See how to get from where you are"
+msgstr "Entra para ver cómo llegar desde donde estes ahora"
 
 #: templates/catastro/ver_administrativearea.html:23
 #: templates/catastro/ver_poi.html:23 templates/core/ver_linea.html:23
 #: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:23
-msgid "Inicio"
-msgstr "Home"
+msgid "Home"
+msgstr "Inicio"
 
 #: templates/catastro/ver_administrativearea.html:69
-msgid "Lineas de transporte público"
-msgstr "Lines of public transport"
+msgid "Lines of public transport"
+msgstr "Líneas de transporte público"
 
 #: templates/catastro/ver_administrativearea.html:91
-msgid "Recorridos de transporte público"
-msgstr "Routes of public transport"
+msgid "Routes of public transport"
+msgstr "Recorridos de transporte público"
 
 #: templates/catastro/ver_administrativearea.html:121
-msgid "Lugares"
-msgstr "Places"
+msgid "Places"
+msgstr "Lugares"
 
 #: templates/catastro/ver_administrativearea.html:135
 #: templates/core/ver_recorrido.html:150
-msgid "Paradas"
-msgstr "Stops"
+msgid "Stops"
+msgstr "Paradas"
 
 #: templates/catastro/ver_administrativearea.html:144
-msgid "Puntos de interés"
-msgstr "Points of interest"
+msgid "Points of interest"
+msgstr "Puntos de interés"
 
 #: templates/catastro/ver_interseccion.html:5
 #: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_interseccion.html:17
 #: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
-msgid "Cómo llegar a"
-msgstr "How to get to"
+#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:46
+msgid "How to get to"
+msgstr "Cómo llegar a"
 
 #: templates/catastro/ver_interseccion.html:5
 #: templates/catastro/ver_interseccion.html:6
@@ -112,13 +111,8 @@ msgstr "How to get to"
 #: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
 #: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
 #: templates/core/ver_recorrido.html:15
-msgid "en"
-msgstr "in"
-
-#: templates/catastro/ver_interseccion.html:17
-#: templates/catastro/ver_poi.html:46
-msgid "¿Cómo llegar a"
-msgstr "How to get to"
+msgid "in"
+msgstr "en"
 
 #: templates/catastro/ver_interseccion.html:17
 #: templates/catastro/ver_poi.html:46
@@ -126,196 +120,179 @@ msgid "?"
 msgstr "?"
 
 #: templates/catastro/ver_interseccion.html:43
-msgid "Recorridos de transporte público que pasan por esta intersección"
-msgstr "Routes of public transport that pass through this intersection"
+msgid "Routes of public transport that pass through this intersection"
+msgstr "Recorridos de transporte público que pasan por esta intersección"
 
 #: templates/catastro/ver_interseccion.html:49
 #: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:105
-msgid "de"
-msgstr "from"
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:56
+#: templates/core/ver_recorrido.html:105
+msgid "from"
+msgstr "desde"
 
 #: templates/catastro/ver_interseccion.html:49
 #: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:105
-msgid "a"
-msgstr "to"
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:46
+#: templates/core/ver_recorrido.html:56 templates/core/ver_recorrido.html:105
+msgid "to"
+msgstr "hasta"
 
 #: templates/catastro/ver_interseccion.html:64
 #: templates/catastro/ver_poi.html:109
-msgid "Paradas cercanas"
-msgstr "Nearby stops"
+msgid "Nearby stops"
+msgstr "Paradas cercanas"
 
 #: templates/catastro/ver_interseccion.html:73
 #: templates/catastro/ver_poi.html:118
-msgid "Otros puntos de interés cercanos"
-msgstr "Other points of interest nearby"
+msgid "Other points of interest nearby"
+msgstr "Otros puntos de interés cercanos"
 
 #: templates/catastro/ver_poi-404.html:7
-msgid "No pudimos encontrar"
-msgstr "Could not find"
+msgid "Could not find"
+msgstr "No pudimos encontrar"
 
 #: templates/catastro/ver_poi-404.html:12
-msgid "Pero hicimos todo lo posible por encontrar lugares similares"
-msgstr "But we did everything possible to find similar places"
-
-#: templates/catastro/ver_poi.html:14
-msgid "Como llegar a"
-msgstr "How to get to"
+msgid "But we did everything possible to find similar places"
+msgstr "Pero hicimos todo lo posible por encontrar lugares similares"
 
 #: templates/catastro/ver_poi.html:57
-msgid "Ir al sitio web"
-msgstr "Go to website"
+msgid "Go to website"
+msgstr "Ir al sitio web"
 
 #: templates/catastro/ver_poi.html:62
-msgid "Telefono"
-msgstr "Phone"
+msgid "Phone"
+msgstr "Teléfono"
 
 #: templates/catastro/ver_poi.html:77 templates/core/ver_recorrido.html:89
-msgid "Ver en mapa interactivo"
-msgstr "See in interactive map"
+msgid "See in interactive map"
+msgstr "Ver en mapa interactivo"
 
 #: templates/catastro/ver_poi.html:88
-msgid "Recorridos de transporte público que pasan por este lugar"
-msgstr "Public transport routes that pass next to this place"
+msgid "Public transport routes that pass next to this place"
+msgstr "Recorridos de transporte público que pasan por este lugar"
 
 #: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
-msgid "Línea"
-msgstr "Line"
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
+msgid "Line"
+msgstr "Línea"
 
 #: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
 msgid ""
-"Toda la información sobre ramales, recorridos, paradas, horarios y tarifas "
-"de la línea"
-msgstr ""
 "All the information about routes, trips, stops, schedules and fares of the "
 "line"
+msgstr ""
+"Toda la información sobre ramales, recorridos, paradas, horarios y tarifas "
+"de la línea"
 
 #: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
-msgid "que pasa por"
-msgstr "that passes through"
-
-#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
-msgid "Linea"
-msgstr "Line"
+msgid "that passes through"
+msgstr "que pasa por"
 
 #: templates/core/ver_linea.html:49
-msgid "Información de la empresa"
-msgstr "Company information"
+msgid "Company information"
+msgstr "Información de la empresa"
 
 #: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:61
-msgid "Lugares que transita"
-msgstr "Places that travel to"
+msgid "Places that travel to"
+msgstr "Lugares que transita"
 
 #: templates/core/ver_linea.html:64
-msgid "Recorridos de la linea"
-msgstr "Routes of the line"
+msgid "Routes of the line"
+msgstr "Recorridos de la línea"
 
 #: templates/core/ver_linea.html:95
-msgid "Cobertura de transporte público de la línea"
-msgstr "Public transportation coverage of the line"
+msgid "Public transportation coverage of the line"
+msgstr "Cobertura de transporte público de la línea"
 
 #: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
 #: templates/core/ver_parada.html:43
-msgid "Parada"
-msgstr "Stop"
+msgid "Stop"
+msgstr "Parada"
 
 #: templates/core/ver_parada.html:6
-msgid ""
-"y qué líneas de recorridos de micros y ómnibus y buses pasan por la parada"
-msgstr "and what lines of routes of buses, train and subway stop in the stop"
+msgid "and what lines of routes of buses, train and subway stop in the stop"
+msgstr ""
+"y qué lneas de recorridos de micros, ómnibus y buses pasan por la parada"
 
 #: templates/core/ver_parada.html:62
-msgid "Recorridos de transporte público que paran en esta parada"
-msgstr "Public transport routes that stop in this stop"
+msgid "Public transport routes that stop in this stop"
+msgstr "Recorridos de transporte público que paran en esta parada"
 
 #: templates/core/ver_parada.html:79
 msgid ""
+"Public transport routes that pass nearby of this stop (do not stop here)"
+msgstr ""
 "Recorridos de transporte público que pasan cerca de esta parada (no paran "
 "aquí)"
-msgstr ""
-"Public transport routes that pass nearby of this stop (do not stop here)"
 
 #: templates/core/ver_parada.html:100
-msgid "Puntos de interés cercanos"
-msgstr "Points of interest nearby"
+msgid "Points of interest nearby"
+msgstr "Puntos de interés cercanos"
 
 #: templates/core/ver_parada.html:117
-msgid "Barrios cercanos"
-msgstr "Neighborhoods nearby"
+msgid "Neighborhoods nearby"
+msgstr "Barrios cercanos"
 
 #: templates/core/ver_parada.html:126
-msgid "Otras paradas cercanas"
-msgstr "Other stops near"
+msgid "Other stops near"
+msgstr "Otras paradas cercanas"
 
 #: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:54
-msgid "Recorrido"
-msgstr "Route"
+msgid "Route"
+msgstr "Recorrido"
 
 #: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:56
-msgid "desde"
-msgstr "from"
-
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:56
-msgid "hasta"
-msgstr "to"
-
-#: templates/core/ver_recorrido.html:5
-msgid "de la linea"
-msgstr "of the line"
+msgid "of the line"
+msgstr "de la línea"
 
 #: templates/core/ver_recorrido.html:6
-msgid "Toda la información sobre paradas, horarios y tarifas del recorrido"
-msgstr "All the information on stops, schedules and fares of the route"
-
-#: templates/core/ver_recorrido.html:6
-msgid "de la línea"
-msgstr "of the line"
+msgid "All the information on stops, schedules and fares of the route"
+msgstr "Toda la información sobre paradas, horarios y tarifas del recorrido"
 
 #: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
-msgid "Descripción del recorrido de colectivo, micro, bus"
-msgstr "Description of the route of the bus"
+msgid "Description of the route of the bus"
+msgstr "Descripción del recorrido de colectivo, micro, bus"
 
 #: templates/core/ver_recorrido.html:15
-msgid "Ramal"
-msgstr "branch"
+msgid "branch"
+msgstr "Ramal"
 
 #: templates/core/ver_recorrido.html:15
-msgid "Recorrido desde"
-msgstr "Route from"
+msgid "Route from"
+msgstr "Recorrido desde"
 
 #: templates/core/ver_recorrido.html:70 templates/core/ver_recorrido.html:80
-msgid "Calles que componen este recorrido"
-msgstr "Streets that compose this route"
+msgid "Streets that compose this route"
+msgstr "Calles que componen este recorrido"
 
 #: templates/core/ver_recorrido.html:99
-msgid "Recorridos similares"
-msgstr "Similar routes"
+msgid "Similar routes"
+msgstr "Recorridos similares"
 
 #: templates/core/ver_recorrido.html:121
-msgid "Puntos de interés por donde pasa"
-msgstr "Points of interest near the route"
+msgid "Points of interest near the route"
+msgstr "Puntos de interés por donde pasa"
 
 #: templates/leaflet/admin/widget.html:29
 msgid "Reset view"
 msgstr "Reset view"
 
 #: templates/navbar.html:26
-msgid "Ir al buscador"
-msgstr "Go to the search engine"
+msgid "Go to the search engine"
+msgstr "Ir al buscador"
 
 #: templates/navbar.html:35
 msgid "Login"
 msgstr "Login"
 
 #: templates/navbar.html:39
-msgid "Usuarios estrella"
-msgstr "Star users"
+msgid "Star users"
+msgstr "Usuarios estrella"
 
 #: templates/navbar.html:40
-msgid "Encuesta"
-msgstr "Poll"
+msgid "Poll"
+msgstr "Encuesta"

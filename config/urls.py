@@ -4,7 +4,8 @@ from django.contrib.gis import admin
 from django.conf import settings
 
 from django.contrib.sitemaps import views as sitemaps_views
-from .sitemaps import sitemaps
+from .sitemaps import sitemaps, getsitemaps
+from apps.catastro.management.commands.update_osm import kings
 
 from django.views.static import serve
 from apps.core.views import index
@@ -41,6 +42,13 @@ urlpatterns = [
     url(r'^auth/', include('rest_framework_social_oauth2.urls', namespace='drfsocial')),
     url('', include('social_django.urls', namespace='social'))
 ]
+
+
+for name,k in kings.items():
+    cc = k['country_code']
+    urlpatterns.append(path(f'{cc}/sitemap.xml', sitemaps_views.index, {'sitemaps': getsitemaps(cc), 'sitemap_url_name': f'django.contrib.sitemaps.views.sitemap-{cc}'}))
+    urlpatterns.append(path(f'{cc}/sitemap-<section>.xml', sitemaps_views.sitemap, {'sitemaps': getsitemaps(cc)}, name=f'django.contrib.sitemaps.views.sitemap-{cc}'))
+
 
 if settings.DEBUG:
     import debug_toolbar

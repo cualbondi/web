@@ -2,8 +2,8 @@
 {% load bootstrap_tags %}
 {% load i18n %}
 
-{% block title %}{% blocktrans %}Cómo llegar a{% endblocktrans %} {{interseccion.nom|title}}{% if ciudad_actual %} {% blocktrans %}en{% endblocktrans %} {{ciudad_actual.0.nombre|title}}{% endif %} - Cualbondi{% endblock %}
-{% block meta_description %}{% blocktrans %}Cómo llegar a{% endblocktrans %} {{interseccion.nom|title}} {% blocktrans %}y qué líneas de recorridos de micros y ómnibus y buses pasan por{% endblocktrans %} {{interseccion.nom|title}}{% if ciudad_actual %} {% blocktrans %}en{% endblocktrans %} {{ciudad_actual.0.nombre|title}}{% endif %}.{% endblock %}
+{% block title %}{% blocktrans %}How to get to{% endblocktrans %} {{interseccion.nom|title}}{% if ciudad_actual %} {% blocktrans %}in{% endblocktrans %} {{ciudad_actual.0.nombre|title}}{% endif %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}How to get to{% endblocktrans %} {{interseccion.nom|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{interseccion.nom|title}}{% if ciudad_actual %} {% blocktrans %}in{% endblocktrans %} {{ciudad_actual.0.nombre|title}}{% endif %}.{% endblock %}
 
 {% block head-attrs %}{% endblock %}
 
@@ -14,7 +14,7 @@
 
 {% block bloque_izquierda %}
     <div itemscope itemtype="http://schema.org/Place">
-        <h1>{% blocktrans %}¿Cómo llegar a{% endblocktrans %} <span itemprop="name">{{interseccion.nom}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
+        <h1>{% blocktrans %}How to get to{% endblocktrans %} <span itemprop="name">{{interseccion.nom}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
         <link itemprop="url" content="{{interseccion.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
             <meta itemprop="latitude" content="{{interseccion.latlng.1|stringformat:"f"}}" />
@@ -40,13 +40,13 @@
 
     {% if recorridos %}
         <div class="row-fluid">
-            <h2>{% blocktrans %}Recorridos de transporte público que pasan por esta intersección{% endblocktrans %}</h2>
+            <h2>{% blocktrans %}Routes of public transport that pass through this intersection{% endblocktrans %}</h2>
             {% for cols in recorridos|partition_horizontal:48 %}
                 {% for columna in cols|dividir_columnas:3 %}
                 <div class="span4">
                     <ul class="nav nav-pills nav-stacked">
                     {% for rs in columna %}
-                        <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}de{% endblocktrans %} {{rs.inicio}} {% blocktrans %}a{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
+                        <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}from{% endblocktrans %} {{rs.inicio}} {% blocktrans %}to{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
                     {% endfor %}
                     </ul>
                 </div>
@@ -61,7 +61,7 @@
     {% endif %}
 
     {% if paradas %}
-        <h2>{% blocktrans %}Paradas cercanas{% endblocktrans %}</h2>
+        <h2>{% blocktrans %}Nearby stops{% endblocktrans %}</h2>
         <ul>
             {% for p in paradas %}
             <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>
@@ -70,7 +70,7 @@
     {% endif %}
 
     {% if interseccions %}
-        <h2>{% blocktrans %}Otros puntos de interés cercanos{% endblocktrans %}</h2>
+        <h2>{% blocktrans %}Other points of interest nearby{% endblocktrans %}</h2>
         <ul>
             {% for p in interseccions %}
             <li itemscope itemtype="http://schema.org/Place">
