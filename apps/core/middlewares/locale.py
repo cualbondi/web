@@ -22,7 +22,6 @@ class LocaleMiddleware(MiddlewareMixin):
         country_code = 'ar'
         regex_match = language_code_prefix_re.match(request.path_info)
         if regex_match:
-            print(regex_match)
             country_code = regex_match.group(1)
         language = next((v['lang'] for k,v in kings.items() if v['country_code'] == country_code), 'es')
         translation.activate(language)
