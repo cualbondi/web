@@ -24,11 +24,14 @@ DEBUG = env.bool('DJANGO_DEBUG', False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = 'UTC'
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = 'es-ar'
+LANGUAGE_CODE = 'en-us'
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
-SITE_ID = 1
+# SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
-USE_I18N = False
+USE_I18N = True
+LOCALE_PATHS = [
+    str(ROOT_DIR.path('locale')),
+]
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
 USE_L10N = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
@@ -91,7 +94,6 @@ LOCAL_APPS = [
     'apps.catastro.apps.CatastroConfig',
     'apps.editor.apps.EditorConfig',
     'apps.api3.apps.Api3Config',
-    # DEPRECATED: 'apps.usuarios',
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -157,7 +159,8 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'apps.core.middleware.AuthenticationMiddleware',
+    'apps.core.middlewares.auth.AuthenticationMiddleware',
+    'apps.core.middlewares.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'apps.core.middleware.WhodidMiddleware',

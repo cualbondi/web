@@ -4,41 +4,22 @@ from django.contrib.gis import admin
 from django.conf import settings
 
 from django.contrib.sitemaps import views as sitemaps_views
-from django.contrib.sitemaps import GenericSitemap  # , FlatPageSitemap
-from apps.core.models import Recorrido, Linea, Parada
-from apps.catastro.models import Poi, AdministrativeArea
+from .sitemaps import sitemaps, getsitemaps
+from apps.catastro.management.commands.update_osm import kings
 
 from django.views.static import serve
+from apps.core.views import index
 from apps.core.urls import urlpatterns as urlpatternsCore
+from apps.catastro.urls import urlpatterns as urlpatternsCatastro, oldurlpattern as oldurlpatternsCatastro
 from apps.editor.urls import urlpatterns as editorUrls
 from apps.usuarios.urls import urlpatterns as usuariosUrls
 from apps.editor.views import revision
-from apps.catastro.urls import urlpatterns as catastroUrls
 from apps.api3.urls import urlpatterns as api3Urls
 from apps.core.views import agradecimientos
-
+from django.contrib.sites.models import Site
 
 # Uncomment the next two lines to enable the admin:
 admin.autodiscover()
-
-sitemaps = {
-    # 'flatpages': FlatPageSitemap,
-    'lineas': GenericSitemap({
-        'queryset': Linea.objects.defer('envolvente'),
-    }, priority=0.6),
-    'recorridos': GenericSitemap({
-        'queryset': Recorrido.objects.defer('ruta'),
-    }, priority=0.6),
-    'paradas': GenericSitemap({
-        'queryset': Parada.objects.defer('latlng'),
-    }, priority=0.4),
-    'pois': GenericSitemap({
-        'queryset': Poi.objects.defer('latlng'),
-    }, priority=0.6),
-    'administrativeareas': GenericSitemap({
-        'queryset': AdministrativeArea.objects.defer('geometry', 'geometry_simple'),
-    }, priority=0.6),
-}
 
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
@@ -49,8 +30,6 @@ urlpatterns = [
     url(r'^editor/', include(editorUrls)),
     url(r'^usuarios/', include(usuariosUrls)),
     url(r'^revision/(?P<id_revision>[-\w]+)/$', revision, name='revision_externa'),
-
-    url(r'^como-llegar/', include(catastroUrls)),
 
     # Ranking aka agradecimientos
     url(r'^agradecimientos/$', agradecimientos, name='agradecimientos'),
@@ -64,6 +43,13 @@ urlpatterns = [
     url('', include('social_django.urls', namespace='social'))
 ]
 
+
+for name,k in kings.items():
+    cc = k['country_code']
+    urlpatterns.append(path(f'{cc}/sitemap.xml', sitemaps_views.index, {'sitemaps': getsitemaps(cc), 'sitemap_url_name': f'django.contrib.sitemaps.views.sitemap-{cc}'}))
+    urlpatterns.append(path(f'{cc}/sitemap-<section>.xml', sitemaps_views.sitemap, {'sitemaps': getsitemaps(cc)}, name=f'django.contrib.sitemaps.views.sitemap-{cc}'))
+
+
 if settings.DEBUG:
     import debug_toolbar
 
@@ -72,6 +58,11 @@ if settings.DEBUG:
     ]
 
 urlpatterns += [
+    url(r'^$', index, name='index'),
+    url(r'^como-llegar/', include(oldurlpatternsCatastro)),
+    url(r'^(?P<country_code>[a-z][a-z])/', include(urlpatternsCatastro)),
+    url(r'^(?P<country_code>[a-z][a-z])/', include(urlpatternsCore)),
+    url(r'^', include(urlpatternsCatastro)),
     url(r'^', include(urlpatternsCore)),
 ]
 

@@ -7,7 +7,7 @@ from django.conf import settings
 def add_osm_bot_user(apps, schema_editor):
     User = apps.get_model(*settings.AUTH_USER_MODEL.split('.'))
     User.objects.get_or_create(
-        email='osm_bot@cualbondi.com.ar',
+        email='osm_bot@cualbondi.org',
         username='osmbot'
     )
 

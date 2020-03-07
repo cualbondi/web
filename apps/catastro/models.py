@@ -1,18 +1,18 @@
 import unicodedata
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import HStoreField
+from django.core.serializers import serialize
 from django.db.models import Manager as GeoManager
 from django.template.defaultfilters import slugify
-from django.urls import reverse
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from treebeard.mp_tree import MP_Node
+from ..utils.reverse import reverse
 from .managers import (
     CiudadManager,
     ZonaManager,
     PuntoBusquedaManager
 )
-from django.core.serializers import serialize
 
 
 # de http://stackoverflow.com/questions/517923/what-is-the-best-way-to-remove-accents-in-a-python-unicode-string/517974#517974
@@ -21,6 +21,7 @@ def remove_accents(input_str):
     return "".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
 
+# deprecated
 class Provincia(models.Model):
     # Obligatorios
     nombre = models.CharField(max_length=200, blank=False, null=False)
@@ -45,6 +46,7 @@ class Provincia(models.Model):
         return self.nombre
 
 
+# deprecated
 class Ciudad(models.Model):
     # Obligatorios
     nombre = models.CharField(max_length=200, blank=False, null=False)
@@ -82,6 +84,7 @@ class Ciudad(models.Model):
         return reverse('ver_ciudad', kwargs={'nombre_ciudad': self.slug})
 
 
+# deprecated
 class ImagenCiudad(models.Model):
     ciudad = models.ForeignKey(Ciudad, blank=False, null=False, on_delete=models.CASCADE)
     original = models.ImageField(
@@ -111,6 +114,7 @@ class ImagenCiudad(models.Model):
         return self.original.name + " (" + self.ciudad.nombre + ")"
 
 
+# deprecated
 class Zona(models.Model):
     name = models.CharField(max_length=200, blank=False, null=False)
     geo = models.GeometryField(srid=4326, geography=True)
@@ -151,6 +155,7 @@ class Poi(models.Model):
     img_panorama = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     tags = HStoreField(null=True)
+    country_code = models.TextField(null=True)
     objects = GeoManager()
 
     @property
@@ -171,8 +176,14 @@ class Poi(models.Model):
             suffix = suffix + 1
         super(Poi, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse('poi_old', kwargs={'slug': self.slug})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'poi_old',
+            kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
+                'slug': self.slug,
+            },
+        )
 
 
 class Interseccion(models.Model):
@@ -184,6 +195,7 @@ class Interseccion(models.Model):
     latlng = models.GeometryField(srid=4326, geography=True)
     osm_id1 = models.BigIntegerField(blank=True, null=True)
     osm_id2 = models.BigIntegerField(blank=True, null=True)
+    country_code = models.TextField(null=True)
     objects = GeoManager()
 
     def save(self, *args, **kwargs):
@@ -195,10 +207,17 @@ class Interseccion(models.Model):
             suffix = suffix + 1
         super(Interseccion, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse('interseccion', kwargs={'slug': self.slug})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'interseccion',
+            kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
+                'slug': self.slug,
+            },
+        )
 
 
+# deprecated
 class Poicb(models.Model):
     """ Un "Punto de interes" pero que pertenece a cualbondi.
         Cualquier poi que agreguemos para nosotros, tiene
@@ -269,6 +288,7 @@ class AdministrativeArea(MP_Node):
     tags = HStoreField()
     img_panorama = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='administrativearea', blank=True, null=True)
+    country_code = models.TextField(null=True)
 
     @property
     def geoJSON(self):
@@ -284,5 +304,13 @@ class AdministrativeArea(MP_Node):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse('administrativearea', kwargs={'osm_type': self.osm_type, 'osm_id': self.osm_id, 'slug': slugify(self.name)})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'administrativearea',
+            kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
+                'osm_type': self.osm_type,
+                'osm_id': self.osm_id,
+                'slug': slugify(self.name),
+            },
+        )

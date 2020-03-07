@@ -1,6 +1,7 @@
 {% extends "contenido.html" %}
+{% load i18n %}
 
 {% block bloque_izquierda %}
-    <h1>Uups! Algo anduvo mal...</h1>
-    <p>Volver al <a href="/">inicio</a></p>
+    <h1>{% blocktrans %}Oops! Something went wrong...{% endblocktrans %}</h1>
+    <p>{% blocktrans %}Go back to{% endblocktrans %} <a href="/">{% blocktrans %}home{% endblocktrans %}</a></p>
 {% endblock %}

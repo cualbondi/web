@@ -40,18 +40,64 @@ kings = {
         'url': 'http://download.geofabrik.de/south-america/argentina-latest.osm.pbf',
         'id': 286393,
         'paradas_completas': False,
+        'country_code': 'ar',
+        'lang': 'es_AR',
     },
     'spain': {
         'name': 'spain',
         'url': 'http://download.geofabrik.de/europe/spain-latest.osm.pbf',
         'id': 1311341,
         'paradas_completas': True,
+        'country_code': 'es',
+        'lang': 'es_ES',
     },
     'uruguay': {
         'name': 'uruguay',
         'url': 'http://download.geofabrik.de/south-america/uruguay-latest.osm.pbf',
         'id': 287072,
         'paradas_completas': False,
+        'country_code': 'uy',
+        'lang': 'es_UY',
+    },
+    'ecuador': {
+        'name': 'ecuador',
+        'url': 'http://download.geofabrik.de/south-america/ecuador-latest.osm.pbf',
+        'id': 108089,
+        'paradas_completas': False,
+        'country_code': 'ec',
+        'lang': 'es_EC',
+    },
+    'peru': {
+        'name': 'peru',
+        'url': 'http://download.geofabrik.de/south-america/peru-latest.osm.pbf',
+        'id': 288247,
+        'paradas_completas': False,
+        'country_code': 'pe',
+        'lang': 'es_PE',
+    },
+    'cuba': {
+        'name': 'cuba',
+        'url': 'http://download.geofabrik.de/south-america/cuba-latest.osm.pbf',
+        'id': 288247,
+        'paradas_completas': False,
+        'country_code': 'cu',
+        'lang': 'es_CU',
+    },
+    'brazil': {
+        'name': 'brasil',
+        'url': 'https://download.geofabrik.de/south-america/brazil-latest.osm.pbf',
+        'id': 59470,
+        'paradas_completas': False,
+        'country_code': 'br',
+        'lang': 'pt_BR',
+    },
+    'ivorycoast': {
+        'name': 'cotedivoire',
+        'url': 'https://download.geofabrik.de/africa/ivory-coast-latest.osm.pbf',
+        'id': 192779,
+        'paradas_completas': False,
+        'country_code': 'ci',
+        'lang': 'fr_CI',
     },
 }
 
@@ -218,6 +264,7 @@ class Command(BaseCommand):
                             'admin_level': admin_level,
                             'name': r.tags['name'],  # .encode('utf-8').strip(),
                             'tags': {k:v for k,v in r.tags},
+                            'country_code': king['country_code'],
                         }
                         # this.out2(f"REL {r.id} {r.tags['name'].encode('utf-8').strip()}")
 
@@ -241,6 +288,7 @@ class Command(BaseCommand):
                                     'admin_level': int(w.tags['admin_level']),
                                     'name': w.tags['name'],  # .encode('utf-8').strip(),
                                     'tags': {k:v for k,v in w.tags},
+                                    'country_code': king['country_code'],
                                 })
 
                     # fill relations that are admin areas
@@ -363,6 +411,7 @@ class Command(BaseCommand):
                     'osm_type': KING['osm_type'],
                     'name': KING['name'],
                     'tags': KING['tags'],
+                    'country_code': king['country_code'],
                 }
             }
             for li in admin_areas:
@@ -643,6 +692,7 @@ class Command(BaseCommand):
                     rp.paradas_completas = bus['paradas_completas']
                     rp.type = bus['pt'].tags['route']
                     rp.king = king['id']
+                    rp.country_code = king['country_code']
                     if not options['dry-run']:
                         rp.save(user=user_bot_osm)
 
@@ -663,6 +713,7 @@ class Command(BaseCommand):
                                     'nombre': s.tags['name'] if 'name' in s.tags else f'{s.lon}, {s.lat}',
                                     'latlng': Point(s.lon, s.lat),
                                     'tags': s.tags,
+                                    'country_code': king['country_code'],
                                 }
                             )
                             if created:
@@ -856,6 +907,7 @@ class Command(BaseCommand):
                                 'nom': n.tags['name'][:200],
                                 'nom_normal': Substr(Trim(Upper(Unaccent(Value(n.tags['name'])))), 1, 200),
                                 'latlng': point,
+                                'country_code': king['country_code'],
                             }
                             Poi.objects.update_or_create(
                                 osm_id=n.id,
@@ -885,6 +937,7 @@ class Command(BaseCommand):
                         'nom': aa.name,
                         'nom_normal': Substr(Trim(Upper(Unaccent(Value(aa.name)))), 1, 200),
                         'latlng': aa.geometry.centroid,
+                        'country_code': king['country_code'],
                     }
                 )
 

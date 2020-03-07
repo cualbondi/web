@@ -41,6 +41,7 @@ class RecorridoProposed(models.Model):
     ruta_last_updated = models.DateTimeField(default=datetime.now)
     type = models.CharField(max_length=30, blank=True, null=True)
     king = models.BigIntegerField(blank=True, null=True, default=286393)  # default = argentina osm_id
+    country_code = models.TextField(null=True)
 
     osm_id = models.BigIntegerField(blank=True, null=True)
     osm_version = models.BigIntegerField(blank=True, null=True)

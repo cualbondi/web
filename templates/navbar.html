@@ -1,3 +1,4 @@
+{% load i18n %}
 <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
     <span class="icon-bar"></span>
     <span class="icon-bar"></span>
@@ -8,7 +9,8 @@
     <ul class="nav">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="">
-                <i class="icon-picture icon-white"></i> Ciudad
+                <i class="icon-picture icon-white"></i>
+                {% blocktrans %}City{% endblocktrans %}
                 <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
@@ -16,17 +18,13 @@
                     {% if ciudad.osm_id == adminarea.osm_id %}
                         <li><a style="font-weight:bold;" href=""><i class="icon-map-marker"></i> {{ciudad.name}}</a></li>
                     {% else %}
-                        <li><a href="{% if es_vista_mapa %}/mapa{% endif %}/{{ciudad.slug}}/"><i class="icon-map-marker"></i> {{ciudad.name}}</a></li>
+                        <li><a href="/{{ciudad.slug}}/"><i class="icon-map-marker"></i> {{ciudad.name}}</a></li>
                     {% endif %}
                 {% endfor %}
             </ul>
         </li>
         {% if ciudad_actual %}
-            {% if es_vista_mapa %}
-                <li><a href="/{{ciudad_actual.slug}}"><i class="icon-file icon-white"></i> Ver más información</a></li>
-            {% else %}
-                <li><a href="/mapa/{{ciudad_actual.slug}}"><i class="icon-search icon-white"></i> Ir al buscador</a></li>
-            {% endif %}
+            <li><a href="/mapa/{{ciudad_actual.slug}}"><i class="icon-search icon-white"></i> {% blocktrans %}Go to the search engine{% endblocktrans %}</a></li>
         {% endif %}
     </ul>
     <ul class="nav pull-right">
@@ -35,11 +33,11 @@
         {% else %}
             <li>
                 <a href="{% url 'social:begin' 'facebook' %}">
-                    <i class="icon-user icon-white"></i> Login
+                    <i class="icon-user icon-white"></i> {% blocktrans %}Login{% endblocktrans %}
                 </a>
             </li>
         {% endif %}
-        <li><a href="{% url "agradecimientos" %}"><i class="icon-star icon-white"></i> Usuarios estrella</a></li>
-        <li><a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dFJERlREQjUyaE1iSkFDYnhOa2Nnbmc6MQ+"><i class="icon-pencil icon-white"></i> Encuesta</a></li>
+        <li><a href="{% url "agradecimientos" %}"><i class="icon-star icon-white"></i> {% blocktrans %}Star users{% endblocktrans %}</a></li>
+        <li><a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dFJERlREQjUyaE1iSkFDYnhOa2Nnbmc6MQ+"><i class="icon-pencil icon-white"></i> {% blocktrans %}Poll{% endblocktrans %}</a></li>
     </ul>
 </div>

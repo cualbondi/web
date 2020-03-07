@@ -9,8 +9,10 @@ from django.contrib.gis.measure import D, A
 from django.contrib.gis.db.models.functions import SymDifference, Area, Intersection
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.postgres.search import TrigramSimilarity
 
 from apps.core.models import Linea, Recorrido, Parada
+from apps.catastro.management.commands.update_osm import kings
 from apps.catastro.models import Ciudad, Poi, AdministrativeArea
 from apps.utils import data
 from apps.utils.parallel_query import parallelize
@@ -75,7 +77,7 @@ def redirect_sockjs_dev(request):
 
 @csrf_exempt
 @require_GET
-def ver_linea(request, osm_type=None, osm_id=None, slug=None):
+def ver_linea(request, osm_type=None, osm_id=None, slug=None, country_code=None):
     """
         osm_type =
             - 'c': cualbondi recorrido, usar id de la tabla directamente
@@ -88,10 +90,6 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
         linea = get_object_or_404(linea_q, id=osm_id)
     elif osm_type == 'r':
         linea = get_object_or_404(linea_q, osm_id=osm_id)
-
-    if slug is None or slug != slugify(linea.nombre):
-        # Redirect with correct slug
-        return HttpResponsePermanentRedirect(linea.get_absolute_url())
 
     linea__envolvente = linea.envolvente.simplify(0.001, True)
 
@@ -124,17 +122,22 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
     #     .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea.envolvente))) \
     #     .order_by('symdiff_area')
 
-    # Zonas por las que pasa el recorrido
-    aas = AdministrativeArea.objects \
-        .filter(geometry_simple__intersects=linea__envolvente, depth__gt=3) \
-        .order_by('depth', 'name')
-
     if aa:
         aa = aa[0]
         aaancestors = aa.get_ancestors().reverse()
     else:
         aa = None
         aaancestors = None
+
+    # linea found, check if url is ok
+    correct_url = linea.get_absolute_url()
+    if correct_url not in request.build_absolute_uri():
+        return HttpResponsePermanentRedirect(correct_url)
+
+    # Zonas por las que pasa el recorrido
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=linea__envolvente, depth__gt=3) \
+        .order_by('depth', 'name')
 
     return render(
         request,
@@ -151,7 +154,7 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None):
 
 @csrf_exempt
 @require_GET
-def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
+def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=None):
     """
         osm_type =
             - 'c': cualbondi recorrido, usar id de la tabla directamente
@@ -164,11 +167,13 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     if osm_type == 'c':
         recorrido = get_object_or_404(recorrido_q, id=osm_id)
     elif osm_type == 'w':
-        recorrido = get_object_or_404(recorrido_q, osm_id=osm_id)
+        # there can be multiple with the same id, so we filter using the most approximate slug
+        recorridos = Recorrido.objects.filter(osm_id=osm_id).annotate(similarity=TrigramSimilarity('slug', slug or '')).order_by('-similarity')
+        if recorridos:
+            recorrido = recorridos[0]
+        else:
+            raise Http404
 
-    if slug is None or slug != recorrido.slug:
-        # Redirect with correct slug
-        return HttpResponsePermanentRedirect(recorrido.get_absolute_url())
 
     recorrido_simplified = recorrido.ruta.simplify(0.00005)
     recorrido_buffer = recorrido_simplified.buffer(0.0001)
@@ -191,6 +196,11 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
     else:
         aa = None
         aaancestors = None
+
+    # recorrido found, check if url is ok
+    correct_url = recorrido.get_absolute_url()
+    if correct_url not in request.build_absolute_uri():
+        return HttpResponsePermanentRedirect(correct_url)
 
     # Calles por las que pasa el recorrido
     """
@@ -315,8 +325,18 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None):
 
 @csrf_exempt
 @require_GET
-def ver_parada(request, id=None):
+def ver_parada(request, id=None, country_code=None):
     p = get_object_or_404(Parada, id=id)
+
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=p.latlng) \
+        .order_by('depth')
+
+    # p found, check if url is ok
+    correct_url = p.get_absolute_url()
+    if correct_url not in request.build_absolute_uri():
+        return HttpResponsePermanentRedirect(correct_url)
+
     recorridosn = Recorrido.objects \
         .filter(ruta__dwithin=(p.latlng, 0.00111)) \
         .select_related('linea') \
@@ -338,7 +358,7 @@ def ver_parada(request, id=None):
         request,
         "core/ver_parada.html",
         {
-            'ciudad_actual': Ciudad.objects.filter(poligono__intersects=p.latlng),
+            'adminareas': aas,
             'parada': p,
             'paradas': ps,
             'recorridosn': recorridosn,
@@ -350,7 +370,7 @@ def ver_parada(request, id=None):
 
 @csrf_exempt
 @require_GET
-def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorrido=None):
+def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorrido=None, country_code=None):
     """
     # v1
     cualbondi.com.ar/la-plata/recorridos/Norte/10/IDA/
@@ -360,10 +380,14 @@ def redirect_nuevas_urls(request, slug_ciudad=None, slug_linea=None, slug_recorr
     # v3
     cualbondi.com.ar/r/c123/asdasd
     """
-    ciudades = data.ciudades
+    ciudades = data.ciudades + data.ciudades_es
     ciudad = next((c for c in ciudades if c.slug == slug_ciudad), False)
     if not ciudad:
-        raise Http404
+        country = next((v for k,v in kings.items() if v['country_code'] == country_code), False)
+        if country:
+            return redirect(get_object_or_404(AdministrativeArea, osm_id=str(country['id'])), permanent=True)
+        else:
+            raise Http404
 
     # ciudad
     if not slug_linea:

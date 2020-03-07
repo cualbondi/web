@@ -1,12 +1,12 @@
-from django.shortcuts import (get_object_or_404, render)
-from django.http import HttpResponsePermanentRedirect
-from django.views.decorators.http import require_GET
-from django.db.models import Prefetch, Count, OuterRef, Subquery, IntegerField
-from django.contrib.gis.db.models.functions import GeoFunc, Cast, Value
+from django.contrib.gis.db.models.functions import Cast, GeoFunc, Value
+from django.db.models import Count, IntegerField, OuterRef, Prefetch, Subquery
+from django.http import Http404, HttpResponsePermanentRedirect
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import slugify
+from django.views.decorators.http import require_GET
 
-from apps.catastro.models import Poi, Ciudad, Interseccion, AdministrativeArea
-from apps.core.models import Recorrido, Parada, Linea
+from apps.catastro.models import AdministrativeArea, Ciudad, Interseccion, Poi
+from apps.core.models import Linea, Parada, Recorrido
 from apps.utils.parallel_query import parallelize
 
 
@@ -68,7 +68,7 @@ def poi(request, osm_type, osm_id, slug):
         return HttpResponsePermanentRedirect(poi.get_absolute_url())
 
 
-def poiORint(request, slug=None):
+def poiORint(request, slug=None, country_code=None):
     poi = None
     pois = Poi.objects.filter(slug=slug)
 
@@ -81,6 +81,18 @@ def poiORint(request, slug=None):
         pois = fuzzy_like_query(slug)
         slug = slug.replace('-', ' ')
         return render(request, 'catastro/ver_poi-404.html', {'slug': slug, 'pois': pois}, status=404)
+
+    aas = AdministrativeArea.objects \
+        .filter(geometry_simple__intersects=poi.latlng) \
+        .order_by('depth')
+
+    # poi found, check if url is ok
+    if not aas:
+        raise Http404
+    correct_url = poi.get_absolute_url()
+    if correct_url not in request.build_absolute_uri():
+        return HttpResponsePermanentRedirect(correct_url)
+
     # TODO: resolver estas queries en 4 threads
     #       ver https://stackoverflow.com/a/12542927/912450
     recorridos = Recorrido.objects \
@@ -91,11 +103,6 @@ def poiORint(request, slug=None):
         .defer('linea__envolvente', 'ruta')
     near_pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
-
-    aas = AdministrativeArea.objects \
-        .filter(geometry_simple__intersects=poi.latlng) \
-        .order_by('depth') \
-        .reverse()
 
     try:
         amenity = amenities[poi.tags['amenity']]
@@ -122,12 +129,12 @@ class Simplify(GeoFunc):
         super().__init__(expression, tolerance, **extra)
 
 
-def administrativearea(request, osm_type=None, osm_id=None, slug=None):
+def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_code=None):
     qs = AdministrativeArea.objects.defer('geometry')
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
-    if slug is None or slug != slugify(aa.name):
-        # Redirect with slug
-        return HttpResponsePermanentRedirect(aa.get_absolute_url())
+    correct_url = aa.get_absolute_url()
+    if correct_url not in request.build_absolute_uri():
+        return HttpResponsePermanentRedirect(correct_url)
     else:
         lineas = None
         pois = None

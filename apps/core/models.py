@@ -1,14 +1,15 @@
 import uuid
 from datetime import datetime
+
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import HStoreField
 from django.db.models import Manager as GeoManager
 from django.template.defaultfilters import slugify
-from django.urls import reverse
+from django.core.serializers import serialize
 
 from apps.catastro.models import Ciudad
+from ..utils.reverse import reverse
 from .managers import RecorridoManager
-from django.core.serializers import serialize
 
 
 class Linea(models.Model):
@@ -27,6 +28,7 @@ class Linea(models.Model):
     telefono = models.CharField(max_length=200, blank=True, null=True)
     envolvente = models.PolygonField(blank=True, null=True)
     osm_id = models.BigIntegerField(blank=True, null=True)
+    country_code = models.TextField(null=True)
 
     @property
     def geoJSON(self):
@@ -44,7 +46,7 @@ class Linea(models.Model):
         self.slug = slugify(self.nombre)
         super(Linea, self).save(*args, **kwargs)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self, argentina=None):
         sid = self.osm_id
         tid = 'r'
         if self.osm_id is None:
@@ -53,10 +55,11 @@ class Linea(models.Model):
         return reverse(
             'ver_linea',
             kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
                 'osm_type': tid,
                 'osm_id': sid,
                 'slug': self.slug,
-            }
+            },
         )
 
 
@@ -87,6 +90,7 @@ class Recorrido(models.Model):
     paradas_completas = models.BooleanField(default=False)
     type = models.CharField(max_length=30, blank=True, null=True)
     king = models.BigIntegerField(blank=True, null=True, default=286393)  # default = argentina osm_id
+    country_code = models.TextField(null=True)
 
     @property
     def geoJSON(self):
@@ -131,7 +135,7 @@ class Recorrido(models.Model):
     class Meta:
         ordering = ['linea__nombre', 'nombre']
 
-    def get_absolute_url(self):
+    def get_absolute_url(self, argentina=None):
         sid = self.osm_id
         tid = 'w'
         if self.osm_id is None:
@@ -140,10 +144,11 @@ class Recorrido(models.Model):
         return reverse(
             'ver_recorrido',
             kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
                 'osm_type': tid,
                 'osm_id': sid,
                 'slug': self.slug,
-            }
+            },
         )
 
 
@@ -169,6 +174,7 @@ class Posicion(models.Model):
         )
 
 
+# deprecated
 class Comercio(models.Model):
     nombre = models.CharField(max_length=200)
     latlng = models.PointField()
@@ -183,14 +189,21 @@ class Parada(models.Model):
     codigo = models.CharField(max_length=15, blank=True, null=True)
     nombre = models.CharField(max_length=200, blank=True, null=True)
     latlng = models.PointField()
+    country_code = models.TextField(null=True)
 
     objects = GeoManager()
 
     def __str__(self):
         return self.nombre or self.codigo or "{}, {}".format(self.latlng.x, self.latlng.y)
 
-    def get_absolute_url(self):
-        return reverse('ver_parada', kwargs={'id': self.id})
+    def get_absolute_url(self, argentina=None):
+        return reverse(
+            'ver_parada',
+            kwargs={
+                **({'country_code': self.country_code} if self.country_code else {}),
+                'id': self.id
+            },
+        )
 
 
 class Horario(models.Model):

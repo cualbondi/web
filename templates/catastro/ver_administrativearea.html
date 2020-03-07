@@ -1,8 +1,9 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load i18n %}
 
-{% block title %}Transporte publico en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}Cómo moverse en {{adminarea.name|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
+{% block title %}{% blocktrans %}Public transportation in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea.name|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -10,39 +11,40 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:administrative_area" />
     <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
-    <meta property="og:title"  content="Como moverse en {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
-    <meta property="og:description"  content="Listado de todos los medios de transporte publico que pasan por {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. Entra para ver como llegar desde donde estes ahora" />
+    <meta property="og:title"  content="{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
+    <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
-    <ul class="breadcrumb">
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}" itemprop="url">
-                <span itemprop="title">Inicio</span>
+    <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/">
+                <span itemprop="name">{% blocktrans %}Home{% endblocktrans %}</span>
             </a>
+            <meta itemprop="position" content="1" />
             <span class="divider">&gt;</span>
         </li>
-
         {% for a in adminareaancestors reversed %}
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}{{a.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{a.name}}</span>
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{a.get_absolute_url}}">
+                <span itemprop="name">{{a.name}}</span>
             </a>
+            <meta itemprop="position" content="{{forloop.counter|add:"1"}}" />
             <span class="divider">&gt;</span>
         </li>
         {% endfor %}
-
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-            <a href="{{HOME_URL}}{{obj.get_absolute_url}}" itemprop="url">
-                <span itemprop="title">{{obj.name}}</span>
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{obj.get_absolute_url}}">
+                <span itemprop="name">{{obj.name}}</span>
             </a>
+            <meta itemprop="position" content="{{adminareaancestors|length|add:"2"}}" />
         </li>
     </ul>
 
     <div itemscope itemtype="http://schema.org/AdministrativeArea">
         <h1><span itemprop="name">{{obj.name|title}}</span></h1>
-        <link itemprop="url" content="{{HOME_URL}}{{obj.get_absolute_url}}" />
+        <link itemprop="url" content="{{obj.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
             <meta itemprop="latitude" content="{{aacentroid.1|stringformat:'f'}}" />
             <meta itemprop="longitude" content="{{aacentroid.0|stringformat:'f'}}" />
@@ -53,7 +55,13 @@
     </div>
 
     <div class="thumbnail">
-        <a href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">Ver en mapa interactivo</a>
+        <a
+            href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}"
+            class="btn btn-primary"
+            style="z-index:1;position:absolute; margin:6px"
+        >
+            {% blocktrans %}See in interactive map{% endblocktrans %}
+        </a>
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
@@ -64,13 +72,13 @@
 
     {% if lineas %}
     <div class="row-fluid">
-        <h2>Lineas de transporte público</h2>
+        <h2>{% blocktrans %}Lines of public transport{% endblocktrans %}</h2>
         {% for cols in lineas|partition_horizontal:60 %}
         {% for columna in cols|dividir_columnas:6 %}
         <div class="span2">
             <ul class="nav nav-pills nav-stacked">
                 {% for linea in columna %}
-                <li><a href="{{HOME_URL}}{{linea.get_absolute_url}}">{{linea.nombre}}</a></li>
+                <li><a href="{{linea.get_absolute_url}}">{{linea.nombre}}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -86,7 +94,7 @@
 
     {% if recorridos %}
     <div class="row-fluid">
-        <h2>Recorridos de transporte público</h2>
+        <h2>{% blocktrans %}Routes of public transport{% endblocktrans %}</h2>
         {% for cols in recorridos|partition_horizontal:48 %}
             {% for columna in cols|dividir_columnas:3 %}
                 <div class="span4">
@@ -116,11 +124,11 @@
 
     {% if children %}
         <div class="row-fluid">
-            <h2>Lugares</h2>
+            <h2>{% blocktrans %}Places{% endblocktrans %}</h2>
             <ul>
                 {% for child in children %}
                 <li>
-                    <a href="{{HOME_URL}}{{child.get_absolute_url}}">{{child.name}}</a>
+                    <a href="{{child.get_absolute_url}}">{{child.name}}</a>
                     <small>({{child.recorridos_count}})</small>
                 </li>
                 {% endfor %}
@@ -130,20 +138,20 @@
 
 
     {% if paradas %}
-        <h2>Paradas</h2>
+        <h2>{% blocktrans %}Stops{% endblocktrans %}</h2>
         <ul>
             {% for p in paradas %}
-            <li><a href="{{HOME_URL}}{{p.get_absolute_url}}">{{ p }}</a></li>
+            <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
 
     {% if pois %}
-        <h2>Puntos de interés</h2>
+        <h2>{% blocktrans %}Points of interest{% endblocktrans %}</h2>
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{p.get_absolute_url}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">

@@ -1,8 +1,9 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load i18n %}
 
-{% block title %}Parada {{parada|title}}{% if ciudad_actual %} en {{ciudad_actual.0.nombre|title}}{% endif %} - Cualbondi{% endblock %}
-{% block meta_description %}Parada {{parada|title}} y qué líneas de recorridos de micros y ómnibus y buses pasan por la parada {{parada|title}}{% if ciudad_actual %} en {{ciudad_actual.0.nombre|title}}{% endif %}.{% endblock %}
+{% block title %}{% blocktrans %}Stop{% endblocktrans %} {{parada|title}}{% if ciudad_actual %} {% blocktrans %}in{% endblocktrans %} {{ciudad_actual.0.nombre|title}}{% endif %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}Stop{% endblocktrans %} {{parada|title}} {% blocktrans %}and what lines of routes of buses, train and subway stop in the stop{% endblocktrans %} {{parada|title}}{% if ciudad_actual %} {% blocktrans %}in{% endblocktrans %} {{ciudad_actual.0.nombre|title}}{% endif %}.{% endblock %}
 
 {% block head-attrs %}{% endblock %}
 
@@ -12,8 +13,34 @@
 {% endblock %}
 
 {% block bloque_izquierda %}
+
+    <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/">
+                <span itemprop="name">{% blocktrans %}Home{% endblocktrans %}</span>
+            </a>
+            <meta itemprop="position" content="1" />
+            <span class="divider">&gt;</span>
+        </li>
+        {% for a in adminareas reversed %}
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{a.get_absolute_url}}">
+                <span itemprop="name">{{a.name}}</span>
+            </a>
+            <meta itemprop="position" content="{{forloop.counter|add:"1"}}" />
+            <span class="divider">&gt;</span>
+        </li>
+        {% endfor %}
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{parada.get_absolute_url}}">
+                <span itemprop="name">{{parada}}</span>
+            </a>
+            <meta itemprop="position" content="{{adminareas|length|add:"2"}}" />
+        </li>
+    </ul>
+
     <div>
-        <h1>Parada {{ parada }}</h1>
+        <h1>{% blocktrans %}Stop{% endblocktrans %} {{ parada }}</h1>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.6.4/leaflet.js"></script>
@@ -32,12 +59,12 @@
 
     {% if recorridosp %}
         <div class="row-fluid">
-            <h2>Recorridos de transporte público que paran en esta parada</h2>
+            <h2>{% blocktrans %}Public transport routes that stop in this stop{% endblocktrans %}</h2>
             {% for columna in recorridosp|dividir_columnas:3 %}
             <div class="span4">
                 <ul class="nav nav-pills nav-stacked">
                 {% for rs in columna %}
-                    <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+                    <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}from{% endblocktrans %} {{rs.inicio}} {% blocktrans %}to{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
                 {% endfor %}
                 </ul>
             </div>
@@ -49,13 +76,13 @@
 
     {% if recorridosn %}
         <div class="row-fluid">
-            <h2>Recorridos de transporte público que pasan cerca de esta parada (no paran aquí)</h2>
+            <h2>{% blocktrans %}Public transport routes that pass nearby of this stop (do not stop here){% endblocktrans %}</h2>
             {% for cols in recorridosn|partition_horizontal:48 %}
                 {% for columna in cols|dividir_columnas:3 %}
                     <div class="span4">
                         <ul class="nav nav-pills nav-stacked">
                         {% for rs in columna %}
-                            <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">de {{rs.inicio}} a {{rs.fin}}</span>{% endif %}</a></li>
+                            <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}from{% endblocktrans %} {{rs.inicio}} {% blocktrans %}to{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
                         {% endfor %}
                         </ul>
                     </div>
@@ -70,11 +97,11 @@
     {% endif %}
 
     {% if pois %}
-        <h2>Puntos de interés cercanos</h2>
+        <h2>{% blocktrans %}Points of interest nearby{% endblocktrans %}</h2>
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="{{HOME_URL}}{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{p.get_absolute_url}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
@@ -87,7 +114,7 @@
     {% endif %}
 
     {% if zonas %}
-        <h2>Barrios cercanos</h2>
+        <h2>{% blocktrans %}Neighborhoods nearby{% endblocktrans %}</h2>
         <ul>
             {% for z in zonas %}
             <li>{{ z.name }}</li>
@@ -96,7 +123,7 @@
     {% endif %}
 
     {% if paradas %}
-        <h2>Otras paradas cercanas</h2>
+        <h2>{% blocktrans %}Other stops near{% endblocktrans %}</h2>
         <ul>
             {% for p in paradas %}
             <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>

@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     make \
     osmium-tool \
+    gettext \
   && rm -rf /var/lib/apt/lists/* \
   && pip3 install wheel
 
