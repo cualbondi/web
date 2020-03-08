@@ -1,10 +1,5 @@
 {% extends "base.html" %}
 
-{% block custom_styles %}
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-    <link href="{{ STATIC_URL }}css/estilo.css" rel="stylesheet" type="text/css" />
-{% endblock %}
-
 {% block navbar %}
     <div class="navbar navbar-fixed-top navbar-inverse">
         <div class="navbar-inner">
@@ -49,48 +44,4 @@
 
 {% block footer %}
     {% include "footer.html"%}
-{% endblock %}
-
-{% block custom_scripts %}
-
-    <script type="text/javascript">
-    window.addEventListener('DOMContentLoaded', function() { // this will wait for jquery defer script
-        $(document).ready(function(){
-            $.ajaxSetup({
-                 beforeSend: function(xhr, settings) {
-                     function getCookie(name) {
-                         var cookieValue = null;
-                         if (document.cookie && document.cookie != '') {
-                             var cookies = document.cookie.split(';');
-                             for (var i = 0; i < cookies.length; i++) {
-                                 var cookie = jQuery.trim(cookies[i]);
-                                 // Does this cookie string begin with the name we want?
-                             if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                 break;
-                             }
-                         }
-                     }
-                     return cookieValue;
-                     }
-                     if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                         // Only send the token to relative URLs i.e. locally.
-                         xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-                     }
-                 }
-            });
-
-            $('.dropdown-toggle').dropdown();
-            $('#submit_button').click(function(){
-                $('#login_form').submit();
-            })
-            $(".navbar-search input.search-query").keypress(function(event){
-                if (event.which==13){
-                    $('#login_form').submit();
-                }
-            })
-
-        })
-    })
-    </script>
 {% endblock %}

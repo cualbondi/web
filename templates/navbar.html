@@ -7,7 +7,7 @@
 <a class="brand" href="/" style="background:url({{ STATIC_URL }}img/logo-navbar.png); height:25px; width:132px; padding:0; margin: 5px 20px 0 0;" alt="Cualbondi"></a>
 <div class="nav-collapse">
     <ul class="nav">
-        <li class="dropdown">
+        {% comment %} <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="">
                 <i class="icon-picture icon-white"></i>
                 {% blocktrans %}City{% endblocktrans %}
@@ -22,7 +22,7 @@
                     {% endif %}
                 {% endfor %}
             </ul>
-        </li>
+        </li> {% endcomment %}
         {% if ciudad_actual %}
             <li><a href="/mapa/{{ciudad_actual.slug}}"><i class="icon-search icon-white"></i> {% blocktrans %}Go to the search engine{% endblocktrans %}</a></li>
         {% endif %}

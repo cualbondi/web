@@ -9,10 +9,19 @@
 		<meta name="description" content="{% block meta_description %}{% blocktrans %}Search engine of public transportation bus, train,  subway, tram.{% endblocktrans %}.{% endblock %}">
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="{{ STATIC_URL }}css/bootstrap.custom.min.css" rel="stylesheet" type="text/css" />
+        {% comment %} <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> {% endcomment %}
+        <link href="{{ STATIC_URL }}css/merged.css" rel="stylesheet" type="text/css" />
+
 
         <meta name="google-site-verification" content="NVSk_0zcZdYua2ILJ4L0DvspOCmHujouihZPlo3mDco">
         <link href="https://plus.google.com/117455886911192315188" rel="publisher">
+
+        <link rel="preconnect" crossorigin href="https://fonts.googleapis.com">
+        <link rel="preconnect" crossorigin href="https://googletagmanager.com">
+        <link rel="preconnect" href="https://www.google-analytics.com">
+        <link rel="preconnect" href="https://stats.g.doubleclick.net">
+        <link rel="preconnect" href="https://tpc.googlesyndication.com">
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com">
 
         {% block custom_styles %}{% endblock %}
 
@@ -30,10 +39,6 @@
         {% block content %}{% endblock %}
 
         {% block footer %}{% endblock %}
-
-	    <!-- Scripts -->
-        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 
         {% block custom_scripts %}{% endblock %}
 
