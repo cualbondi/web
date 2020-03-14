@@ -199,6 +199,16 @@ MEDIA_URL = 'media/'
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
 TEMPLATES = [
     {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [
+            str(ROOT_DIR.path('templates_jinja2')),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'environment': 'config.settings.jinja2.environment',
+        },
+    },
+    {
         # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs

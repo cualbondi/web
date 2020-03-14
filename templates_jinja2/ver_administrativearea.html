@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{% trans %}Public transportation in{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% trans %}How to get around in{% endtrans %} {{adminarea.name|title}} {% trans %}and what lines and routes of buses go through{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
+
+{% block head_attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
+
+{% block custom_top_scripts %}
+  <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
+  <meta property="og:type"   content="cualbondi:administrative_area" />
+  <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
+  <meta property="og:title"  content="{% trans %}How to get around in{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
+  <meta property="og:description"  content="{% trans %}List of all the public transport that go through{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% trans %}See how to get from where you are{% endtrans %}" />
+  {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
+{% endblock %}
+
+{% block content %}
+    <ul class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="/">
+                <span itemprop="name">{% trans %}Home{% endtrans %}</span>
+            </a>
+            <meta itemprop="position" content="1" />
+            <span class="divider">&gt;</span>
+        </li>
+        {% for a in adminareaancestors|reverse %}
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{a.get_absolute_url}}">
+                <span itemprop="name">{{a.name}}</span>
+            </a>
+            <meta itemprop="position" content="{{loop.index + 1}}" />
+            <span class="divider">&gt;</span>
+        </li>
+        {% endfor %}
+        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+            <a itemprop="item" href="{{obj.get_absolute_url}}">
+                <span itemprop="name">{{obj.name}}</span>
+            </a>
+            <meta itemprop="position" content="{{adminareaancestors|length + 2}}" />
+        </li>
+    </ul>
+
+    <div itemscope itemtype="http://schema.org/AdministrativeArea">
+        <h1><span itemprop="name">{{obj.name|title}}</span></h1>
+        <link itemprop="url" content="{{obj.get_absolute_url}}" />
+        <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
+            <meta itemprop="latitude" content="{{'{}'.format(aacentroid.1)}}" />
+            <meta itemprop="longitude" content="{{'{}'.format(aacentroid.0)}}" />
+        </div>
+        {% if obj.tags.description %}
+            <div>{{obj.tags.description}}</div>
+        {% endif %}
+    </div>
+
+    <div class="thumbnail">
+        <a
+            href="/mapa/{{slugify(adminarea.name)}}|{{'{}'.format(adminarea.geometry.centroid.0)}},{{'{}'.format(adminarea.geometry.centroid.1)}}/geolocation|{{'{}'.format(adminarea.geometry.centroid.0)}},{{'{}'.format(adminarea.geometry.centroid.1)}},{{adminarea.name}}"
+            class="btn btn-primary"
+            style="z-index:1;position:absolute; margin:6px"
+        >
+            {% trans %}See in interactive map{% endtrans %}
+        </a>
+        {% if obj.img_panorama %}
+        <div id="map" style="background:lightblue;">
+            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
+        </div>
+        {% endif %}
+    </div>
+    {% include "ad_contenido.html"%}
+
+    {% if lineas %}
+    <div class="row-fluid">
+        <h2>{% trans %}Lines of public transport{% endtrans %}</h2>
+        {% for cols in partition_horizontal(lineas, 60) %}
+        {% for columna in dividir_columnas(cols, 60) %}
+        <div class="span2">
+            <ul class="nav nav-pills nav-stacked">
+                {% for linea in columna %}
+                <li><a href="{{linea.get_absolute_url}}">{{linea.nombre}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+        {% if not loop.last %}
+        <div class="span12 ad">
+            {% include "ad_contenido_infeed.html"%}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if recorridos %}
+    <div class="row-fluid">
+        <h2>{% trans %}Routes of public transport{% endtrans %}</h2>
+        {% for cols in partition_horizontal(recorridos, 48) %}
+            {% for columna in dividir_columnas(cols, 3) %}
+                <div class="span4">
+                    <ul class="nav nav-pills nav-stacked">
+                    {% for recorrido in columna %}
+                        <li style="text-align:left">
+                            <a href={{recorrido.get_absolute_url}}>
+                                {{recorrido.nombre}}
+                                {% if recorrido.inicio and recorrido.fin %}
+                                    <span class="light">de {{recorrido.inicio}} a {{recorrido.fin}}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+            {% if not loop.last %}
+                <div class="span12 ad">
+                    {% include "ad_contenido_infeed.html"%}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    {% if children %}
+        <div class="row-fluid">
+            <h2>{% trans %}Places{% endtrans %}</h2>
+            <ul>
+                {% for child in children %}
+                <li>
+                    <a href="{{child.get_absolute_url}}">{{child.name}}</a>
+                    <small>({{child.recorridos_count}})</small>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+
+    {% if paradas %}
+        <h2>{% trans %}Stops{% endtrans %}</h2>
+        <ul>
+            {% for p in paradas %}
+            <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if pois %}
+        <h2>{% trans %}Points of interest{% endtrans %}</h2>
+        <ul>
+            {% for p in pois %}
+            <li itemscope itemtype="http://schema.org/Place">
+                <a itemprop="url" href="{{p.get_absolute_url}}">
+                    <span itemprop="name">{{ p.nom }}</span>
+                </a>
+                <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
+                    <meta itemprop="latitude" content="{{'{}'.format(p.latlng.1)}}" />
+                    <meta itemprop="longitude" content="{{'{}'.format(p.latlng.0)}}" />
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}

@@ -1,8 +1,9 @@
 from django.contrib.gis.db.models.functions import Cast, GeoFunc, Value
 from django.db.models import Count, IntegerField, OuterRef, Prefetch, Subquery
-from django.http import Http404, HttpResponsePermanentRedirect
+from django.http import Http404, HttpResponsePermanentRedirect, StreamingHttpResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import slugify
+from django.template.loader import get_template
 from django.views.decorators.http import require_GET
 
 from apps.catastro.models import AdministrativeArea, Ciudad, Interseccion, Poi
@@ -140,7 +141,8 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_c
         pois = None
         ps = None
         if aa.geometry_simple is not None:
-            lineas, pois, ps, aaancestors, children, recorridos = parallelize(
+            # lineas, pois, ps, aaancestors, children, recorridos = parallelize(
+            lineas, pois, ps, aaancestors, children, recorridos = (
                 Linea
                 .objects
                 .filter(recorridos__ruta__intersects=aa.geometry_simple)
@@ -173,18 +175,22 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_c
                 .order_by('nombre')
                 .defer('ruta') if aa.depth > 2 else None
             )
-        return render(
-            request,
-            'catastro/ver_administrativearea.html',
-            {
-                'obj': aa,
-                'adminarea': aa,
-                'adminareaancestors': aaancestors,
-                'aacentroid': aa.geometry_simple.centroid,
-                'children': children,
-                'paradas': ps,
-                'lineas': lineas,
-                'recorridos': recorridos,
-                'pois': pois
-            }
-        )
+
+        context = {
+            'request': request,
+            'obj': aa,
+            'adminarea': aa,
+            'adminareaancestors': aaancestors,
+            'aacentroid': aa.geometry_simple.centroid,
+            'children': children,
+            'paradas': ps,
+            'lineas': lineas,
+            'recorridos': recorridos,
+            'pois': pois
+        }
+
+        # jinja: parallelize=300, no parallel=480, streaming=30/600
+
+        # return render(request, 'catastro/ver_administrativearea.html', context)
+        # return HttpResponse(get_template('ver_administrativearea.html').template.render(context))
+        return StreamingHttpResponse(get_template('ver_administrativearea.html').template.generate(context))
