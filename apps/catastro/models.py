@@ -183,19 +183,20 @@ class Poi(models.Model):
             ]
             return sorted(objects_list, key=alphanum_key, reverse=True)
 
-        baseslug = slugify(self.nom)
-        allslugs = [p.slug for p in alphanumeric_sort(Poi.objects.filter(slug__startswith=baseslug).filter(slug__regex=baseslug + r'(-\d*)?$'), 'slug')]
-        if len(allslugs) == 0:
-            self.slug = baseslug
-        elif len(allslugs) == 1:
-            self.slug = baseslug + '-2'
-        else:
-            try:
-                self.slug = baseslug + '-' + str(int(allslugs[0].split('-')[-1]) + 1)
-            except Exception as e:
-                print('BASE: ' + baseslug)
-                print(allslugs)
-                print(str(e))
+        if not self.slug:
+            baseslug = slugify(self.nom)
+            allslugs = [p.slug for p in alphanumeric_sort(Poi.objects.filter(slug__startswith=baseslug).filter(slug__regex=baseslug + r'(-\d*)?$'), 'slug')]
+            if len(allslugs) == 0:
+                self.slug = baseslug
+            elif len(allslugs) == 1:
+                self.slug = baseslug + '-2'
+            else:
+                try:
+                    self.slug = baseslug + '-' + str(int(allslugs[0].split('-')[-1]) + 1)
+                except Exception as e:
+                    print('BASE: ' + baseslug)
+                    print(allslugs)
+                    print(str(e))
 
         super(Poi, self).save(*args, **kwargs)
 
