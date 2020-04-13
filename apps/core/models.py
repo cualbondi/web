@@ -4,11 +4,11 @@ from datetime import datetime
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import HStoreField
 from django.db.models import Manager as GeoManager
-from django.template.defaultfilters import slugify
 from django.core.serializers import serialize
 
 from apps.catastro.models import Ciudad
-from ..utils.reverse import reverse
+from apps.utils.reverse import reverse
+from apps.utils.slugify import slugify
 from .managers import RecorridoManager
 
 

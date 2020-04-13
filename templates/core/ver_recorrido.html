@@ -1,5 +1,6 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load uslugify %}
 {% load i18n %}
 
 {% block title %}{% blocktrans %}Route{% endblocktrans %} {{obj.nombre|title}} {% if obj.inicio and obj.fin %} {% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}of the line{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
@@ -86,7 +87,7 @@
 
     {% if obj.img_panorama %}
     <div class="thumbnail">
-	<a href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
+	<a href="/mapa/{{adminarea.name|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
         </div>

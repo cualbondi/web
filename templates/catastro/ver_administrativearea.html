@@ -1,5 +1,6 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load uslugify %}
 {% load i18n %}
 
 {% block title %}{% blocktrans %}Public transportation in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
@@ -56,7 +57,7 @@
 
     <div class="thumbnail">
         <a
-            href="/mapa/{{adminarea.name|slugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}"
+            href="/mapa/{{adminarea.name|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}"
             class="btn btn-primary"
             style="z-index:1;position:absolute; margin:6px"
         >

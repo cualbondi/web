@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.template.defaultfilters import slugify
 from django.templatetags.static import static
 from django.utils import translation
 from django.utils.translation import gettext, ngettext
@@ -7,6 +6,7 @@ from django.urls import reverse
 from math import ceil
 
 from jinja2 import Environment
+from apps.utils.slugify import slugify
 
 
 def dividir_columnas(lista, cantidad_columnas):
@@ -39,16 +39,17 @@ def partition_horizontal(thelist, n):
 def environment(**options):
     options.pop('debug', None)
     options['extensions'] = ['jinja2.ext.i18n']
+    # options['enable_async'] = True
     env = Environment(**options)
     env.globals.update({
         'static': static,
         'url': reverse,
-        'FACEBOOK_APP_ID': settings.FACEBOOK_APP_ID,
+        'FACEBOOK_APP_ID': 'pedo',
         'HOME_URL': settings.HOME_URL,
         'STATIC_URL': settings.STATIC_URL,
         'dividir_columnas': dividir_columnas,
         'partition_horizontal': partition_horizontal,
-        'slugify': slugify,
+        'uslugify': slugify,
         'get_current_language': translation.get_language,
     })
     env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)

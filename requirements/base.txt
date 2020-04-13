@@ -4,7 +4,7 @@ argon2-cffi==19.1.0  # https://github.com/hynek/argon2_cffi
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.0  # https://www.djangoproject.com/
+django==3.0.4  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 
 django-extensions==2.2.3  # https://github.com/django-extensions/django-extensions
@@ -27,6 +27,8 @@ geopandas==0.6.0
 pandas==0.25.1
 Shapely==1.6.4.post2
 Rtree==0.8.3
+
+unidecode==1.1.1
 
 # warning, pinned! test before changing this one
 osmium==2.15.3 #

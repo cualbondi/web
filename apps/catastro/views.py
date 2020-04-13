@@ -2,14 +2,14 @@ from django.contrib.gis.db.models.functions import Cast, GeoFunc, Value
 from django.db.models import Count, IntegerField, OuterRef, Prefetch, Subquery
 from django.http import Http404, HttpResponsePermanentRedirect, StreamingHttpResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.views.decorators.http import require_GET
 
 from apps.catastro.models import AdministrativeArea, Ciudad, Interseccion, Poi
 from apps.core.models import Linea, Parada, Recorrido
 from apps.utils.parallel_query import parallelize
-
+from apps.utils.slugify import slugify
+import os
 
 def fuzzy_like_query(q):
     params = {"q": q}
@@ -129,7 +129,6 @@ class Simplify(GeoFunc):
     def __init__(self, expression, tolerance=0.02, **extra):
         super().__init__(expression, tolerance, **extra)
 
-
 def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_code=None):
     qs = AdministrativeArea.objects.defer('geometry')
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
@@ -191,6 +190,12 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_c
 
         # jinja: parallelize=300, no parallel=480, streaming=30/600
 
-        # return render(request, 'catastro/ver_administrativearea.html', context)
+        return render(request, 'catastro/ver_administrativearea.html', context)
+
         # return HttpResponse(get_template('ver_administrativearea.html').template.render(context))
-        return StreamingHttpResponse(get_template('ver_administrativearea.html').template.generate(context))
+
+        # os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+        # template = get_template('ver_administrativearea.html').template
+        # generator = template.generate(context)
+        # response = StreamingHttpResponse(generator)
+        # return response

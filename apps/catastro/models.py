@@ -3,11 +3,11 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import HStoreField
 from django.core.serializers import serialize
 from django.db.models import Manager as GeoManager
-from django.template.defaultfilters import slugify
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from treebeard.mp_tree import MP_Node
-from ..utils.reverse import reverse
+from apps.utils.reverse import reverse
+from apps.utils.slugify import slugify
 from .managers import (
     CiudadManager,
     ZonaManager,
@@ -150,7 +150,7 @@ class Poi(models.Model):
     osm_id = models.BigIntegerField(blank=True, null=True)
     nom_normal = models.TextField()
     nom = models.TextField()
-    slug = models.SlugField(max_length=150, null=True)
+    slug = models.SlugField(max_length=200, null=True)
     latlng = models.GeometryField(srid=4326, geography=True)
     img_panorama = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
     img_cuadrada = models.ImageField(max_length=200, upload_to='poi', blank=True, null=True)
@@ -168,12 +168,35 @@ class Poi(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        slug = slugify(self.nom)
-        self.slug = slug
-        suffix = 2
-        while Poi.objects.filter(slug=self.slug).exists():
-            self.slug = "%s-%d" % (slug, suffix)
-            suffix = suffix + 1
+
+        def alphanumeric_sort(objects_list, sort_key):
+            """ Sort a list of objects by a given key
+            This function sort a list of objects by a given
+            key common across the objects
+            Sorting can be implemented on keys that are either
+            alphabets, integers or both
+            """
+            import re
+            convert = lambda text: int(text) if text.isdigit() else text
+            alphanum_key = lambda key: [
+                convert(c) for c in re.split("([0-9]+)", getattr(key, sort_key))
+            ]
+            return sorted(objects_list, key=alphanum_key, reverse=True)
+
+        baseslug = slugify(self.nom)
+        allslugs = [p.slug for p in alphanumeric_sort(Poi.objects.filter(slug__startswith=baseslug).filter(slug__regex=baseslug + r'(-\d*)?$'), 'slug')]
+        if len(allslugs) == 0:
+            self.slug = baseslug
+        elif len(allslugs) == 1:
+            self.slug = baseslug + '-2'
+        else:
+            try:
+                self.slug = baseslug + '-' + str(int(allslugs[0].split('-')[-1]) + 1)
+            except Exception as e:
+                print('BASE: ' + baseslug)
+                print(allslugs)
+                print(str(e))
+
         super(Poi, self).save(*args, **kwargs)
 
     def get_absolute_url(self, argentina=None):
@@ -191,7 +214,7 @@ class Interseccion(models.Model):
     """
     nom_normal = models.TextField()
     nom = models.TextField()
-    slug = models.SlugField(max_length=150, null=True)
+    slug = models.SlugField(max_length=200, null=True)
     latlng = models.GeometryField(srid=4326, geography=True)
     osm_id1 = models.BigIntegerField(blank=True, null=True)
     osm_id2 = models.BigIntegerField(blank=True, null=True)

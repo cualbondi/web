@@ -1,5 +1,6 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
+{% load uslugify %}
 {% load i18n %}
 
 {% block title %}{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
@@ -74,7 +75,7 @@
     </div>
 
     <div class="thumbnail">
-        <a href="/mapa/{{adminareas.0.name|slugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
+        <a href="/mapa/{{adminareas.0.name|uslugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
         {% if poi.img_panorama %}
         <div id="map" style="background:lightblue;">
             <img src="{{HOME_URL}}/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />

@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 from django.shortcuts import get_object_or_404, render, redirect
-from django.template.defaultfilters import slugify
 from django.views.decorators.http import require_GET, require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponsePermanentRedirect, Http404
@@ -16,6 +15,7 @@ from apps.catastro.management.commands.update_osm import kings
 from apps.catastro.models import Ciudad, Poi, AdministrativeArea
 from apps.utils import data
 from apps.utils.parallel_query import parallelize
+from apps.utils.slugify import slugify
 
 
 @csrf_exempt

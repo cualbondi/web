@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import pytz
+from cProfile import Profile
 
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
@@ -99,6 +100,14 @@ kings = {
         'country_code': 'ci',
         'lang': 'fr_CI',
     },
+    'china': {
+        'name': 'china',
+        'url': 'http://download.geofabrik.de/asia/china-latest.osm.pbf',
+        'id': 270056,
+        'paradas_completas': False,
+        'country_code': 'cn',
+        'lang': 'zh_CN',
+    },
 }
 
 
@@ -106,6 +115,13 @@ class Command(BaseCommand):
     help = 'update local database with osm POIs and Streets'
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            '--profile',
+            action='store_true',
+            dest='profile',
+            default=False,
+            help='Run cProfile'
+        )
         parser.add_argument(
             '--ciudad',
             action='store',
@@ -204,7 +220,15 @@ class Command(BaseCommand):
             print('{}'.format(s), end=end)
         sys.stdout.flush()
 
-    def handle(self, *args, **options):
+    def _handle(self, *args, **options):
+        if options['profile']:
+            profiler = Profile()
+            profiler.runcall(self._handle, *args, **options)
+            profiler.print_stats()
+        else:
+            self._handle(*args, **options)
+
+    def _handle(self, *args, **options):
 
         king = kings[options['king']]
 
