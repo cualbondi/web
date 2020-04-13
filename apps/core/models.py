@@ -119,6 +119,7 @@ class Recorrido(models.Model):
             self.slug = slugify(self.nombre + " desde " + self.inicio + " hasta " + self.fin)
         except Exception:
             self.slug = slugify(self.nombre)
+        self.slug = self.slug[:200]
 
         self.ruta_simple = self.ruta.simplify(0.0001, True)
 

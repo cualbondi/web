@@ -11,7 +11,7 @@
 {% block custom_top_scripts %}
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:administrative_area" />
-    <meta property="og:url"    content="{{HOME_URL}}{{ obj.get_absolute_url }}" />
+    <meta property="og:url"    content="{{ obj.get_absolute_url }}" />
     <meta property="og:title"  content="{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
     <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}

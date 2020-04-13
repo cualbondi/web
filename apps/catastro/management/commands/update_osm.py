@@ -220,7 +220,7 @@ class Command(BaseCommand):
             print('{}'.format(s), end=end)
         sys.stdout.flush()
 
-    def _handle(self, *args, **options):
+    def handle(self, *args, **options):
         if options['profile']:
             profiler = Profile()
             profiler.runcall(self._handle, *args, **options)
