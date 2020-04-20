@@ -122,6 +122,13 @@ class Command(BaseCommand):
             default = False,
             help    = 'Saltear objetos que ya tienen thumbs creadas'
         )
+        parser.add_argument(
+            '-c',
+            action  = 'store',
+            dest    = 'country_code',
+            default = '',
+            help    = 'Rehacer thumbs de todos los objetos con este country_code'
+        )
 
 
     def create_screenshot(self, url, filename, size):
@@ -218,6 +225,8 @@ class Command(BaseCommand):
             lineas = [Linea.objects.get(osm_id=options['linea_osm_id'])]
         elif options['linea_id']:
             lineas = [Linea.objects.get(id=options['linea_id'])]
+        elif options['country_code']:
+            lineas = Linea.objects.filter(country_code=options['country_code'])
         for linea in lineas:
             self.make_map_img(linea, skip=options['skip'])
 
@@ -229,6 +238,8 @@ class Command(BaseCommand):
             recorridos = [Recorrido.objects.get(osm_id=options['recorrido_osm_id'])]
         elif options['recorrido_id']:
             recorridos = [Recorrido.objects.get(id=options['recorrido_id'])]
+        elif options['country_code']:
+            recorridos = Recorrido.objects.filter(country_code=options['country_code'])
         for recorrido in recorridos:
             self.make_map_img(recorrido, skip=options['skip'])
 
@@ -240,6 +251,8 @@ class Command(BaseCommand):
             pois = [Poi.objects.get(slug=options['poi_slug'])]
         elif options['poi_id']:
             pois = [Poi.objects.get(id=options['poi_id'])]
+        elif options['country_code']:
+            pois = Poi.objects.filter(country_code=options['country_code'])
         for poi in pois:
             self.make_map_img(poi, skip=options['skip'])
 
@@ -251,5 +264,7 @@ class Command(BaseCommand):
             administrativeareas = [AdministrativeArea.objects.get(osm_id=options['administrativearea_osm_id'])]
         elif options['administrativearea_id']:
             administrativeareas = [AdministrativeArea.objects.get(id=options['administrativearea_id'])]
+        elif options['country_code']:
+            administrativeareas = AdministrativeArea.objects.filter(country_code=options['country_code'])
         for administrativearea in administrativeareas:
             self.make_map_img(administrativearea, skip=options['skip'])
