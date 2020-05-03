@@ -167,7 +167,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_c
                         .annotate(count=Count('*'))
                         .values('count')
                     ), output_field=IntegerField())
-                ).order_by('-recorridos_count', 'name'),
+                ).order_by('-recorridos_count', 'name') if osm_id != '60189' else aa.get_children().order_by('name'), # russia workaround
                 Recorrido
                 .objects
                 .filter(ruta__intersects=aa.geometry_simple, linea__isnull=True)
