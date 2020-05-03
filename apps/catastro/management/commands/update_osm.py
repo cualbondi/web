@@ -14,8 +14,10 @@ from django.db.models import BooleanField
 from django.db.models.functions import Upper, Trim, Substr
 from django.db.models.expressions import RawSQL
 from django.contrib.gis.geos import LineString, Polygon, MultiPolygon, Point
+from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.db.models.functions import MakeValid
 from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
 
 from apps.catastro.models import Poi, Interseccion, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog, Parada, Horario
@@ -107,6 +109,14 @@ kings = {
         'paradas_completas': False,
         'country_code': 'cn',
         'lang': 'zh_CN',
+    },
+    'russia': {
+        'name': 'russia',
+        'url': 'http://download.geofabrik.de/russia-latest.osm.pbf',
+        'id': 60189,
+        'paradas_completas': False,
+        'country_code': 'ru',
+        'lang': 'ru_RU',
     },
 }
 
@@ -292,6 +302,26 @@ class Command(BaseCommand):
                         }
                         # this.out2(f"REL {r.id} {r.tags['name'].encode('utf-8').strip()}")
 
+            def make_valid(geom):
+                cursor = connection._cursor()
+                try:
+                    try:
+                        cursor.execute('SELECT ST_MakeValid(%s)', (PostGISAdapter(geom),))
+                        row = cursor.fetchone()
+                    except:
+                        # Responsibility of callers to perform error handling.
+                        raise
+                finally:
+                    # Close out the connection.  See #9437.
+                    connection.close()
+                return GEOSGeometry(row[0])
+
+            def maybe_make_valid(geom):
+                if not geom.valid:
+                    return make_valid(geom)
+                else:
+                    return geom
+
             class WaysHandler(osmium.SimpleHandler):
                 def way(self, w):
 
@@ -307,8 +337,8 @@ class Command(BaseCommand):
                                     'import_timestamp': run_timestamp,
                                     'osm_id': w.id,
                                     'osm_type': 'w',
-                                    'geometry': poly,
-                                    'geometry_simple': poly.simplify(0.01, True),
+                                    'geometry': maybe_make_valid(poly),
+                                    'geometry_simple': maybe_make_valid(poly.simplify(0.001, True)),
                                     'admin_level': int(w.tags['admin_level']),
                                     'name': w.tags['name'],  # .encode('utf-8').strip(),
                                     'tags': {k:v for k,v in w.tags},
@@ -346,7 +376,7 @@ class Command(BaseCommand):
                     v['img_cuadrada'] = dbadminarea.img_cuadrada
 
                 if v['admin_level'] >= ADMIN_LEVEL_MIN and v['admin_level'] <= ADMIN_LEVEL_MAX:
-                    self.out2(f"osmid={k} level={v['admin_level']} name={v['name'].encode('utf-8')}", end="")
+                    self.out2(f"osmid={k} level={v['admin_level']} name={v['name']}", end="")
                     wfull = [w for w in v['ways'] if not isinstance(w, int)]
                     if len(wfull) == 0 or float(len(wfull)) / float(len(v['ways'])) < 0.8:
                         self.out2(f" NOK skipping adminarea, less than 80% of fragments")
@@ -364,8 +394,8 @@ class Command(BaseCommand):
                         admin_count_ok = admin_count_ok + 1
                         try:
                             poly = Polygon(way)
-                            v['geometry'] = poly
-                            v['geometry_simple'] = poly.simplify(0.01, True)
+                            v['geometry'] = maybe_make_valid(poly)
+                            v['geometry_simple'] = maybe_make_valid(poly.simplify(0.01, True))
                             if v['osm_id'] != KING_ID:
                                 admin_areas[v['admin_level']].append(v)
                         except Exception as e:
@@ -380,8 +410,8 @@ class Command(BaseCommand):
                                         except Exception as e3:
                                             self.out2(f" {e3} {status}, skipping fragment. ({len(p_fixed)} nodes) [{status}]")
                                 poly = MultiPolygon(mp)
-                                v['geometry'] = poly
-                                v['geometry_simple'] = poly.simplify(0.01, True)
+                                v['geometry'] = maybe_make_valid(poly)
+                                v['geometry_simple'] = maybe_make_valid(poly.simplify(0.01, True))
                                 if v['osm_id'] != KING_ID:
                                     admin_areas[v['admin_level']].append(v)
                                 self.out2('-> ok')
@@ -392,11 +422,24 @@ class Command(BaseCommand):
                             KING = v
             self.out2(f"TOTALS: {admin_count_all} {admin_count} {admin_count_ok}, {len(admin_areas)}")
 
-            def fuzzy_contains(out_geom, in_geom, buffer=0):
-                return (
-                    out_geom.intersects(in_geom) and  # optimization
-                    out_geom.buffer(buffer).contains(in_geom)
-                )
+            def fuzzy_contains(out_geom, in_geom, buffer=0, attempts=3):
+                try:
+                    return (
+                        out_geom.intersects(in_geom) and  # optimization
+                        out_geom.buffer(buffer).contains(in_geom)
+                    )
+                except GEOSException as e:
+                    if attempts > 0:
+                        self.out2(f'''
+                        out_geom.valid: {out_geom.valid}
+                        out_geom.valid_reason: {out_geom.valid_reason}
+                        in_geom.valid: {in_geom.valid}
+                        in_geom.valid_reason: {in_geom.valid_reason}
+                        ''')
+                        return fuzzy_contains(maybe_make_valid(out_geom), maybe_make_valid(in_geom), buffer, attempts - 1)
+                    else:
+                        raise
+
 
             KING_GEOM_BUFF = KING['geometry_simple'].buffer(0.01)
 
@@ -419,7 +462,7 @@ class Command(BaseCommand):
                         return None
                 except Exception:
                     # print('node.geometry', node['data']['geometry'])
-                    print('node.data', node['data']['name'].encode('utf-8'))
+                    print('node.data', node['data']['name'])
                     print('node.osm_id', node['data']['osm_id'])
                     print('node.osm_type', node['data']['osm_type'])
                     # traceback.print_exc()
@@ -445,23 +488,23 @@ class Command(BaseCommand):
                         if not aa['geometry'].intersects(KING_GEOM_BUFF):
                             continue
                     except GEOSException as e:
-                        self.out2(f'{str(e)}\n{aa["osm_id"]} {aa["name"].encode("utf-8")}')
+                        self.out2(f'{str(e)}\n{aa["osm_id"]} {aa["name"]}')
                     try:
                         parent_aa = get_parent_aa(tree, aa['geometry'])
                         aa.pop('admin_level')
                         if 'ways' in aa:
                             aa.pop('ways')
                         else:
-                            self.out2(f" {aa['osm_id']}: {aa['name'].encode('utf-8').strip()}, does not have 'ways' attribute")
+                            self.out2(f" {aa['osm_id']}: {aa['name']}, does not have 'ways' attribute")
                         if parent_aa is None:
                             tree['children'].append({'children': [], 'data': aa})
                         else:
                             parent_aa['children'].append({'children': [], 'data': aa})
                     except GEOSException as e:
-                        self.out2(f'{str(e)}\n{tree["data"]["osm_id"]} {tree["data"]["name"].encode("utf-8")}\n{aa["osm_id"]} {aa["name"].encode("utf-8")}')
+                        self.out2(f'{str(e)}\n{tree["data"]["osm_id"]} {tree["data"]["name"]}\n{aa["osm_id"]} {aa["name"]}')
 
             def print_tree(node, level=0):
-                print(f'{" " * level} {level} {node["data"]["name"].encode("utf-8")}')
+                print(f'{" " * level} {level} {node["data"]["name"].decode("utf-8")}')
                 for node in node['children']:
                     print_tree(node, level + 1)
 
