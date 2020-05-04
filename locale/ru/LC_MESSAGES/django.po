@@ -1,0 +1,303 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Julian Perelli <jperelli@gmail.com>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-06 23:57+0000\n"
+"PO-Revision-Date: 2020-03-07 00:17+0000\n"
+"Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
+"Language-Team: Russian (Russia) (https://www.transifex.com/cualbondi/teams/107940/ru_RU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: templates/404.html:5
+msgid "Oops! The page could not be found..."
+msgstr "К сожалению! Страница не найдена ..."
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "Go back to"
+msgstr "Вернуться к"
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "home"
+msgstr "дом"
+
+#: templates/500.html:5
+msgid "Oops! Something went wrong..."
+msgstr "К сожалению! Что-то пошло не так..."
+
+#: templates/base.html:9
+msgid "Search engine of public transportation bus, train,  subway, tram."
+msgstr ""
+"Поисковая система общественного транспорта: автобус, поезд, метро, трамвай."
+
+#: templates/catastro/ver_administrativearea.html:5
+msgid "Public transportation in"
+msgstr "Общественный транспорт в"
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/catastro/ver_administrativearea.html:14
+msgid "How to get around in"
+msgstr "Как обойти в"
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:6
+msgid "and what lines and routes of buses go through"
+msgstr "и какие линии и маршруты автобусов проходят"
+
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/catastro/ver_poi.html:15
+msgid "List of all the public transport that go through"
+msgstr "Список всего общественного транспорта, который проходит через"
+
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/catastro/ver_poi.html:15
+msgid "See how to get from where you are"
+msgstr "Посмотрите, как добраться, где вы находитесь"
+
+#: templates/catastro/ver_administrativearea.html:23
+#: templates/catastro/ver_poi.html:23 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:23
+msgid "Home"
+msgstr "Дом"
+
+#: templates/catastro/ver_administrativearea.html:69
+msgid "Lines of public transport"
+msgstr "Линии общественного транспорта"
+
+#: templates/catastro/ver_administrativearea.html:91
+msgid "Routes of public transport"
+msgstr "Маршруты общественного транспорта"
+
+#: templates/catastro/ver_administrativearea.html:121
+msgid "Places"
+msgstr "места"
+
+#: templates/catastro/ver_administrativearea.html:135
+#: templates/core/ver_recorrido.html:150
+msgid "Stops"
+msgstr "Остановки"
+
+#: templates/catastro/ver_administrativearea.html:144
+msgid "Points of interest"
+msgstr "Точки интереса"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
+#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:46
+msgid "How to get to"
+msgstr "Как добраться до"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
+#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:15
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:95
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:15
+msgid "in"
+msgstr "в"
+
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:46
+msgid "?"
+msgstr "?"
+
+#: templates/catastro/ver_interseccion.html:43
+msgid "Routes of public transport that pass through this intersection"
+msgstr ""
+"Маршруты общественного транспорта, которые проходят через этот перекресток"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:56
+#: templates/core/ver_recorrido.html:105
+msgid "from"
+msgstr "от"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:46
+#: templates/core/ver_recorrido.html:56 templates/core/ver_recorrido.html:105
+msgid "to"
+msgstr "в"
+
+#: templates/catastro/ver_interseccion.html:64
+#: templates/catastro/ver_poi.html:109
+msgid "Nearby stops"
+msgstr "Близлежащие остановки"
+
+#: templates/catastro/ver_interseccion.html:73
+#: templates/catastro/ver_poi.html:118
+msgid "Other points of interest nearby"
+msgstr "Другие достопримечательности поблизости"
+
+#: templates/catastro/ver_poi-404.html:7
+msgid "Could not find"
+msgstr "Не могли найти"
+
+#: templates/catastro/ver_poi-404.html:12
+msgid "But we did everything possible to find similar places"
+msgstr "Но мы сделали все возможное, чтобы найти похожие места"
+
+#: templates/catastro/ver_poi.html:57
+msgid "Go to website"
+msgstr "Перейти на сайт"
+
+#: templates/catastro/ver_poi.html:62
+msgid "Phone"
+msgstr "Телефон"
+
+#: templates/catastro/ver_poi.html:77 templates/core/ver_recorrido.html:89
+msgid "See in interactive map"
+msgstr "Смотрите на интерактивной карте"
+
+#: templates/catastro/ver_poi.html:88
+msgid "Public transport routes that pass next to this place"
+msgstr ""
+"Маршруты общественного транспорта, которые проходят рядом с этим местом"
+
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
+msgid "Line"
+msgstr "Линия"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid ""
+"All the information about routes, trips, stops, schedules and fares of the "
+"line"
+msgstr ""
+"Вся информация о маршрутах, поездках, остановках, расписаниях и тарифах "
+"линии"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid "that passes through"
+msgstr "который проходит через"
+
+#: templates/core/ver_linea.html:49
+msgid "Company information"
+msgstr "Информация о компании"
+
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:61
+msgid "Places that travel to"
+msgstr "Места, которые путешествуют в"
+
+#: templates/core/ver_linea.html:64
+msgid "Routes of the line"
+msgstr "Маршруты линии"
+
+#: templates/core/ver_linea.html:95
+msgid "Public transportation coverage of the line"
+msgstr "Общественный транспорт покрытия линии"
+
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_parada.html:43
+msgid "Stop"
+msgstr "Стоп"
+
+#: templates/core/ver_parada.html:6
+msgid "and what lines of routes of buses, train and subway stop in the stop"
+msgstr ""
+"и какие линии маршрутов автобусов, поездов и метро останавливаются на "
+"остановке"
+
+#: templates/core/ver_parada.html:62
+msgid "Public transport routes that stop in this stop"
+msgstr ""
+"Маршруты общественного транспорта, которые останавливаются на этой остановке"
+
+#: templates/core/ver_parada.html:79
+msgid ""
+"Public transport routes that pass nearby of this stop (do not stop here)"
+msgstr ""
+"Маршруты общественного транспорта, которые проходят поблизости от этой "
+"остановки (не останавливайтесь здесь)"
+
+#: templates/core/ver_parada.html:100
+msgid "Points of interest nearby"
+msgstr "Достопримечательности поблизости"
+
+#: templates/core/ver_parada.html:117
+msgid "Neighborhoods nearby"
+msgstr "Окрестности поблизости"
+
+#: templates/core/ver_parada.html:126
+msgid "Other stops near"
+msgstr "Другие остановки поблизости"
+
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:54
+msgid "Route"
+msgstr "маршрут"
+
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+msgid "of the line"
+msgstr "линии"
+
+#: templates/core/ver_recorrido.html:6
+msgid "All the information on stops, schedules and fares of the route"
+msgstr "Вся информация о остановках, расписаниях и тарифах маршрута"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+msgid "Description of the route of the bus"
+msgstr "Описание маршрута автобуса"
+
+#: templates/core/ver_recorrido.html:15
+msgid "branch"
+msgstr "филиал"
+
+#: templates/core/ver_recorrido.html:15
+msgid "Route from"
+msgstr "Маршрут из"
+
+#: templates/core/ver_recorrido.html:70 templates/core/ver_recorrido.html:80
+msgid "Streets that compose this route"
+msgstr "Улицы, составляющие этот маршрут"
+
+#: templates/core/ver_recorrido.html:99
+msgid "Similar routes"
+msgstr "Подобные маршруты"
+
+#: templates/core/ver_recorrido.html:121
+msgid "Points of interest near the route"
+msgstr "Достопримечательности рядом с маршрутом"
+
+#: templates/leaflet/admin/widget.html:29
+msgid "Reset view"
+msgstr "Сбросить вид"
+
+#: templates/navbar.html:26
+msgid "Go to the search engine"
+msgstr "Перейти в поисковик"
+
+#: templates/navbar.html:35
+msgid "Login"
+msgstr "логин"
+
+#: templates/navbar.html:39
+msgid "Star users"
+msgstr "Звездные пользователи"
+
+#: templates/navbar.html:40
+msgid "Poll"
+msgstr "Голосование"
