@@ -352,9 +352,10 @@ class Command(BaseCommand):
                             linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
 
                         for rel_id in admin_relations_ways_ids[w.id]:
-                            for i, wid in enumerate(admin_relations[rel_id]['ways']):
-                                if wid == w.id:
-                                    admin_relations[rel_id]['ways'][i] = linestring
+                            if 'ways' in admin_relations[rel_id]:
+                                for i, wid in enumerate(admin_relations[rel_id]['ways']):
+                                    if wid == w.id:
+                                        admin_relations[rel_id]['ways'][i] = linestring
 
             self.out2(f'Collecting rels, using {inputfile}')
             h = RelsHandler()
