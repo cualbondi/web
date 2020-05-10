@@ -55,11 +55,25 @@
         background-repeat: no-repeat;
         margin: 0 2px -2px 0;
       }
+
+      /* from https://github.com/madebybowtie/FlagKit */
       .flag-AR {
-        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAMAAAA8hHRZAAAAAXNSR0IArs4c6QAAAGxQTFRFd67eeK7eeK/eeK/fe7HgfLHgfLLhf7Tif7Tjgrfkg7flhrnmhrrnh7rn57yY6Jku6r+b7drM7sOf8N3P8fHx8vLy87Au9LMu9OHT9PT09eLU9fX19+TW9/f3+OXX+Pj4+vr6+/v7/f39/v7+ctF7GgAAAHhJREFUGNO9TwEKw0AISzxBGOwT+//vNtaWXr2d2m4/mAgajUZ5Hxgc4CB+psesODF7iYMRVcLpX1YySGVOu3jG4oLhpFAEUnmjPnCq9dfNLlX1UuGy2NPt1NAuuROr0d4NcgTWDkh02mZbgLp3v06StbHA3P3X3z7okExLqUXh/wAAAABJRU5ErkJggg==');
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAMAAAA8hHRZAAAAbFBMVEV3rt54rt54r954r997seB8seB8suF/tOJ/tOOCt+SDt+WGueaGuueHuufnvJjomS7qv5vt2szuw5/w3c/x8fHy8vLzsC70sy704dP09PT14tT19fX35Nb39/f45df4+Pj6+vr7+/v9/f3+/v5y0XsaAAAAc0lEQVQYV71Pyw6AMAij00gy482LBw/G//86TZYZHe7Bov6AnEppC2AQEghBQE/BfpmkiCxDkaok9WiRUTBBmazVzPfEBKwlC3LulusOLCUTzrHvuSbMJjtp6yDHEN2px0QFHSf7tquXjArouppGOcGvv9104E7jIco0GQAAAABJRU5ErkJggg==')
       }
       .flag-ES {
-        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAMAAAA8hHRZAAAAAXNSR0IArs4c6QAAAIdQTFRFpBUXsi8Yx1kXx1wmyQwgyQwhyQ0hzWQUzg8kzw8kzxAk0nAc0nQr1BIn1HMV1RMn1RMo2hUq2hYr2xYr24AQ24Ui3IYi34gQ34kQ5Zce5Zge+bsM+bsN/8YD/8YE/8cL/8gL/8gM/8kS/8kT/8oT/8sa/8wh/80h/84o/84p/88p/88v/9Aw1m+u0QAAAIxJREFUGNO1j00KwmAQQ99Mv6K07hQ9gvc/jXgDUdwIgsLMxEXrzwXMMiThxdZQXng5MmEyoEXh4UgCILsEbDllZJM7daw3gE+7vIC252fvrZaC62W7KQeYs57SsR+7Q0VERCikUpPQaTjPCAiBWgKr53hL++Fo6ez6x2LIL0upKVkw4KqJQyDa/T+PXy/5be7A39N6AAAAAElFTkSuQmCC');
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAMAAAA8hHRZAAAAh1BMVEWkFReyLxjHWRfHXCbJDCDJDCHJDSHNZBTODyTPDyTPECTScBzSdCvUEifUcxXVEyfVEyjaFSraFivbFivbgBDbhSLchiLfiBDfiRDllx7lmB75uwz5uw3/xgP/xgT/xwv/yAv/yAz/yRL/yRP/yhP/yxr/zCH/zSH/zij/zin/zyn/zy//0DDWb67RAAAAh0lEQVQYV7VPMQrCUBTLe6VUqOCgOOoseP+riDcQxVUEXxKHXyk9gNkSEpLEFlAKqYTDCAeA2DSlMYAdAcSqeRwGgCkTffP80koBiPOszIiTgedjv1MCaM1A0r72Y3dRVVWVy5bTkm9x9wRZspIk1p8RlCiSJM04Jl79e+Cw2HJorcsd8afHX80ddTwSGR50AAAAAElFTkSuQmCC')
+      }
+      .flag-CN {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAMAAAA8hHRZAAAAz1BMVEXfKRDgKRDgKhHhKhHhKxLiKxLiLBPjLBPkLRTlLRTlLhTmLhXnLxXnLxbnMhbnQBToLxboMBboMBfpMBfpMRfpMRjpPhbpQRbpQRfqMRjqMhjqNhnqQBbqQhfrMhjrMhnrQhrsMxnsMxrtMxrtNBrtNhruNBvuNRvvNRvvNRzvNxzvRx7vXRzwNRzwNhzwNh3wRyDwUCHwXx7xYB/ybiHybiLybiPzfRzzhxzzhx30kR/1kR/2hij2hyj3lC74ljH8xC39zhv+1TD+1in+1ym4e4huAAAAt0lEQVQY022PwUoCARRFz305Ko5GVJqthMqFq/7/R6JFe4NSGDJBJ951MY4SeFfvwYF7rl4hI5EFgCwsLYwsNK52AJax9BJQ8lvcLQ0QGYCehKZaZtyysrAMaOb76yB/vif+iqTh9dhl9KDPtXt1py7Yd/fIGptnKT9irvezw+iK4UZldVP1678OssjQsPEsF2/bxspEanDsLerTEkv91uYcWT0uRMU/BsvIimgv8rhCFnH6IlviAF8BUzqT5sU3AAAAAElFTkSuQmCC')
+      }
+      .flag-BR {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAMAAAA8hHRZAAABIFBMVEUBKXoBnDkBnTkBnToBnjoCKnsCKnwCK30CnToCnjoCnzoCnzsCoDsCoTsCoTwCojwDLYEDoTwDojwDozwDoz0DpD0DpT0DpT4Dpj4ELoQEpj4Epj8Epz8EqD8EqEAEqT8EqUAEqkAFozwFqUAFqkAFqkEFq0EGpD0Gpj4HMYUNMXUOM3sONYUPNoEcpTYdpjcfrTsnqTcoqTcprTk0S2Q1TWg2Tms3UW85WZxDYZ9IZqFbsS1bsS5cc6JctzBcuDBqtSxquC5ruS95uCp5uSt5uit6uiuFmcGHm8OLvSezoTOzwyGzxCG0oja0oje0oze0xiK1ojS4xB+5xyG6pznBxh/Bxx/H0OPR2OjY3uva1rzu58fx0Bj20Rf3+Pv90hZ2qZJFAAAA+UlEQVQYGQXBW0tCURSF0W+efbaSmJGaVnjDQOg5of//0kNXgowgpCINsRIrMnQdXY2hHlg0okUAACDZmAULwYO7u7u5mZnaKeuwxtWuvr9sCOsAqAlyUe7swNfzJwCokZFmae/wZ7Io1EvjxywFtB/IGkdbv4M50C//DUeEterstuoJWVh+zR96x2wmrzOpqn4NuNR2qezjLjC9kCqqNA8S7m+R9zuRzdvTtyVmk/O7BXvuSz/7YzG4ma+CipEszU4as+miUCuPrlzIVXTkotuqwMdo6HJABceikVud1qfXwuXIleSxaESLrHIrXI5cyrPMLwGQCwD5P3MbeqSw3o+JAAAAAElFTkSuQmCC')
+      }
+      .flag-CI {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAYAAAALWoRrAAAAAXNSR0IArs4c6QAAAUVJREFUOBF9U8FxBDEIs2f8SBfpJQWlhBSRgvJPR3nE9kmACLubPeZmwQbLEpz7z+fbbg0/2Ibr3T3XL+9fdGYbyY4kPe31+8P8f5/R1gxIAKLCgKOSAALh1iGey+qtVEzoYWMDlAxo5GDAtmptLRxU7sS0reOFccTcMGrB1aEdmNnK7LIG0zsD6LocVvFZvvbp9+/0AdTNiAEK+dEdCLKYnkbQe/lsl7NVy6TU5CtJ4R4rfWxBbcee92Rs+sH64jioW0NPXQ8Zu8lbT/PgSUeVnzUCwPT/9ByzY9ee4irDjSufDaqBKXDTStispxKgm+XXs0FNwlSoxG+jl7+UnqEmzjL1lXv1Maw6qNPDwIviMPxG5MzkBchNTV6e8ivPGvv0pdcx85sAuVMCkx9rGwTiwDlOn9epACFB1QrFeREUZpyHHPUB+yzvvwWrSqkAAAAASUVORK5CYII=')
+      }
+      .flag-RU {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAMAAAA8hHRZAAAAb1BMVEUHPqUHPqYIPqYIQKkJQKoJQq0KQq0KQq4KRLELRLELRrQMRrXULynVLynVMCrYMizZMizbNC7cNC7cNS7cNS/fNzHgNzHgODLjOjPjOjTkOjTx8fHy8vL09PT19fX39/f4+Pj6+vr7+/v9/f3+/v4jLzoUAAAAd0lEQVQY022PQQrCUAxE30t1ISKCCxeKFMT739A/Llp+q3U2mSSTGeILYjD2Cj4DMHeTAhydGX0bfdCvF3hnA+ORVUqfH7ba6L6I6b7ViujuVxfAahgx0qpRrQBv+Zd2TdcCtGqAlyUthuE9AJ7X/3eHU77SJv4Beas+K4DHvsYAAAAASUVORK5CYII=')
       }
 
       .city {
@@ -121,20 +135,36 @@
       </div>
       <div class="right">
         <div class="cities">
-          {% for c in CIUDADES %}
-          <a class="city" href="https://cualbondi.com.ar/mapa/{{c.slug}}/">
+          <a class="city" href="https://cualbondi.com.ar/ar">
             <span class="flag flag-AR"></span>
-            <span class="name">{{c.name}}</span>
+            <span class="name">Argentina</span>
             <span class="chevron"></span>
           </a>
-          {% endfor %}
-          {% for c in CIUDADES_ES %}
-          <a class="city" href="https://cualbondi.org/mapa/{{c.slug}}/">
+          <a class="city" href="https://cualbondi.org/br">
+            <span class="flag flag-BR"></span>
+            <span class="name">Brasil</span>
+            <span class="chevron"></span>
+          </a>
+          <a class="city" href="https://cualbondi.org/ci">
+            <span class="flag flag-CI"></span>
+            <span class="name">Côte d'Ivoire</span>
+            <span class="chevron"></span>
+          </a>
+          <a class="city" href="https://cualbondi.org/cn">
+            <span class="flag flag-CN"></span>
+            <span class="name">中国</span>
+            <span class="chevron"></span>
+          </a>
+          <a class="city" href="https://cualbondi.org/es">
             <span class="flag flag-ES"></span>
-            <span class="name">{{c.name}}</span>
+            <span class="name">España</span>
             <span class="chevron"></span>
           </a>
-          {% endfor %}
+          <a class="city" href="https://cualbondi.org/ru">
+            <span class="flag flag-RU"></span>
+            <span class="name">Россия</span>
+            <span class="chevron"></span>
+          </a>
         </div>
       </div>
     </div>
