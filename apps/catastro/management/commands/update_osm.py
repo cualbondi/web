@@ -352,7 +352,7 @@ class Command(BaseCommand):
                             linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
 
                         for rel_id in admin_relations_ways_ids[w.id]:
-                            if 'ways' in admin_relations[rel_id]:
+                            if rel_id in admin_relations and 'ways' in admin_relations[rel_id]:
                                 for i, wid in enumerate(admin_relations[rel_id]['ways']):
                                     if wid == w.id:
                                         admin_relations[rel_id]['ways'][i] = linestring
