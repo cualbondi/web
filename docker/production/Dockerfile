@@ -38,11 +38,11 @@ RUN \
     pip3 install --no-cache-dir -r /requirements/production.txt \
 && \
     echo "00 2 * * * root /usr/bin/python3 /app/manage.py update_osm --king=argentina --download --admin_areas --update_routes --pois >> /var/log/cualbondi-argentina.log 2>&1" > /etc/cron.d/osm-cualbondi && \
-    echo "40 2 * * * root /usr/bin/python3 /app/manage.py update_osm --king=spain --download --admin_areas --update_routes --pois >> /var/log/cualbondi-spain.log 2>&1" > /etc/cron.d/osm-cualbondi && \
-    echo "30 3 * * * root /usr/bin/python3 /app/manage.py update_osm --king=ivorycoast --download --admin_areas --update_routes --pois >> /var/log/cualbondi-ivorycoast.log 2>&1" > /etc/cron.d/osm-cualbondi && \
-    echo "00 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=brazil --download --admin_areas --update_routes --pois >> /var/log/cualbondi-brazil.log 2>&1" > /etc/cron.d/osm-cualbondi && \
-    echo "30 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=china --download --admin_areas --update_routes --pois >> /var/log/cualbondi-china.log 2>&1" > /etc/cron.d/osm-cualbondi && \
-    # TODO FIX --cross: RUN echo "00 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=argentina --cross >> /var/log/cualbondi-cross.log 2>&1" >> /etc/cron.d/osm-cualbondi
+    echo "40 2 * * * root /usr/bin/python3 /app/manage.py update_osm --king=spain --download --admin_areas --update_routes --pois >> /var/log/cualbondi-spain.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
+    echo "30 3 * * * root /usr/bin/python3 /app/manage.py update_osm --king=ivorycoast --download --admin_areas --update_routes --pois >> /var/log/cualbondi-ivorycoast.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
+    echo "00 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=brazil --download --admin_areas --update_routes --pois >> /var/log/cualbondi-brazil.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
+    echo "30 4 * * * root /usr/bin/python3 /app/manage.py update_osm --king=china --download --admin_areas --update_routes --pois >> /var/log/cualbondi-china.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
+    echo "30 5 * * * root /usr/bin/python3 /app/manage.py update_osm --king=russia --download --admin_areas --update_routes --pois >> /var/log/cualbondi-russia.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
     echo "00 4 * * * root /usr/bin/python3 /app/manage.py calcular_envolventes >> /var/log/cualbondi-envolventes.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
     echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sF >> /var/log/cualbondi-thumbs.log 2>&1" >> /etc/cron.d/osm-cualbondi \
 && \
