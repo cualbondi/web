@@ -802,12 +802,12 @@ class Command(BaseCommand):
                     osm_id = rec.osm_id
                     if osm_id in buses:
                         way = buses[osm_id]['way']
-                        status = buses[osm_id]['status']
-                        osm_osm_version = buses[osm_id]['version']
-                        osm_last_updated = buses[osm_id]['timestamp']
-                        name = buses[osm_id]['name']
+                        status = buses[osm_id]['pt'].status.code
+                        osm_osm_version = buses[osm_id]['pt'].info['version']
+                        osm_last_updated = buses[osm_id]['pt'].info['timestamp']
+                        name = buses[osm_id]['pt'].tags['name']
                         paradas_completas = buses[osm_id]['paradas_completas']
-                        routetype = buses[osm_id]['type']
+                        routetype = buses[osm_id]['pt'].tags['route']
                     else:
                         way = None
                         status = None
