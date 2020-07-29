@@ -134,14 +134,14 @@ kings = {
         'country_code': 'tw',
         'lang': 'zh_TW',
     },
-    'morocco': {
-        'name': 'morocco',
-        'url': 'https://download.geofabrik.de/africa/morocco-latest.osm.pbf',
-        'id': 3630439,
-        'paradas_completas': False,
-        'country_code': 'ma',
-        'lang': 'ar_MA',  # TODO: falta ar como lang
-    },
+    # 'morocco': {
+    #     'name': 'morocco',
+    #     'url': 'https://download.geofabrik.de/africa/morocco-latest.osm.pbf',
+    #     'id': 3630439,
+    #     'paradas_completas': False,
+    #     'country_code': 'ma',
+    #     'lang': 'ar_MA',  # TODO: falta ar como lang
+    # },
     'burkinafaso': {
         'name': 'burkinafaso',
         'url': 'https://download.geofabrik.de/africa/burkina-faso-latest.osm.pbf',
