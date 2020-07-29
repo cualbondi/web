@@ -1,7 +1,8 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
 <!DOCTYPE html>
-<html lang="{{LANGUAGE_CODE}}">
+<html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}lang="{{LANGUAGE_CODE}}">
     <head{% block head-attrs %}{% endblock %}>
 	    <meta charset="utf-8">
         <link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}img/favicon.png" />
