@@ -217,6 +217,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        # administrativearea
+        administrativeareas = []
+        if options['administrativeareas'] or options['full']:
+            administrativeareas = AdministrativeArea.objects.all()
+        elif options['administrativearea_osm_id']:
+            administrativeareas = [AdministrativeArea.objects.get(osm_id=options['administrativearea_osm_id'])]
+        elif options['administrativearea_id']:
+            administrativeareas = [AdministrativeArea.objects.get(id=options['administrativearea_id'])]
+        elif options['country_code']:
+            administrativeareas = AdministrativeArea.objects.filter(country_code=options['country_code'])
+        for administrativearea in administrativeareas:
+            self.make_map_img(administrativearea, skip=options['skip'])
+
         # lineas
         lineas = []
         if options['lineas'] or options['full']:
@@ -255,16 +268,3 @@ class Command(BaseCommand):
             pois = Poi.objects.filter(country_code=options['country_code'])
         for poi in pois:
             self.make_map_img(poi, skip=options['skip'])
-
-        # administrativearea
-        administrativeareas = []
-        if options['administrativeareas'] or options['full']:
-            administrativeareas = AdministrativeArea.objects.all()
-        elif options['administrativearea_osm_id']:
-            administrativeareas = [AdministrativeArea.objects.get(osm_id=options['administrativearea_osm_id'])]
-        elif options['administrativearea_id']:
-            administrativeareas = [AdministrativeArea.objects.get(id=options['administrativearea_id'])]
-        elif options['country_code']:
-            administrativeareas = AdministrativeArea.objects.filter(country_code=options['country_code'])
-        for administrativearea in administrativeareas:
-            self.make_map_img(administrativearea, skip=options['skip'])
