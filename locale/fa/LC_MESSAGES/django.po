@@ -1,0 +1,296 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Julian Perelli <jperelli@gmail.com>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-03-06 23:57+0000\n"
+"PO-Revision-Date: 2020-03-07 00:17+0000\n"
+"Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
+"Language-Team: Persian (https://www.transifex.com/cualbondi/teams/107940/fa/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fa\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: templates/404.html:5
+msgid "Oops! The page could not be found..."
+msgstr "اوه! صفحه یافت نشد ..."
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "Go back to"
+msgstr "بازگشت به"
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "home"
+msgstr "شروع"
+
+#: templates/500.html:5
+msgid "Oops! Something went wrong..."
+msgstr "اوه! مشکلی پیش آمد ..."
+
+#: templates/base.html:9
+msgid "Search engine of public transportation bus, train,  subway, tram."
+msgstr "موتور جستجوی اتوبوس حمل و نقل عمومی ، قطار ، مترو ، تراموا."
+
+#: templates/catastro/ver_administrativearea.html:5
+msgid "Public transportation in"
+msgstr "حمل و نقل عمومی در"
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/catastro/ver_administrativearea.html:14
+msgid "How to get around in"
+msgstr "چگونه می توانیم وارد شوید"
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:6
+msgid "and what lines and routes of buses go through"
+msgstr "و چه خطوط و مسیرهای اتوبوس ها طی می شوند"
+
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/catastro/ver_poi.html:15
+msgid "List of all the public transport that go through"
+msgstr "لیست تمام وسایل حمل و نقل عمومی که از طریق آن عبور می کنید"
+
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/catastro/ver_poi.html:15
+msgid "See how to get from where you are"
+msgstr "ببینید چگونه می توانید از جایی که هستید بگیرید"
+
+#: templates/catastro/ver_administrativearea.html:23
+#: templates/catastro/ver_poi.html:23 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:23
+msgid "Home"
+msgstr "شروع"
+
+#: templates/catastro/ver_administrativearea.html:69
+msgid "Lines of public transport"
+msgstr "خطوط حمل و نقل عمومی"
+
+#: templates/catastro/ver_administrativearea.html:91
+msgid "Routes of public transport"
+msgstr "مسیرهای حمل و نقل عمومی"
+
+#: templates/catastro/ver_administrativearea.html:121
+msgid "Places"
+msgstr "اماکن"
+
+#: templates/catastro/ver_administrativearea.html:135
+#: templates/core/ver_recorrido.html:150
+msgid "Stops"
+msgstr "ایستگاه"
+
+#: templates/catastro/ver_administrativearea.html:144
+msgid "Points of interest"
+msgstr "نقاط مورد علاقه"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
+#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:46
+msgid "How to get to"
+msgstr "چگونه به آن برسیم"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
+#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:15
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:95
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:15
+msgid "in"
+msgstr "در ظرف"
+
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:46
+msgid "?"
+msgstr "؟"
+
+#: templates/catastro/ver_interseccion.html:43
+msgid "Routes of public transport that pass through this intersection"
+msgstr "مسیرهای حمل و نقل عمومی که از این تقاطع عبور می کنند"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:56
+#: templates/core/ver_recorrido.html:105
+msgid "from"
+msgstr "از"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:46
+#: templates/core/ver_recorrido.html:56 templates/core/ver_recorrido.html:105
+msgid "to"
+msgstr "تا"
+
+#: templates/catastro/ver_interseccion.html:64
+#: templates/catastro/ver_poi.html:109
+msgid "Nearby stops"
+msgstr "ایستگاه های نزدیک"
+
+#: templates/catastro/ver_interseccion.html:73
+#: templates/catastro/ver_poi.html:118
+msgid "Other points of interest nearby"
+msgstr "سایر نقاط دیدنی اطراف"
+
+#: templates/catastro/ver_poi-404.html:7
+msgid "Could not find"
+msgstr "یافت نشد"
+
+#: templates/catastro/ver_poi-404.html:12
+msgid "But we did everything possible to find similar places"
+msgstr "اما ما برای یافتن مکانهای مشابه همه کار ممکن را انجام دادیم"
+
+#: templates/catastro/ver_poi.html:57
+msgid "Go to website"
+msgstr "به وب سایت بروید"
+
+#: templates/catastro/ver_poi.html:62
+msgid "Phone"
+msgstr "تلفن"
+
+#: templates/catastro/ver_poi.html:77 templates/core/ver_recorrido.html:89
+msgid "See in interactive map"
+msgstr "در نقشه تعاملی مشاهده کنید"
+
+#: templates/catastro/ver_poi.html:88
+msgid "Public transport routes that pass next to this place"
+msgstr "مسیرهای حمل و نقل عمومی که کنار این مکان می گذرد"
+
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
+msgid "Line"
+msgstr "خط"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid ""
+"All the information about routes, trips, stops, schedules and fares of the "
+"line"
+msgstr ""
+"تمام اطلاعات در مورد مسیرها ، مسافرت ها ، توقف ها ، برنامه ها و کرایه های خط"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid "that passes through"
+msgstr "که می گذرد"
+
+#: templates/core/ver_linea.html:49
+msgid "Company information"
+msgstr "اطلاعات شرکت"
+
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:61
+msgid "Places that travel to"
+msgstr "مکانهایی که به آنجا سفر می کنند"
+
+#: templates/core/ver_linea.html:64
+msgid "Routes of the line"
+msgstr "مسیرهای خط"
+
+#: templates/core/ver_linea.html:95
+msgid "Public transportation coverage of the line"
+msgstr "پوشش حمل و نقل عمومی خط"
+
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_parada.html:43
+msgid "Stop"
+msgstr "ایستگاه"
+
+#: templates/core/ver_parada.html:6
+msgid "and what lines of routes of buses, train and subway stop in the stop"
+msgstr "و چه خطوط مسیرهایی از اتوبوس ها ، قطار و مترو در توقف است"
+
+#: templates/core/ver_parada.html:62
+msgid "Public transport routes that stop in this stop"
+msgstr "مسیرهای حمل و نقل عمومی که در این توقف متوقف می شوند"
+
+#: templates/core/ver_parada.html:79
+msgid ""
+"Public transport routes that pass nearby of this stop (do not stop here)"
+msgstr ""
+"مسیرهای حمل و نقل عمومی که از نزدیکی این توقف عبور می کنند (در اینجا متوقف "
+"نشوید)"
+
+#: templates/core/ver_parada.html:100
+msgid "Points of interest nearby"
+msgstr "نقاط مورد علاقه در این نزدیکی هست"
+
+#: templates/core/ver_parada.html:117
+msgid "Neighborhoods nearby"
+msgstr "محله های اطراف"
+
+#: templates/core/ver_parada.html:126
+msgid "Other stops near"
+msgstr "سایر توقفها در نزدیکی"
+
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:54
+msgid "Route"
+msgstr "مسیر"
+
+#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+msgid "of the line"
+msgstr "از خط"
+
+#: templates/core/ver_recorrido.html:6
+msgid "All the information on stops, schedules and fares of the route"
+msgstr "تمام اطلاعات در مورد توقف ها ، برنامه ها و کرایه های مسیر"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+msgid "Description of the route of the bus"
+msgstr "شرح مسیر اتوبوس"
+
+#: templates/core/ver_recorrido.html:15
+msgid "branch"
+msgstr "بخش"
+
+#: templates/core/ver_recorrido.html:15
+msgid "Route from"
+msgstr "مسیر از"
+
+#: templates/core/ver_recorrido.html:70 templates/core/ver_recorrido.html:80
+msgid "Streets that compose this route"
+msgstr "خیابان هایی که این مسیر را تشکیل می دهند"
+
+#: templates/core/ver_recorrido.html:99
+msgid "Similar routes"
+msgstr "مسیرهای مشابه"
+
+#: templates/core/ver_recorrido.html:121
+msgid "Points of interest near the route"
+msgstr "نقاط مورد علاقه در نزدیکی مسیر"
+
+#: templates/leaflet/admin/widget.html:29
+msgid "Reset view"
+msgstr "نمایش تنظیم مجدد"
+
+#: templates/navbar.html:26
+msgid "Go to the search engine"
+msgstr "به موتور جستجو بروید"
+
+#: templates/navbar.html:35
+msgid "Login"
+msgstr "وارد شدن"
+
+#: templates/navbar.html:39
+msgid "Star users"
+msgstr "کاربران ستاره"
+
+#: templates/navbar.html:40
+msgid "Poll"
+msgstr "نظرسنجی"

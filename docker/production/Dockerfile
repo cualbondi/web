@@ -46,6 +46,7 @@ RUN \
     echo "30 6 * * * root /usr/bin/python3 /app/manage.py update_osm --king=srilanka --download --admin_areas --update_routes --pois >> /var/log/cualbondi-srilanka.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
     echo "45 6 * * * root /usr/bin/python3 /app/manage.py update_osm --king=taiwan --download --admin_areas --update_routes --pois >> /var/log/cualbondi-taiwan.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
     echo "00 7 * * * root /usr/bin/python3 /app/manage.py update_osm --king=burkinafaso --download --admin_areas --update_routes --pois >> /var/log/cualbondi-burkinafaso.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
+    echo "00 7 * * * root /usr/bin/python3 /app/manage.py update_osm --king=iran --download --admin_areas --update_routes --pois >> /var/log/cualbondi-iran.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
     # echo "10 7 * * * root /usr/bin/python3 /app/manage.py update_osm --king=morocco --download --admin_areas --update_routes --pois >> /var/log/cualbondi-morocco.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
     echo "00 4 * * * root /usr/bin/python3 /app/manage.py calcular_envolventes >> /var/log/cualbondi-envolventes.log 2>&1" >> /etc/cron.d/osm-cualbondi && \
     echo "00 5 * * * root /usr/bin/python3 /app/manage.py crear_thumbs -sF >> /var/log/cualbondi-thumbs.log 2>&1" >> /etc/cron.d/osm-cualbondi \

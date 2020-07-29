@@ -150,6 +150,14 @@ kings = {
         'country_code': 'bf',
         'lang': 'fr_BF',
     },
+    'iran': {
+        'name': 'iran',
+        'url': 'http://download.geofabrik.de/asia/iran-latest.osm.pbf',
+        'id': 304938,
+        'paradas_completas': False,
+        'country_code': 'ir',
+        'lang': 'fa_IR',
+    },
     # 'usa': {
     #     'name': 'usa',
     #     'url': 'https://download.geofabrik.de/north-america/us-latest.osm.pbf',
