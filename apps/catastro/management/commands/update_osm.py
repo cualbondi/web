@@ -158,6 +158,14 @@ kings = {
         'country_code': 'ir',
         'lang': 'fa_IR',
     },
+    'southkorea': {
+        'name': 'southkorea',
+        'url': 'https://download.geofabrik.de/asia/south-korea-latest.osm.pbf',
+        'id': 307756,
+        'paradas_completas': True,
+        'country_code': 'kr',
+        'lang': 'ko_KR',
+    },
     # 'usa': {
     #     'name': 'usa',
     #     'url': 'https://download.geofabrik.de/north-america/us-latest.osm.pbf',
