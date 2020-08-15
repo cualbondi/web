@@ -2,24 +2,210 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 # Translators:
 # Julian Perelli <jperelli@gmail.com>, 2020
-# 
+# Julian Perelli <jperelli@gmail.com>, 2020
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 23:57+0000\n"
+"POT-Creation-Date: 2020-08-15 22:36+0000\n"
 "PO-Revision-Date: 2020-03-07 00:17+0000\n"
 "Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
-"Language-Team: Spanish (https://www.transifex.com/cualbondi/teams/107940/es/)\n"
+"Language-Team: Spanish (https://www.transifex.com/cualbondi/teams/107940/"
+"es/)\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/catastro/views.py:41
+msgctxt "an amenity type"
+msgid "restaurant"
+msgstr "restaurant"
+
+#: apps/catastro/views.py:42
+msgctxt "an amenity type"
+msgid "school"
+msgstr "escuela"
+
+#: apps/catastro/views.py:43
+msgctxt "an amenity type"
+msgid "pharmacy"
+msgstr "farmacia"
+
+#: apps/catastro/views.py:44
+msgctxt "an amenity type"
+msgid "Kindergarten"
+msgstr "jardín de infantes"
+
+#: apps/catastro/views.py:45
+msgctxt "an amenity type"
+msgid "cafe"
+msgstr "café"
+
+#: apps/catastro/views.py:46
+msgctxt "an amenity type"
+msgid "fast_food"
+msgstr "comida rápida"
+
+#: apps/catastro/views.py:47
+msgctxt "an amenity type"
+msgid "bar"
+msgstr "bar"
+
+#: apps/catastro/views.py:48
+msgctxt "an amenity type"
+msgid "place_of_worship"
+msgstr "templo"
+
+#: apps/catastro/views.py:49
+msgctxt "an amenity type"
+msgid "college"
+msgstr "universidad"
+
+#: apps/catastro/views.py:50
+msgctxt "an amenity type"
+msgid "ice_cream"
+msgstr "heladería"
+
+#: apps/catastro/views.py:51
+msgctxt "an amenity type"
+msgid "police"
+msgstr "policía"
+
+#: apps/catastro/views.py:52
+msgctxt "an amenity type"
+msgid "hospital"
+msgstr "hospital"
+
+#: apps/catastro/views.py:53
+msgctxt "an amenity type"
+msgid "clinic"
+msgstr "clínica"
+
+#: apps/catastro/views.py:54
+msgctxt "an amenity type"
+msgid "community_centre"
+msgstr "centro comunitario"
+
+#: apps/catastro/views.py:55
+msgctxt "an amenity type"
+msgid "veterinary"
+msgstr "veterinaria"
+
+#: apps/catastro/views.py:56
+msgctxt "an amenity type"
+msgid "doctors"
+msgstr "doctor"
+
+#: apps/catastro/views.py:57
+msgctxt "an amenity type"
+msgid "bicycle_rental"
+msgstr "alquiler de bicicletas"
+
+#: apps/catastro/views.py:58
+msgctxt "an amenity type"
+msgid "taxi"
+msgstr "taxi"
+
+#: apps/catastro/views.py:59
+msgctxt "an amenity type"
+msgid "library"
+msgstr "biblioteca"
+
+#: apps/catastro/views.py:60
+msgctxt "an amenity type"
+msgid "dentist"
+msgstr "dentista"
+
+#: apps/catastro/views.py:61
+msgctxt "an amenity type"
+msgid "bank"
+msgstr "banco"
+
+#: apps/catastro/views.py:62
+msgctxt "an amenity type"
+msgid "theatre"
+msgstr "teatro"
+
+#: apps/catastro/views.py:63
+msgctxt "an amenity type"
+msgid "car_wash"
+msgstr "lavadero de autos"
+
+#: apps/catastro/views.py:64
+msgctxt "an amenity type"
+msgid "pub"
+msgstr "bar"
+
+#: apps/catastro/views.py:65
+msgctxt "an amenity type"
+msgid "university"
+msgstr "universidad"
+
+#: apps/reviews/forms.py:12 apps/reviews/templates/reviews/form.html:19
+msgid "Terrible"
+msgstr "Terrible"
+
+#: apps/reviews/forms.py:13 apps/reviews/templates/reviews/form.html:20
+msgid "Poor"
+msgstr "Pobre"
+
+#: apps/reviews/forms.py:14 apps/reviews/templates/reviews/form.html:21
+msgid "Average"
+msgstr "Bueno"
+
+#: apps/reviews/forms.py:15
+msgid "Very Good"
+msgstr "Muy Bueno"
+
+#: apps/reviews/forms.py:16 apps/reviews/templates/reviews/form.html:23
+msgid "Excellent"
+msgstr "Excelente"
+
+#: apps/reviews/forms.py:25 apps/reviews/templates/reviews/form.html:18
+msgid "Select a rating"
+msgstr "Seleccione un puntaje"
+
+#: apps/reviews/forms.py:26
+msgid "Rating"
+msgstr "Puntaje"
+
+#: apps/reviews/templates/reviews/aggregate.html:8
+#, python-format
+msgid "see %(comment_count)s reviews"
+msgstr "ver %(comment_count)s reseñas"
+
+#: apps/reviews/templates/reviews/aggregate.html:13
+msgid "write the first review"
+msgstr "escribe la primer reseña"
+
+#: apps/reviews/templates/reviews/form.html:15
+msgid "Name"
+msgstr "Nombre"
+
+#: apps/reviews/templates/reviews/form.html:22
+msgid "Very"
+msgstr "Muy"
+
+#: apps/reviews/templates/reviews/form.html:28
+#, fuzzy
+#| msgid "Reset view"
+msgid "Review"
+msgstr "Reset view"
+
+#: apps/reviews/templates/reviews/form.html:30
+msgid "Post"
+msgstr "Publicar"
+
+#: apps/reviews/templates/reviews/list.html:12
+msgid "at"
+msgstr "en"
 
 #: templates/404.html:5
 msgid "Oops! The page could not be found..."
@@ -39,83 +225,99 @@ msgstr "inicio"
 msgid "Oops! Something went wrong..."
 msgstr "Uups! Algo anduvo mal..."
 
-#: templates/base.html:9
+#: templates/base.html:10 templates/parts/base/top.html:9
 msgid "Search engine of public transportation bus, train,  subway, tram."
 msgstr "Buscador de recorridos de bondis, colectivos, micros"
 
-#: templates/catastro/ver_administrativearea.html:5
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/parts/catastro/ver_administrativearea/top.html:4
 msgid "Public transportation in"
 msgstr "Transporte público en"
 
-#: templates/catastro/ver_administrativearea.html:6
-#: templates/catastro/ver_administrativearea.html:14
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+#: templates/parts/catastro/ver_administrativearea/top.html:13
 msgid "How to get around in"
 msgstr "Cómo moverse en"
 
-#: templates/catastro/ver_administrativearea.html:6
-#: templates/catastro/ver_interseccion.html:6
-#: templates/catastro/ver_poi.html:6
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:8
+#: templates/parts/catastro/ver_administrativearea/top.html:5
 msgid "and what lines and routes of buses go through"
 msgstr "y qué lneas de recorridos de micros y ómnibus y buses pasan por"
 
-#: templates/catastro/ver_administrativearea.html:15
-#: templates/catastro/ver_poi.html:15
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
 msgid "List of all the public transport that go through"
 msgstr "Listado de todos los medios de transporte público que pasan por"
 
-#: templates/catastro/ver_administrativearea.html:15
-#: templates/catastro/ver_poi.html:15
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
 msgid "See how to get from where you are"
 msgstr "Entra para ver cómo llegar desde donde estes ahora"
 
-#: templates/catastro/ver_administrativearea.html:23
-#: templates/catastro/ver_poi.html:23 templates/core/ver_linea.html:23
-#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:23
+#: templates/catastro/ver_administrativearea.html:24
+#: templates/catastro/ver_poi.html:25 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:24
+#: templates/parts/catastro/ver_administrativearea/content.html:9
 msgid "Home"
 msgstr "Inicio"
 
-#: templates/catastro/ver_administrativearea.html:69
+#: templates/catastro/ver_administrativearea.html:64
+#: templates/catastro/ver_poi.html:83 templates/core/ver_recorrido.html:90
+#: templates/parts/catastro/ver_administrativearea/content.html:49
+msgid "See in interactive map"
+msgstr "Ver en mapa interactivo"
+
+#: templates/catastro/ver_administrativearea.html:76
+#: templates/parts/catastro/ver_administrativearea/content.html:61
 msgid "Lines of public transport"
 msgstr "Líneas de transporte público"
 
-#: templates/catastro/ver_administrativearea.html:91
+#: templates/catastro/ver_administrativearea.html:98
+#: templates/parts/catastro/ver_administrativearea/content.html:83
 msgid "Routes of public transport"
 msgstr "Recorridos de transporte público"
 
-#: templates/catastro/ver_administrativearea.html:121
+#: templates/catastro/ver_administrativearea.html:128
+#: templates/parts/catastro/ver_administrativearea/content.html:113
 msgid "Places"
 msgstr "Lugares"
 
-#: templates/catastro/ver_administrativearea.html:135
-#: templates/core/ver_recorrido.html:150
+#: templates/catastro/ver_administrativearea.html:142
+#: templates/core/ver_recorrido.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:127
 msgid "Stops"
 msgstr "Paradas"
 
-#: templates/catastro/ver_administrativearea.html:144
+#: templates/catastro/ver_administrativearea.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:136
 msgid "Points of interest"
 msgstr "Puntos de interés"
 
 #: templates/catastro/ver_interseccion.html:5
 #: templates/catastro/ver_interseccion.html:6
 #: templates/catastro/ver_interseccion.html:17
-#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
-#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:46
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:48
 msgid "How to get to"
 msgstr "Cómo llegar a"
 
 #: templates/catastro/ver_interseccion.html:5
-#: templates/catastro/ver_interseccion.html:6
-#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
-#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:15
-#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:95
-#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:15
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:7
+#: templates/catastro/ver_poi.html:8 templates/catastro/ver_poi.html:16
+#: templates/catastro/ver_poi.html:17 templates/core/ver_linea.html:5
+#: templates/core/ver_linea.html:95 templates/core/ver_parada.html:5
+#: templates/core/ver_parada.html:6 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
 msgid "in"
 msgstr "en"
 
 #: templates/catastro/ver_interseccion.html:17
-#: templates/catastro/ver_poi.html:46
+#: templates/catastro/ver_poi.html:48
 msgid "?"
 msgstr "?"
 
@@ -124,30 +326,30 @@ msgid "Routes of public transport that pass through this intersection"
 msgstr "Recorridos de transporte público que pasan por esta intersección"
 
 #: templates/catastro/ver_interseccion.html:49
-#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:56
-#: templates/core/ver_recorrido.html:105
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:47 templates/core/ver_recorrido.html:57
+#: templates/core/ver_recorrido.html:106
 msgid "from"
 msgstr "desde"
 
 #: templates/catastro/ver_interseccion.html:49
-#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:46
-#: templates/core/ver_recorrido.html:56 templates/core/ver_recorrido.html:105
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16 templates/core/ver_recorrido.html:47
+#: templates/core/ver_recorrido.html:57 templates/core/ver_recorrido.html:106
 msgid "to"
 msgstr "hasta"
 
 #: templates/catastro/ver_interseccion.html:64
-#: templates/catastro/ver_poi.html:109
+#: templates/catastro/ver_poi.html:117
 msgid "Nearby stops"
 msgstr "Paradas cercanas"
 
 #: templates/catastro/ver_interseccion.html:73
-#: templates/catastro/ver_poi.html:118
+#: templates/catastro/ver_poi.html:126
 msgid "Other points of interest nearby"
 msgstr "Otros puntos de interés cercanos"
 
@@ -159,24 +361,26 @@ msgstr "No pudimos encontrar"
 msgid "But we did everything possible to find similar places"
 msgstr "Pero hicimos todo lo posible por encontrar lugares similares"
 
-#: templates/catastro/ver_poi.html:57
+#: templates/catastro/ver_poi.html:64
 msgid "Go to website"
 msgstr "Ir al sitio web"
 
-#: templates/catastro/ver_poi.html:62
+#: templates/catastro/ver_poi.html:69
 msgid "Phone"
 msgstr "Teléfono"
 
-#: templates/catastro/ver_poi.html:77 templates/core/ver_recorrido.html:89
-msgid "See in interactive map"
-msgstr "Ver en mapa interactivo"
-
-#: templates/catastro/ver_poi.html:88
+#: templates/catastro/ver_poi.html:96
 msgid "Public transport routes that pass next to this place"
 msgstr "Recorridos de transporte público que pasan por este lugar"
 
+#: templates/catastro/ver_poi.html:142
+#, fuzzy
+#| msgid "Reset view"
+msgid "Reviews of"
+msgstr "Reset view"
+
 #: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
-#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:16
 msgid "Line"
 msgstr "Línea"
 
@@ -196,7 +400,7 @@ msgstr "que pasa por"
 msgid "Company information"
 msgstr "Información de la empresa"
 
-#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:61
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:62
 msgid "Places that travel to"
 msgstr "Lugares que transita"
 
@@ -241,39 +445,39 @@ msgstr "Barrios cercanos"
 msgid "Other stops near"
 msgstr "Otras paradas cercanas"
 
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:54
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:55
 msgid "Route"
 msgstr "Recorrido"
 
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
 msgid "of the line"
 msgstr "de la línea"
 
-#: templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:7
 msgid "All the information on stops, schedules and fares of the route"
 msgstr "Toda la información sobre paradas, horarios y tarifas del recorrido"
 
-#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
 msgid "Description of the route of the bus"
 msgstr "Descripción del recorrido de colectivo, micro, bus"
 
-#: templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:16
 msgid "branch"
 msgstr "Ramal"
 
-#: templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:16
 msgid "Route from"
 msgstr "Recorrido desde"
 
-#: templates/core/ver_recorrido.html:70 templates/core/ver_recorrido.html:80
+#: templates/core/ver_recorrido.html:71 templates/core/ver_recorrido.html:81
 msgid "Streets that compose this route"
 msgstr "Calles que componen este recorrido"
 
-#: templates/core/ver_recorrido.html:99
+#: templates/core/ver_recorrido.html:100
 msgid "Similar routes"
 msgstr "Recorridos similares"
 
-#: templates/core/ver_recorrido.html:121
+#: templates/core/ver_recorrido.html:122
 msgid "Points of interest near the route"
 msgstr "Puntos de interés por donde pasa"
 
@@ -281,18 +485,18 @@ msgstr "Puntos de interés por donde pasa"
 msgid "Reset view"
 msgstr "Reset view"
 
-#: templates/navbar.html:26
+#: templates/navbar.html:28 templates/parts/base/top.html:52
 msgid "Go to the search engine"
 msgstr "Ir al buscador"
 
-#: templates/navbar.html:35
+#: templates/navbar.html:37 templates/parts/base/top.html:61
 msgid "Login"
 msgstr "Login"
 
-#: templates/navbar.html:39
+#: templates/navbar.html:41 templates/parts/base/top.html:65
 msgid "Star users"
 msgstr "Usuarios estrella"
 
-#: templates/navbar.html:40
+#: templates/navbar.html:42 templates/parts/base/top.html:66
 msgid "Poll"
 msgstr "Encuesta"

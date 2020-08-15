@@ -5,13 +5,14 @@
 #
 # Translators:
 # Julian Perelli <jperelli@gmail.com>, 2020
+# Julian Perelli <jperelli@gmail.com>, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-12 19:51+0000\n"
+"POT-Creation-Date: 2020-08-15 22:36+0000\n"
 "PO-Revision-Date: 2020-03-07 00:17+0000\n"
 "Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/cualbondi/"
@@ -21,6 +22,190 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/catastro/views.py:41
+msgctxt "an amenity type"
+msgid "restaurant"
+msgstr "餐厅"
+
+#: apps/catastro/views.py:42
+msgctxt "an amenity type"
+msgid "school"
+msgstr "学校"
+
+#: apps/catastro/views.py:43
+msgctxt "an amenity type"
+msgid "pharmacy"
+msgstr "药店"
+
+#: apps/catastro/views.py:44
+msgctxt "an amenity type"
+msgid "Kindergarten"
+msgstr "幼儿园"
+
+#: apps/catastro/views.py:45
+msgctxt "an amenity type"
+msgid "cafe"
+msgstr "咖啡馆"
+
+#: apps/catastro/views.py:46
+msgctxt "an amenity type"
+msgid "fast_food"
+msgstr "快餐"
+
+#: apps/catastro/views.py:47
+msgctxt "an amenity type"
+msgid "bar"
+msgstr "酒吧"
+
+#: apps/catastro/views.py:48
+msgctxt "an amenity type"
+msgid "place_of_worship"
+msgstr "宗教场所"
+
+#: apps/catastro/views.py:49
+msgctxt "an amenity type"
+msgid "college"
+msgstr "学院"
+
+#: apps/catastro/views.py:50
+msgctxt "an amenity type"
+msgid "ice_cream"
+msgstr "冰淇淋"
+
+#: apps/catastro/views.py:51
+msgctxt "an amenity type"
+msgid "police"
+msgstr "警察"
+
+#: apps/catastro/views.py:52
+msgctxt "an amenity type"
+msgid "hospital"
+msgstr "医院"
+
+#: apps/catastro/views.py:53
+msgctxt "an amenity type"
+msgid "clinic"
+msgstr "诊所"
+
+#: apps/catastro/views.py:54
+msgctxt "an amenity type"
+msgid "community_centre"
+msgstr "社区活动中心"
+
+#: apps/catastro/views.py:55
+msgctxt "an amenity type"
+msgid "veterinary"
+msgstr "兽医"
+
+#: apps/catastro/views.py:56
+msgctxt "an amenity type"
+msgid "doctors"
+msgstr "医生"
+
+#: apps/catastro/views.py:57
+msgctxt "an amenity type"
+msgid "bicycle_rental"
+msgstr "自行车出租"
+
+#: apps/catastro/views.py:58
+msgctxt "an amenity type"
+msgid "taxi"
+msgstr "出租汽车"
+
+#: apps/catastro/views.py:59
+msgctxt "an amenity type"
+msgid "library"
+msgstr "图书馆"
+
+#: apps/catastro/views.py:60
+msgctxt "an amenity type"
+msgid "dentist"
+msgstr "牙医"
+
+#: apps/catastro/views.py:61
+msgctxt "an amenity type"
+msgid "bank"
+msgstr "银行"
+
+#: apps/catastro/views.py:62
+msgctxt "an amenity type"
+msgid "theatre"
+msgstr "剧院"
+
+#: apps/catastro/views.py:63
+msgctxt "an amenity type"
+msgid "car_wash"
+msgstr "洗车"
+
+#: apps/catastro/views.py:64
+msgctxt "an amenity type"
+msgid "pub"
+msgstr "酒馆"
+
+#: apps/catastro/views.py:65
+msgctxt "an amenity type"
+msgid "university"
+msgstr "大学"
+
+#: apps/reviews/forms.py:12 apps/reviews/templates/reviews/form.html:19
+msgid "Terrible"
+msgstr "可怕"
+
+#: apps/reviews/forms.py:13 apps/reviews/templates/reviews/form.html:20
+msgid "Poor"
+msgstr "较差的"
+
+#: apps/reviews/forms.py:14 apps/reviews/templates/reviews/form.html:21
+msgid "Average"
+msgstr "平均"
+
+#: apps/reviews/forms.py:15
+msgid "Very Good"
+msgstr "很好"
+
+#: apps/reviews/forms.py:16 apps/reviews/templates/reviews/form.html:23
+msgid "Excellent"
+msgstr "优秀的"
+
+#: apps/reviews/forms.py:25 apps/reviews/templates/reviews/form.html:18
+msgid "Select a rating"
+msgstr "选择一个评分"
+
+#: apps/reviews/forms.py:26
+msgid "Rating"
+msgstr "评分"
+
+#: apps/reviews/templates/reviews/aggregate.html:8
+#, python-format
+msgid "see %(comment_count)s reviews"
+msgstr "查看%(comment_count)s条评论"
+
+#: apps/reviews/templates/reviews/aggregate.html:13
+msgid "write the first review"
+msgstr "写第一篇评论"
+
+#: apps/reviews/templates/reviews/form.html:15
+msgid "Name"
+msgstr "名称"
+
+#: apps/reviews/templates/reviews/form.html:22
+msgid "Very"
+msgstr "非常"
+
+#: apps/reviews/templates/reviews/form.html:28
+#, fuzzy
+#| msgid "Reset view"
+msgid "Review"
+msgstr "重置视图"
+
+#: apps/reviews/templates/reviews/form.html:30
+msgid "Post"
+msgstr "发布"
+
+#: apps/reviews/templates/reviews/list.html:12
+msgid "at"
+msgstr "在"
 
 #: templates/404.html:5
 msgid "Oops! The page could not be found..."
@@ -40,75 +225,75 @@ msgstr "家"
 msgid "Oops! Something went wrong..."
 msgstr "糟糕！ 出问题了..."
 
-#: templates/base.html:9 templates/parts/base/top.html:9
+#: templates/base.html:10 templates/parts/base/top.html:9
 msgid "Search engine of public transportation bus, train,  subway, tram."
 msgstr "公交，火车，地铁，电车的搜索引擎"
 
-#: templates/catastro/ver_administrativearea.html:5
+#: templates/catastro/ver_administrativearea.html:6
 #: templates/parts/catastro/ver_administrativearea/top.html:4
 msgid "Public transportation in"
 msgstr "的公共交通"
 
-#: templates/catastro/ver_administrativearea.html:6
-#: templates/catastro/ver_administrativearea.html:14
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_administrativearea.html:15
 #: templates/parts/catastro/ver_administrativearea/top.html:5
 #: templates/parts/catastro/ver_administrativearea/top.html:13
 msgid "How to get around in"
 msgstr "如何四处走走"
 
-#: templates/catastro/ver_administrativearea.html:6
-#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:6
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:8
 #: templates/parts/catastro/ver_administrativearea/top.html:5
 msgid "and what lines and routes of buses go through"
 msgstr "以及公交线路和路线"
 
-#: templates/catastro/ver_administrativearea.html:15
-#: templates/catastro/ver_poi.html:15
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
 #: templates/parts/catastro/ver_administrativearea/top.html:14
 msgid "List of all the public transport that go through"
 msgstr "所有经过的公共交通工具清单"
 
-#: templates/catastro/ver_administrativearea.html:15
-#: templates/catastro/ver_poi.html:15
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
 #: templates/parts/catastro/ver_administrativearea/top.html:14
 msgid "See how to get from where you are"
 msgstr "了解如何从您所在的地方"
 
-#: templates/catastro/ver_administrativearea.html:23
-#: templates/catastro/ver_poi.html:23 templates/core/ver_linea.html:23
-#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:23
+#: templates/catastro/ver_administrativearea.html:24
+#: templates/catastro/ver_poi.html:25 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:24
 #: templates/parts/catastro/ver_administrativearea/content.html:9
 msgid "Home"
 msgstr "家"
 
-#: templates/catastro/ver_administrativearea.html:63
-#: templates/catastro/ver_poi.html:77 templates/core/ver_recorrido.html:89
+#: templates/catastro/ver_administrativearea.html:64
+#: templates/catastro/ver_poi.html:83 templates/core/ver_recorrido.html:90
 #: templates/parts/catastro/ver_administrativearea/content.html:49
 msgid "See in interactive map"
 msgstr "在互动地图中查看"
 
-#: templates/catastro/ver_administrativearea.html:75
+#: templates/catastro/ver_administrativearea.html:76
 #: templates/parts/catastro/ver_administrativearea/content.html:61
 msgid "Lines of public transport"
 msgstr "公共交通线路"
 
-#: templates/catastro/ver_administrativearea.html:97
+#: templates/catastro/ver_administrativearea.html:98
 #: templates/parts/catastro/ver_administrativearea/content.html:83
 msgid "Routes of public transport"
 msgstr "公共交通路线"
 
-#: templates/catastro/ver_administrativearea.html:127
+#: templates/catastro/ver_administrativearea.html:128
 #: templates/parts/catastro/ver_administrativearea/content.html:113
 msgid "Places"
 msgstr "地方"
 
-#: templates/catastro/ver_administrativearea.html:141
-#: templates/core/ver_recorrido.html:150
+#: templates/catastro/ver_administrativearea.html:142
+#: templates/core/ver_recorrido.html:151
 #: templates/parts/catastro/ver_administrativearea/content.html:127
 msgid "Stops"
 msgstr "停止"
 
-#: templates/catastro/ver_administrativearea.html:150
+#: templates/catastro/ver_administrativearea.html:151
 #: templates/parts/catastro/ver_administrativearea/content.html:136
 msgid "Points of interest"
 msgstr "兴趣点"
@@ -116,23 +301,23 @@ msgstr "兴趣点"
 #: templates/catastro/ver_interseccion.html:5
 #: templates/catastro/ver_interseccion.html:6
 #: templates/catastro/ver_interseccion.html:17
-#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
-#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:46
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:48
 msgid "How to get to"
 msgstr "怎么去"
 
 #: templates/catastro/ver_interseccion.html:5
-#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:5
-#: templates/catastro/ver_poi.html:6 templates/catastro/ver_poi.html:14
-#: templates/catastro/ver_poi.html:15 templates/core/ver_linea.html:5
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:7
+#: templates/catastro/ver_poi.html:8 templates/catastro/ver_poi.html:16
+#: templates/catastro/ver_poi.html:17 templates/core/ver_linea.html:5
 #: templates/core/ver_linea.html:95 templates/core/ver_parada.html:5
-#: templates/core/ver_parada.html:6 templates/core/ver_recorrido.html:5
-#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+#: templates/core/ver_parada.html:6 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
 msgid "in"
 msgstr "在"
 
 #: templates/catastro/ver_interseccion.html:17
-#: templates/catastro/ver_poi.html:46
+#: templates/catastro/ver_poi.html:48
 msgid "?"
 msgstr "?"
 
@@ -141,30 +326,30 @@ msgid "Routes of public transport that pass through this intersection"
 msgstr "穿过这个十字路口的公共交通路线"
 
 #: templates/catastro/ver_interseccion.html:49
-#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:56
-#: templates/core/ver_recorrido.html:105
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:47 templates/core/ver_recorrido.html:57
+#: templates/core/ver_recorrido.html:106
 msgid "from"
 msgstr "从"
 
 #: templates/catastro/ver_interseccion.html:49
-#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:46
-#: templates/core/ver_recorrido.html:56 templates/core/ver_recorrido.html:105
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16 templates/core/ver_recorrido.html:47
+#: templates/core/ver_recorrido.html:57 templates/core/ver_recorrido.html:106
 msgid "to"
 msgstr "至"
 
 #: templates/catastro/ver_interseccion.html:64
-#: templates/catastro/ver_poi.html:109
+#: templates/catastro/ver_poi.html:117
 msgid "Nearby stops"
 msgstr "附近的车站"
 
 #: templates/catastro/ver_interseccion.html:73
-#: templates/catastro/ver_poi.html:118
+#: templates/catastro/ver_poi.html:126
 msgid "Other points of interest nearby"
 msgstr "附近的其他景点"
 
@@ -176,20 +361,26 @@ msgstr "找不到"
 msgid "But we did everything possible to find similar places"
 msgstr "但是我们竭尽所能找到相似的地方"
 
-#: templates/catastro/ver_poi.html:57
+#: templates/catastro/ver_poi.html:64
 msgid "Go to website"
 msgstr "前往网站"
 
-#: templates/catastro/ver_poi.html:62
+#: templates/catastro/ver_poi.html:69
 msgid "Phone"
 msgstr "电话"
 
-#: templates/catastro/ver_poi.html:88
+#: templates/catastro/ver_poi.html:96
 msgid "Public transport routes that pass next to this place"
 msgstr "经过这个地方的公交路线"
 
+#: templates/catastro/ver_poi.html:142
+#, fuzzy
+#| msgid "Reset view"
+msgid "Reviews of"
+msgstr "重置视图"
+
 #: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
-#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:16
 msgid "Line"
 msgstr "线"
 
@@ -207,7 +398,7 @@ msgstr "通过"
 msgid "Company information"
 msgstr "公司信息"
 
-#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:61
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:62
 msgid "Places that travel to"
 msgstr "前往的地方"
 
@@ -249,39 +440,39 @@ msgstr "附近的社区"
 msgid "Other stops near"
 msgstr "附近的其他车站"
 
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:54
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:55
 msgid "Route"
 msgstr "路线"
 
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
 msgid "of the line"
 msgstr "的线"
 
-#: templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:7
 msgid "All the information on stops, schedules and fares of the route"
 msgstr "有关该路线的站点，时间表和票价的所有信息"
 
-#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
 msgid "Description of the route of the bus"
 msgstr "巴士路线说明"
 
-#: templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:16
 msgid "branch"
 msgstr "科"
 
-#: templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:16
 msgid "Route from"
 msgstr "出发地"
 
-#: templates/core/ver_recorrido.html:70 templates/core/ver_recorrido.html:80
+#: templates/core/ver_recorrido.html:71 templates/core/ver_recorrido.html:81
 msgid "Streets that compose this route"
 msgstr "组成此路线的街道"
 
-#: templates/core/ver_recorrido.html:99
+#: templates/core/ver_recorrido.html:100
 msgid "Similar routes"
 msgstr "类似路线"
 
-#: templates/core/ver_recorrido.html:121
+#: templates/core/ver_recorrido.html:122
 msgid "Points of interest near the route"
 msgstr "路线附近的景点"
 

@@ -27,7 +27,7 @@
             <a itemprop="item" href="{{a.get_absolute_url}}">
                 <span itemprop="name">{{a.name}}</span>
             </a>
-            <meta itemprop="position" content="{{forloop.counter|add:"1"}}" />
+            <meta itemprop="position" content="{{forloop.counter|add:'1'}}" />
             <span class="divider">&gt;</span>
         </li>
         {% endfor %}
@@ -35,7 +35,7 @@
             <a itemprop="item" href="{{parada.get_absolute_url}}">
                 <span itemprop="name">{{parada}}</span>
             </a>
-            <meta itemprop="position" content="{{adminareas|length|add:"2"}}" />
+            <meta itemprop="position" content="{{adminareas|length|add:'2'}}" />
         </li>
     </ul>
 
@@ -53,8 +53,8 @@
         var osmAttrib='&copy; Cualbondi &amp; OpenStreetMap contributors';
         map.attributionControl.setPrefix('Leaflet').addAttribution( osmAttrib );
         map.addLayer(new L.TileLayer(osmUrl, {maxZoom: 17, fadeAnimation: false}));
-        L.marker([{{parada.latlng.1|stringformat:"f"}},{{parada.latlng.0|stringformat:"f"}}]).addTo(map);
-        map.setView([{{parada.latlng.1|stringformat:"f"}},{{parada.latlng.0|stringformat:"f"}}], 15);
+        L.marker([{{parada.latlng.1|stringformat:'f'}},{{parada.latlng.0|stringformat:'f'}}]).addTo(map);
+        map.setView([{{parada.latlng.1|stringformat:'f'}},{{parada.latlng.0|stringformat:'f'}}], 15);
     </script>
 
     {% if recorridosp %}
@@ -105,8 +105,8 @@
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:"f"}}" />
-                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:"f"}}" />
+                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />
+                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:'f'}}" />
                 </div>
             </li>
             {% endfor %}

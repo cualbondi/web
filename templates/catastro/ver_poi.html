@@ -2,6 +2,7 @@
 {% load bootstrap_tags %}
 {% load uslugify %}
 {% load i18n %}
+{% load reviews %}
 
 {% block title %}{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
 {% block meta_description %}{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}.{% endblock %}
@@ -31,7 +32,7 @@
             <a itemprop="item" href="{{a.get_absolute_url}}">
                 <span itemprop="name">{{a.name}}</span>
             </a>
-            <meta itemprop="position" content="{{forloop.counter|add:"1"}}" />
+            <meta itemprop="position" content="{{forloop.counter|add:'1'}}" />
             <span class="divider">&gt;</span>
         </li>
         {% endfor %}
@@ -39,16 +40,21 @@
             <a itemprop="item" href="{{poi.get_absolute_url}}">
                 <span itemprop="name">{{poi.nom}}</span>
             </a>
-            <meta itemprop="position" content="{{adminareas|length|add:"2"}}" />
+            <meta itemprop="position" content="{{adminareas|length|add:'2'}}" />
         </li>
     </ul>
 
-    <div itemscope itemtype="http://schema.org/Place">
+    <div itemprop="itemReviewed" itemscope itemtype="http://schema.org/{{schemaorg_itemtype}}" id="mainitemid">
         <h1>{% blocktrans %}How to get to{% endblocktrans %} <span itemprop="name">{{poi.nom}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
         <link itemprop="url" content="{{poi.get_absolute_url}}" />
-        <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-            <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:"f"}}" />
-            <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:"f"}}" />
+        <div>
+            {% render_review_aggregate for poi %}
+        </div>
+        <div itemprop="location" itemscope itemtype="http://schema.org/Place">
+            <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
+                <meta itemprop="latitude" content="{{poi.latlng.1|stringformat:'f'}}" />
+                <meta itemprop="longitude" content="{{poi.latlng.0|stringformat:'f'}}" />
+            </div>
         </div>
         <div>
             {% if amenity %}
@@ -63,24 +69,25 @@
                 <span>{% blocktrans %}Phone{% endblocktrans %}: <a href="tel:{{poi.tags.phone}}">{{poi.tags.phone}}</a></span>
             {% endif %}
             {% if poi.tags.email %}
-                <a href="mailto:{{poi.tags.email}}">{{poi.tags.email}}</div>
+                <a href="mailto:{{poi.tags.email}}">{{poi.tags.email}}</a>
             {% endif %}
         </div>
         {% if poi.tags.operator %}
             <div>{{poi.tags.operator}}</div>
         {% endif %}
         {% if poi.tags.description %}
-            <div>{{poi.tags.description}}</div>
+            <div itemprop="description">{{poi.tags.description}}</div>
         {% endif %}
-    </div>
 
-    <div class="thumbnail">
-        <a href="/mapa/{{adminareas.0.name|uslugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
-        {% if poi.img_panorama %}
-        <div id="map" style="background:lightblue;">
-            <img src="{{HOME_URL}}/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />
+        <div class="thumbnail">
+            <a href="/mapa/{{adminareas.0.name|uslugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
+            {% if poi.img_panorama %}
+            <div id="map" style="background:lightblue;">
+                <img itemprop="image" src="{{HOME_URL}}/{{ poi.img_panorama.url }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
+
     </div>
     {% include "ad_contenido.html"%}
 
@@ -124,12 +131,16 @@
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:"f"}}" />
-                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:"f"}}" />
+                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />
+                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:'f'}}" />
                 </div>
             </li>
             {% endfor %}
         </ul>
     {% endif %}
+
+    <h2 id="reviews">{% blocktrans %}Reviews of{% endblocktrans %} {{poi.nom|title}}</h2>
+    {% render_review_form for poi %}
+    {% render_review_list for poi %}
 
 {% endblock %}

@@ -2,24 +2,210 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 # Translators:
 # Julian Perelli <jperelli@gmail.com>, 2020
-# 
+# Julian Perelli <jperelli@gmail.com>, 2020
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-06 23:57+0000\n"
+"POT-Creation-Date: 2020-08-15 22:36+0000\n"
 "PO-Revision-Date: 2020-03-07 00:17+0000\n"
 "Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
-"Language-Team: Persian (https://www.transifex.com/cualbondi/teams/107940/fa/)\n"
+"Language-Team: Persian (https://www.transifex.com/cualbondi/teams/107940/"
+"fa/)\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fa\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: apps/catastro/views.py:41
+msgctxt "an amenity type"
+msgid "restaurant"
+msgstr "رستوران"
+
+#: apps/catastro/views.py:42
+msgctxt "an amenity type"
+msgid "school"
+msgstr "مدرسه"
+
+#: apps/catastro/views.py:43
+msgctxt "an amenity type"
+msgid "pharmacy"
+msgstr "داروخانه"
+
+#: apps/catastro/views.py:44
+msgctxt "an amenity type"
+msgid "Kindergarten"
+msgstr "مهد کودک"
+
+#: apps/catastro/views.py:45
+msgctxt "an amenity type"
+msgid "cafe"
+msgstr "کافی شاپ"
+
+#: apps/catastro/views.py:46
+msgctxt "an amenity type"
+msgid "fast_food"
+msgstr "فست فود"
+
+#: apps/catastro/views.py:47
+msgctxt "an amenity type"
+msgid "bar"
+msgstr "بار"
+
+#: apps/catastro/views.py:48
+msgctxt "an amenity type"
+msgid "place_of_worship"
+msgstr "محل عبادت"
+
+#: apps/catastro/views.py:49
+msgctxt "an amenity type"
+msgid "college"
+msgstr "دانشکده"
+
+#: apps/catastro/views.py:50
+msgctxt "an amenity type"
+msgid "ice_cream"
+msgstr "بستنی"
+
+#: apps/catastro/views.py:51
+msgctxt "an amenity type"
+msgid "police"
+msgstr "پلیس"
+
+#: apps/catastro/views.py:52
+msgctxt "an amenity type"
+msgid "hospital"
+msgstr "بیمارستان"
+
+#: apps/catastro/views.py:53
+msgctxt "an amenity type"
+msgid "clinic"
+msgstr "درمانگاه"
+
+#: apps/catastro/views.py:54
+msgctxt "an amenity type"
+msgid "community_centre"
+msgstr "مرکز جامعه"
+
+#: apps/catastro/views.py:55
+msgctxt "an amenity type"
+msgid "veterinary"
+msgstr "دامپزشکی"
+
+#: apps/catastro/views.py:56
+msgctxt "an amenity type"
+msgid "doctors"
+msgstr "پزشکان"
+
+#: apps/catastro/views.py:57
+msgctxt "an amenity type"
+msgid "bicycle_rental"
+msgstr "اجاره دوچرخه"
+
+#: apps/catastro/views.py:58
+msgctxt "an amenity type"
+msgid "taxi"
+msgstr "تاکسی"
+
+#: apps/catastro/views.py:59
+msgctxt "an amenity type"
+msgid "library"
+msgstr "کتابخانه"
+
+#: apps/catastro/views.py:60
+msgctxt "an amenity type"
+msgid "dentist"
+msgstr "دندانپزشک"
+
+#: apps/catastro/views.py:61
+msgctxt "an amenity type"
+msgid "bank"
+msgstr "بانک"
+
+#: apps/catastro/views.py:62
+msgctxt "an amenity type"
+msgid "theatre"
+msgstr "تئاتر"
+
+#: apps/catastro/views.py:63
+msgctxt "an amenity type"
+msgid "car_wash"
+msgstr "کارواش"
+
+#: apps/catastro/views.py:64
+msgctxt "an amenity type"
+msgid "pub"
+msgstr "میخانه"
+
+#: apps/catastro/views.py:65
+msgctxt "an amenity type"
+msgid "university"
+msgstr "دانشگاه"
+
+#: apps/reviews/forms.py:12 apps/reviews/templates/reviews/form.html:19
+msgid "Terrible"
+msgstr "وحشتناک"
+
+#: apps/reviews/forms.py:13 apps/reviews/templates/reviews/form.html:20
+msgid "Poor"
+msgstr "فقیر"
+
+#: apps/reviews/forms.py:14 apps/reviews/templates/reviews/form.html:21
+msgid "Average"
+msgstr "میانگین"
+
+#: apps/reviews/forms.py:15
+msgid "Very Good"
+msgstr "خیلی خوب"
+
+#: apps/reviews/forms.py:16 apps/reviews/templates/reviews/form.html:23
+msgid "Excellent"
+msgstr "عالی"
+
+#: apps/reviews/forms.py:25 apps/reviews/templates/reviews/form.html:18
+msgid "Select a rating"
+msgstr "یک رتبه بندی را انتخاب کنید"
+
+#: apps/reviews/forms.py:26
+msgid "Rating"
+msgstr "رتبه بندی"
+
+#: apps/reviews/templates/reviews/aggregate.html:8
+#, python-format
+msgid "see %(comment_count)s reviews"
+msgstr "%(comment_count)s بررسی را ببینید"
+
+#: apps/reviews/templates/reviews/aggregate.html:13
+msgid "write the first review"
+msgstr "اولین نظر را بنویسید"
+
+#: apps/reviews/templates/reviews/form.html:15
+msgid "Name"
+msgstr "نام"
+
+#: apps/reviews/templates/reviews/form.html:22
+msgid "Very"
+msgstr "خیلی"
+
+#: apps/reviews/templates/reviews/form.html:28
+#, fuzzy
+#| msgid "Reset view"
+msgid "Review"
+msgstr "نمایش تنظیم مجدد"
+
+#: apps/reviews/templates/reviews/form.html:30
+msgid "Post"
+msgstr "پست"
+
+#: apps/reviews/templates/reviews/list.html:12
+msgid "at"
+msgstr "در"
 
 #: templates/404.html:5
 msgid "Oops! The page could not be found..."
@@ -39,83 +225,99 @@ msgstr "شروع"
 msgid "Oops! Something went wrong..."
 msgstr "اوه! مشکلی پیش آمد ..."
 
-#: templates/base.html:9
+#: templates/base.html:10 templates/parts/base/top.html:9
 msgid "Search engine of public transportation bus, train,  subway, tram."
 msgstr "موتور جستجوی اتوبوس حمل و نقل عمومی ، قطار ، مترو ، تراموا."
 
-#: templates/catastro/ver_administrativearea.html:5
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/parts/catastro/ver_administrativearea/top.html:4
 msgid "Public transportation in"
 msgstr "حمل و نقل عمومی در"
 
-#: templates/catastro/ver_administrativearea.html:6
-#: templates/catastro/ver_administrativearea.html:14
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+#: templates/parts/catastro/ver_administrativearea/top.html:13
 msgid "How to get around in"
 msgstr "چگونه می توانیم وارد شوید"
 
-#: templates/catastro/ver_administrativearea.html:6
-#: templates/catastro/ver_interseccion.html:6
-#: templates/catastro/ver_poi.html:6
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:8
+#: templates/parts/catastro/ver_administrativearea/top.html:5
 msgid "and what lines and routes of buses go through"
 msgstr "و چه خطوط و مسیرهای اتوبوس ها طی می شوند"
 
-#: templates/catastro/ver_administrativearea.html:15
-#: templates/catastro/ver_poi.html:15
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
 msgid "List of all the public transport that go through"
 msgstr "لیست تمام وسایل حمل و نقل عمومی که از طریق آن عبور می کنید"
 
-#: templates/catastro/ver_administrativearea.html:15
-#: templates/catastro/ver_poi.html:15
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
 msgid "See how to get from where you are"
 msgstr "ببینید چگونه می توانید از جایی که هستید بگیرید"
 
-#: templates/catastro/ver_administrativearea.html:23
-#: templates/catastro/ver_poi.html:23 templates/core/ver_linea.html:23
-#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:23
+#: templates/catastro/ver_administrativearea.html:24
+#: templates/catastro/ver_poi.html:25 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:24
+#: templates/parts/catastro/ver_administrativearea/content.html:9
 msgid "Home"
 msgstr "شروع"
 
-#: templates/catastro/ver_administrativearea.html:69
+#: templates/catastro/ver_administrativearea.html:64
+#: templates/catastro/ver_poi.html:83 templates/core/ver_recorrido.html:90
+#: templates/parts/catastro/ver_administrativearea/content.html:49
+msgid "See in interactive map"
+msgstr "در نقشه تعاملی مشاهده کنید"
+
+#: templates/catastro/ver_administrativearea.html:76
+#: templates/parts/catastro/ver_administrativearea/content.html:61
 msgid "Lines of public transport"
 msgstr "خطوط حمل و نقل عمومی"
 
-#: templates/catastro/ver_administrativearea.html:91
+#: templates/catastro/ver_administrativearea.html:98
+#: templates/parts/catastro/ver_administrativearea/content.html:83
 msgid "Routes of public transport"
 msgstr "مسیرهای حمل و نقل عمومی"
 
-#: templates/catastro/ver_administrativearea.html:121
+#: templates/catastro/ver_administrativearea.html:128
+#: templates/parts/catastro/ver_administrativearea/content.html:113
 msgid "Places"
 msgstr "اماکن"
 
-#: templates/catastro/ver_administrativearea.html:135
-#: templates/core/ver_recorrido.html:150
+#: templates/catastro/ver_administrativearea.html:142
+#: templates/core/ver_recorrido.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:127
 msgid "Stops"
 msgstr "ایستگاه"
 
-#: templates/catastro/ver_administrativearea.html:144
+#: templates/catastro/ver_administrativearea.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:136
 msgid "Points of interest"
 msgstr "نقاط مورد علاقه"
 
 #: templates/catastro/ver_interseccion.html:5
 #: templates/catastro/ver_interseccion.html:6
 #: templates/catastro/ver_interseccion.html:17
-#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
-#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:46
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:48
 msgid "How to get to"
 msgstr "چگونه به آن برسیم"
 
 #: templates/catastro/ver_interseccion.html:5
-#: templates/catastro/ver_interseccion.html:6
-#: templates/catastro/ver_poi.html:5 templates/catastro/ver_poi.html:6
-#: templates/catastro/ver_poi.html:14 templates/catastro/ver_poi.html:15
-#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:95
-#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:15
+#: templates/catastro/ver_interseccion.html:6 templates/catastro/ver_poi.html:7
+#: templates/catastro/ver_poi.html:8 templates/catastro/ver_poi.html:16
+#: templates/catastro/ver_poi.html:17 templates/core/ver_linea.html:5
+#: templates/core/ver_linea.html:95 templates/core/ver_parada.html:5
+#: templates/core/ver_parada.html:6 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
 msgid "in"
 msgstr "در ظرف"
 
 #: templates/catastro/ver_interseccion.html:17
-#: templates/catastro/ver_poi.html:46
+#: templates/catastro/ver_poi.html:48
 msgid "?"
 msgstr "؟"
 
@@ -124,30 +326,30 @@ msgid "Routes of public transport that pass through this intersection"
 msgstr "مسیرهای حمل و نقل عمومی که از این تقاطع عبور می کنند"
 
 #: templates/catastro/ver_interseccion.html:49
-#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:46 templates/core/ver_recorrido.html:56
-#: templates/core/ver_recorrido.html:105
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:47 templates/core/ver_recorrido.html:57
+#: templates/core/ver_recorrido.html:106
 msgid "from"
 msgstr "از"
 
 #: templates/catastro/ver_interseccion.html:49
-#: templates/catastro/ver_poi.html:94 templates/core/ver_linea.html:74
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
 #: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
-#: templates/core/ver_recorrido.html:15 templates/core/ver_recorrido.html:46
-#: templates/core/ver_recorrido.html:56 templates/core/ver_recorrido.html:105
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16 templates/core/ver_recorrido.html:47
+#: templates/core/ver_recorrido.html:57 templates/core/ver_recorrido.html:106
 msgid "to"
 msgstr "تا"
 
 #: templates/catastro/ver_interseccion.html:64
-#: templates/catastro/ver_poi.html:109
+#: templates/catastro/ver_poi.html:117
 msgid "Nearby stops"
 msgstr "ایستگاه های نزدیک"
 
 #: templates/catastro/ver_interseccion.html:73
-#: templates/catastro/ver_poi.html:118
+#: templates/catastro/ver_poi.html:126
 msgid "Other points of interest nearby"
 msgstr "سایر نقاط دیدنی اطراف"
 
@@ -159,24 +361,26 @@ msgstr "یافت نشد"
 msgid "But we did everything possible to find similar places"
 msgstr "اما ما برای یافتن مکانهای مشابه همه کار ممکن را انجام دادیم"
 
-#: templates/catastro/ver_poi.html:57
+#: templates/catastro/ver_poi.html:64
 msgid "Go to website"
 msgstr "به وب سایت بروید"
 
-#: templates/catastro/ver_poi.html:62
+#: templates/catastro/ver_poi.html:69
 msgid "Phone"
 msgstr "تلفن"
 
-#: templates/catastro/ver_poi.html:77 templates/core/ver_recorrido.html:89
-msgid "See in interactive map"
-msgstr "در نقشه تعاملی مشاهده کنید"
-
-#: templates/catastro/ver_poi.html:88
+#: templates/catastro/ver_poi.html:96
 msgid "Public transport routes that pass next to this place"
 msgstr "مسیرهای حمل و نقل عمومی که کنار این مکان می گذرد"
 
+#: templates/catastro/ver_poi.html:142
+#, fuzzy
+#| msgid "Reset view"
+msgid "Reviews of"
+msgstr "نمایش تنظیم مجدد"
+
 #: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
-#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:15
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:16
 msgid "Line"
 msgstr "خط"
 
@@ -195,7 +399,7 @@ msgstr "که می گذرد"
 msgid "Company information"
 msgstr "اطلاعات شرکت"
 
-#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:61
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:62
 msgid "Places that travel to"
 msgstr "مکانهایی که به آنجا سفر می کنند"
 
@@ -239,39 +443,39 @@ msgstr "محله های اطراف"
 msgid "Other stops near"
 msgstr "سایر توقفها در نزدیکی"
 
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:54
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:55
 msgid "Route"
 msgstr "مسیر"
 
-#: templates/core/ver_recorrido.html:5 templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
 msgid "of the line"
 msgstr "از خط"
 
-#: templates/core/ver_recorrido.html:6
+#: templates/core/ver_recorrido.html:7
 msgid "All the information on stops, schedules and fares of the route"
 msgstr "تمام اطلاعات در مورد توقف ها ، برنامه ها و کرایه های مسیر"
 
-#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
 msgid "Description of the route of the bus"
 msgstr "شرح مسیر اتوبوس"
 
-#: templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:16
 msgid "branch"
 msgstr "بخش"
 
-#: templates/core/ver_recorrido.html:15
+#: templates/core/ver_recorrido.html:16
 msgid "Route from"
 msgstr "مسیر از"
 
-#: templates/core/ver_recorrido.html:70 templates/core/ver_recorrido.html:80
+#: templates/core/ver_recorrido.html:71 templates/core/ver_recorrido.html:81
 msgid "Streets that compose this route"
 msgstr "خیابان هایی که این مسیر را تشکیل می دهند"
 
-#: templates/core/ver_recorrido.html:99
+#: templates/core/ver_recorrido.html:100
 msgid "Similar routes"
 msgstr "مسیرهای مشابه"
 
-#: templates/core/ver_recorrido.html:121
+#: templates/core/ver_recorrido.html:122
 msgid "Points of interest near the route"
 msgstr "نقاط مورد علاقه در نزدیکی مسیر"
 
@@ -279,18 +483,18 @@ msgstr "نقاط مورد علاقه در نزدیکی مسیر"
 msgid "Reset view"
 msgstr "نمایش تنظیم مجدد"
 
-#: templates/navbar.html:26
+#: templates/navbar.html:28 templates/parts/base/top.html:52
 msgid "Go to the search engine"
 msgstr "به موتور جستجو بروید"
 
-#: templates/navbar.html:35
+#: templates/navbar.html:37 templates/parts/base/top.html:61
 msgid "Login"
 msgstr "وارد شدن"
 
-#: templates/navbar.html:39
+#: templates/navbar.html:41 templates/parts/base/top.html:65
 msgid "Star users"
 msgstr "کاربران ستاره"
 
-#: templates/navbar.html:40
+#: templates/navbar.html:42 templates/parts/base/top.html:66
 msgid "Poll"
 msgstr "نظرسنجی"

@@ -1,15 +1,19 @@
+import os
+
 from django.contrib.gis.db.models.functions import Cast, GeoFunc, Value
 from django.db.models import Count, IntegerField, OuterRef, Prefetch, Subquery
-from django.http import Http404, HttpResponsePermanentRedirect, StreamingHttpResponse, HttpResponse
+from django.http import (Http404, HttpResponse, HttpResponsePermanentRedirect,
+                         StreamingHttpResponse)
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import get_template
+from django.utils.translation import pgettext
 from django.views.decorators.http import require_GET
 
 from apps.catastro.models import AdministrativeArea, Ciudad, Interseccion, Poi
 from apps.core.models import Linea, Parada, Recorrido
 from apps.utils.parallel_query import parallelize
 from apps.utils.slugify import slugify
-import os
+
 
 def fuzzy_like_query(q):
     params = {"q": q}
@@ -32,35 +36,33 @@ def fuzzy_like_query(q):
     query_set = Poi.objects.raw(query, params)
     return list(query_set)
 
-
-amenities = {
-    'restaurant': 'Restaurant',
-    'school': 'Escuela',
-    'pharmacy': 'Farmacia',
-    'Kindergarten': 'Jardin',
-    'cafe': 'Cafe',
-    'fast_food': 'Comida rapida',
-    'bar': 'Bar',
-    'place_of_worship': 'Templo',
-    'college': 'Secundario',
-    'ice_cream': 'Heladeria',
-    'police': 'Policia',
-    'hospital': 'Hospital',
-    'clinic': 'Clinica',
-    'community_centre': 'Centro comunitario',
-    'veterinary': 'Veterinaria',
-    'doctors': 'Doctor',
-    'bicycle_rental': 'Alquiler de bicicletas',
-    'taxi': 'Taxi',
-    'library': 'Biblioteca',
-    'dentist': 'Dentista',
-    'bank': 'Banco',
-    'theatre': 'Teatro',
-    'car_wash': 'Lavadero de autos',
-    'pub': 'Bar',
-    'university': 'Universidad',
+amenities_schemaorg_itemtype = {
+    'restaurant': 'LocalBusiness',
+    'school': 'EducationalOrganization',
+    'pharmacy': 'MedicalOrganization',
+    'Kindergarten': 'EducationalOrganization',
+    'cafe': 'LocalBusiness',
+    'fast_food': 'LocalBusiness',
+    'bar': 'LocalBusiness',
+    'place_of_worship': 'NGO',
+    'college': 'EducationalOrganization',
+    'ice_cream': 'LocalBusiness',
+    'police': 'GovernmentOrganization',
+    'hospital': 'MedicalOrganization',
+    'clinic': 'MedicalOrganization',
+    'community_centre': '',
+    'veterinary': 'MedicalOrganization',
+    'doctors': 'MedicalOrganization',
+    'bicycle_rental': 'LocalBusiness',
+    'taxi': 'Organization',
+    'library': 'Organization',
+    'dentist': 'MedicalOrganization',
+    'bank': 'Organization',
+    'theatre': 'Organization',
+    'car_wash': 'LocalBusiness',
+    'pub': 'LocalBusiness',
+    'university': 'EducationalOrganization',
 }
-
 
 @require_GET
 def poi(request, osm_type, osm_id, slug):
@@ -105,10 +107,44 @@ def poiORint(request, slug=None, country_code=None):
     near_pois = Poi.objects.filter(latlng__dwithin=(poi.latlng, 0.111)).exclude(id=poi.id)
     ps = Parada.objects.filter(latlng__dwithin=(poi.latlng, 0.003))
 
+    amenities = {
+        'restaurant': pgettext('an amenity type', 'restaurant'),
+        'school': pgettext('an amenity type', 'school'),
+        'pharmacy': pgettext('an amenity type', 'pharmacy'),
+        'Kindergarten': pgettext('an amenity type', 'Kindergarten'),
+        'cafe': pgettext('an amenity type', 'cafe'),
+        'fast_food': pgettext('an amenity type', 'fast_food'),
+        'bar': pgettext('an amenity type', 'bar'),
+        'place_of_worship': pgettext('an amenity type', 'place_of_worship'),
+        'college': pgettext('an amenity type', 'college'),
+        'ice_cream': pgettext('an amenity type', 'ice_cream'),
+        'police': pgettext('an amenity type', 'police'),
+        'hospital': pgettext('an amenity type', 'hospital'),
+        'clinic': pgettext('an amenity type', 'clinic'),
+        'community_centre': pgettext('an amenity type', 'community_centre'),
+        'veterinary': pgettext('an amenity type', 'veterinary'),
+        'doctors': pgettext('an amenity type', 'doctors'),
+        'bicycle_rental': pgettext('an amenity type', 'bicycle_rental'),
+        'taxi': pgettext('an amenity type', 'taxi'),
+        'library': pgettext('an amenity type', 'library'),
+        'dentist': pgettext('an amenity type', 'dentist'),
+        'bank': pgettext('an amenity type', 'bank'),
+        'theatre': pgettext('an amenity type', 'theatre'),
+        'car_wash': pgettext('an amenity type', 'car_wash'),
+        'pub': pgettext('an amenity type', 'pub'),
+        'university': pgettext('an amenity type', 'university'),
+    }
+
     try:
         amenity = amenities[poi.tags['amenity']]
     except KeyError:
         amenity = None
+
+    try:
+        schemaorg_itemtype = amenities_schemaorg_itemtype[poi.tags['amenity']]
+    except KeyError:
+        schemaorg_itemtype = 'Organization'
+
 
     return render(
         request,
@@ -116,6 +152,7 @@ def poiORint(request, slug=None, country_code=None):
         {
             'obj': poi,
             'amenity': amenity,
+            'schemaorg_itemtype': schemaorg_itemtype,
             'adminareas': aas,
             'paradas': ps,
             'poi': poi,

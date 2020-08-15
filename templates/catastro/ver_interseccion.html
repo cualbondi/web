@@ -17,8 +17,8 @@
         <h1>{% blocktrans %}How to get to{% endblocktrans %} <span itemprop="name">{{interseccion.nom}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
         <link itemprop="url" content="{{interseccion.get_absolute_url}}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-            <meta itemprop="latitude" content="{{interseccion.latlng.1|stringformat:"f"}}" />
-            <meta itemprop="longitude" content="{{interseccion.latlng.0|stringformat:"f"}}" />
+            <meta itemprop="latitude" content="{{interseccion.latlng.1|stringformat:'f'}}" />
+            <meta itemprop="longitude" content="{{interseccion.latlng.0|stringformat:'f'}}" />
         </div>
     </div>
 
@@ -32,8 +32,8 @@
         var osmAttrib='&copy; Cualbondi &amp; OpenStreetMap contributors';
         map.attributionControl.setPrefix('Leaflet').addAttribution( osmAttrib );
         map.addLayer(new L.TileLayer(osmUrl, {maxZoom: 17, fadeAnimation: false}));
-        L.marker([{{interseccion.latlng.1|stringformat:"f"}},{{interseccion.latlng.0|stringformat:"f"}}]).addTo(map);
-        map.setView([{{interseccion.latlng.1|stringformat:"f"}},{{interseccion.latlng.0|stringformat:"f"}}], 15);
+        L.marker([{{interseccion.latlng.1|stringformat:'f'}},{{interseccion.latlng.0|stringformat:'f'}}]).addTo(map);
+        map.setView([{{interseccion.latlng.1|stringformat:'f'}},{{interseccion.latlng.0|stringformat:'f'}}], 15);
     </script>
 
     {% include "ad_contenido.html"%}
@@ -78,8 +78,8 @@
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:"f"}}" />
-                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:"f"}}" />
+                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />
+                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:'f'}}" />
                 </div>
             </li>
             {% endfor %}

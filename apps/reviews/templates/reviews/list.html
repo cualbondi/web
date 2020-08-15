@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<div>
+    {% for review in review_list %}
+    <div id="c{{ review.id }}" style="padding-bottom: 15px" itemscope itemtype="http://schema.org/Review" itemref="mainitemid">
+        <meta itemprop="ratingValue" content="{{review.rating}}" />
+        <div>
+            <span>
+                {% include "reviews/stars.html" with value=review.rating %}
+            </span>
+            <span itemprop="author">{{ review.name }}</span>
+            <small><a href="#c{{ review.id }}">{% blocktrans %}at{%endblocktrans%} {{ review.submit_date }}</a></small>
+        </div>
+        <div itemprop="reviewBody">
+            {{ review.comment }}
+        </div>
+    </div>
+    {% endfor %}
+</div>

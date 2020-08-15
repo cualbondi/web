@@ -306,10 +306,24 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
 
     aaancestors, calles_fin, pois, aas, horarios, recorridos_similares = parallelize(aaancestors, calles_fin, pois, aas, horarios, recorridos_similares)
 
+    try:
+        schemaorg_itemtype = {
+            'bus': 'BusTrip',
+            'trolleybus': 'BusTrip',
+            'train': 'TrainTrip',
+            'subway': 'TrainTrip',
+            'monorail': 'TrainTrip',
+            'tram': 'TrainTrip',
+            'light_rail': 'TrainTrip',
+        }[recorrido.type]
+    except:
+        schemaorg_itemtype = 'Trip'
+
     return render(
         request,
         "core/ver_recorrido.html",
         {
+            'schemaorg_itemtype': schemaorg_itemtype,
             'obj': recorrido,
             'linea': recorrido.linea,
             'adminarea': aa,

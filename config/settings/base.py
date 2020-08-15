@@ -87,6 +87,7 @@ THIRD_PARTY_APPS = [
     'social_django',
     'rest_framework_social_oauth2',
     'treebeard',
+    'django_comments',
 ]
 LOCAL_APPS = [
     'apps.usuarios.apps.UsuariosConfig',
@@ -94,10 +95,12 @@ LOCAL_APPS = [
     'apps.catastro.apps.CatastroConfig',
     'apps.editor.apps.EditorConfig',
     'apps.api3.apps.Api3Config',
+    'apps.reviews.apps.ReviewsConfig',
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+COMMENTS_APP = 'apps.reviews'
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------

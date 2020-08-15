@@ -1,0 +1,32 @@
+{% load comments i18n %}
+<form class="form-inline" action="{% comment_form_target %}" method="post">
+
+  <p style="display: none">
+    {% csrf_token %}
+    {{ form.honeypot }}
+    {{ form.content_type }}
+    {{ form.object_pk }}
+    {{ form.timestamp }}
+    {{ form.security_hash }}
+  </p>
+
+  <input type="hidden" name="next" value="{{form.target_object.get_absolute_url}}#reviews" />
+
+  <input placeholder="{% trans 'Name' %}" type="text" name="name" maxlength="50" required id="id_name">
+
+  <select name="rating" class="star-rating" required id="id_rating">
+    <option value="" selected>{% trans 'Select a rating' %}</option>
+    <option value="1">{% trans 'Terrible' %}</option>
+    <option value="2">{% trans 'Poor' %}</option>
+    <option value="3">{% trans 'Average' %}</option>
+    <option value="4">{% trans 'Very' %} Good</option>
+    <option value="5">{% trans 'Excellent' %}</option>
+  </select>
+
+  <br />
+
+  <textarea style="width: 430px; margin-top:5px;" rows="4" placeholder="{% trans 'Review' %}" name="comment" maxlength="3000" required id="id_comment"></textarea>
+
+  <input type="submit" name="post" class="submit-post" value="{% trans 'Post' %}"/>
+
+</form>

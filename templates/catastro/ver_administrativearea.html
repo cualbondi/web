@@ -31,7 +31,7 @@
             <a itemprop="item" href="{{a.get_absolute_url}}">
                 <span itemprop="name">{{a.name}}</span>
             </a>
-            <meta itemprop="position" content="{{forloop.counter|add:"1"}}" />
+            <meta itemprop="position" content="{{forloop.counter|add:'1'}}" />
             <span class="divider">&gt;</span>
         </li>
         {% endfor %}
@@ -39,7 +39,7 @@
             <a itemprop="item" href="{{obj.get_absolute_url}}">
                 <span itemprop="name">{{obj.name}}</span>
             </a>
-            <meta itemprop="position" content="{{adminareaancestors|length|add:"2"}}" />
+            <meta itemprop="position" content="{{adminareaancestors|length|add:'2'}}" />
         </li>
     </ul>
 

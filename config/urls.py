@@ -29,6 +29,7 @@ urlpatterns = [
     url(settings.ADMIN_URL, admin.site.urls),
     url(r'^editor/', include(editorUrls)),
     url(r'^usuarios/', include(usuariosUrls)),
+    url(r'^comments/', include('django_comments.urls')),
     url(r'^revision/(?P<id_revision>[-\w]+)/$', revision, name='revision_externa'),
 
     # Ranking aka agradecimientos

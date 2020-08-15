@@ -1,0 +1,15 @@
+{% load i18n %}
+{% if count %}
+    {% include "./stars.html" with value=avg %}
+    <small itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+    (<span itemprop="ratingValue">{{avg|stringformat:'.1f'}}</span>)
+    <span style="display:none" itemprop="reviewCount">{{count}}</span>
+    <a href="#reviews">
+        {% blocktrans with comment_count=count %}see {{comment_count}} reviews{% endblocktrans %}
+    </a>
+    </small>
+{% else %}
+    <a href="#reviews">
+        {% blocktrans %}write the first review{% endblocktrans %}
+    </a>
+{% endif %}

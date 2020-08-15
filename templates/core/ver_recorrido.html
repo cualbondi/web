@@ -2,6 +2,7 @@
 {% load bootstrap_tags %}
 {% load uslugify %}
 {% load i18n %}
+{% load reviews %}
 
 {% block title %}{% blocktrans %}Route{% endblocktrans %} {{obj.nombre|title}} {% if obj.inicio and obj.fin %} {% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}of the line{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
 {% block meta_description %}{% blocktrans %}All the information on stops, schedules and fares of the route{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}of the line{% endblocktrans %} {{linea.nombre|title}} {% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% blocktrans %}in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}: {% blocktrans %}Description of the route of the bus{% endblocktrans %}.{% endblock %}
@@ -50,50 +51,58 @@
         </li>
     </ul>
 
-    <div>
+    <div itemprop="itemReviewed" itemscope itemtype="http://schema.org/{{schemaorg_itemtype}}" id="mainitemid">
         <h1>
-            {% blocktrans %}Route{% endblocktrans %} {{linea.nombre}} {{obj.nombre}}
+            {% blocktrans %}Route{% endblocktrans %} <span itemprop="name">{{linea.nombre}} {{obj.nombre}}</span>
             <span style="margin-left:5px;" class="fb-like" data-layout="button_count" data-action="like" data-colorscheme="light" data-show-faces="false" data-share="false"></span>
             {% if obj.inicio and obj.fin %}<small>{% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}}</small>{% endif %}
         </h1>
-    </div>
-
-    {% if adminareas %}
-        <h2>{% blocktrans %}Places that travel to{% endblocktrans %}</h2>
-        <ul>
-            {% for a in adminareas %}
-            <li><a href="{{a.get_absolute_url}}">{{ a.name }}</a></li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    {% if calles %}
-        <h2>{% blocktrans %}Streets that compose this route{% endblocktrans %}</h2>
-        <ol>
-            {% for c in calles %}
-            <li style="color:gray">
-                <span style="color:black">{{ c }}</span>
-            </li>
-            {% endfor %}
-        </ol>
-    {% else %}
-        {% if obj.descripcion %}
-            <h2>{% blocktrans %}Streets that compose this route{% endblocktrans %}</h2>
-            <div>{{ obj.descripcion }}</div>
-        {% endif %}
-    {% endif %}
-
-    {% include "ad_contenido.html"%}
-
-    {% if obj.img_panorama %}
-    <div class="thumbnail">
-	<a href="/mapa/{{adminarea.name|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
-        <div id="map" style="background:lightblue;">
-            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
+        <link itemprop="url" content="{{obj.get_absolute_url}}" />
+        <div>
+            {% render_review_aggregate for obj %}
         </div>
+
+        {% if adminareas %}
+            <h2>{% blocktrans %}Places that travel to{% endblocktrans %}</h2>
+            <ul>
+                {% for a in adminareas %}
+                <li itemprop="itinerary" itemtype="http://schema.org/AdministrativeArea" itemscope>
+                    <a href="{{a.get_absolute_url}}" itemprop="name">{{ a.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if calles %}
+            <h2>{% blocktrans %}Streets that compose this route{% endblocktrans %}</h2>
+            <ol>
+                {% for c in calles %}
+                <li style="color:gray">
+                    <span style="color:black">{{ c }}</span>
+                </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            {% if obj.descripcion %}
+                <h2>{% blocktrans %}Streets that compose this route{% endblocktrans %}</h2>
+                <div>{{ obj.descripcion }}</div>
+            {% endif %}
+        {% endif %}
+
+        {% include "ad_contenido.html"%}
+
+        {% if obj.img_panorama %}
+        <div class="thumbnail">
+        <a href="/mapa/{{adminarea.name|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
+            <div id="map" style="background:lightblue;">
+                <img itemprop="image" src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea.name }}." />
+            </div>
+        </div>
+        <br />
+        {% endif %}
+
     </div>
-    <br />
-    {% endif %}
+
 
     {% if recorridos_similares %}
         <div class="row-fluid">
@@ -130,8 +139,8 @@
                                     <span itemprop="name">{{ p.nom }}</span>
                                 </a>
                                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
-                                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:"f"}}" />
-                                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:"f"}}" />
+                                    <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />
+                                    <meta itemprop="longitude" content="{{p.latlng.0|stringformat:'f'}}" />
                                 </div>
                             </li>
                         {% endfor %}
@@ -156,21 +165,8 @@
         </ul>
     {% endif %}
 
-    <!--
-    <h2>Dejanos un comentario sobre el recorrido "{{linea.nombre}} {{obj.nombre}}"</h2>
-	<p>Si el recorrido esta mal, podés ayudar haciendo <a href="/editor/{{ obj.id }}/">click acá</a></p>
-        <div id="disqus_thread"></div>
-        <script type="text/javascript">
-            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-            var disqus_shortname = 'cualbondi'; // required: replace example with your forum shortname
+    <h2 id="reviews">{% blocktrans %}Reviews of{% endblocktrans %} {{linea.nombre}} {{obj.nombre}}</h2>
+    {% render_review_form for obj %}
+    {% render_review_list for obj %}
 
-            /* * * DON'T EDIT BELOW THIS LINE * * */
-            (function() {
-                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-            })();
-        </script>
-        <noscript>Habilita Javascript para ver los comentarios</noscript>
-    -->
 {% endblock %}
