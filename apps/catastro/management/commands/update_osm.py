@@ -174,6 +174,38 @@ kings = {
     #     'country_code': 'us',
     #     'lang': 'en_US',
     # },
+    'newzealand': {
+        'name': 'newzealand',
+        'url': 'https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf',
+        'id': 556706,
+        'paradas_completas': False,
+        'country_code': 'nz',
+        'lang': 'en_NZ',
+    },
+    'australia': {
+        'name': 'australia',
+        'url': 'https://download.geofabrik.de/australia-oceania/australia-latest.osm.pbf',
+        'id': 80500,
+        'paradas_completas': False,
+        'country_code': 'au',
+        'lang': 'en_AU',
+    },
+    'portugal': {
+        'name': 'portugal',
+        'url': 'https://download.geofabrik.de/europe/portugal-latest.osm.pbf',
+        'id': 295480,
+        'paradas_completas': False,
+        'country_code': 'pt',
+        'lang': 'pt_PT',
+    },
+    # 'england': { great britain, united kingdom? iso country code is GB but there is no england country code
+    #     'name': 'england',
+    #     'url': 'https://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf',
+    #     'id': 58447,
+    #     'paradas_completas': False,
+    #     'country_code': 'pt',
+    #     'lang': 'pt_PT',
+    # },
 }
 
 
@@ -299,8 +331,6 @@ class Command(BaseCommand):
         king = kings[options['king']]
 
         run_timestamp = datetime.now()
-
-        cu = connection.cursor()
 
         inputfile = f'/tmp/osm-{king["name"]}.pbf'
 
@@ -712,6 +742,7 @@ class Command(BaseCommand):
             linea_nombres = core_recorrido.loc[recorrido_ids].linea_nombre.values.tolist()
 
             self.out2('DROP TABLE crossed_areas')
+            cu = connection.cursor()
             cu.execute("DROP TABLE IF EXISTS crossed_areas;")
             cu.execute('DROP INDEX IF EXISTS crossed_areas_recorrido_id;')
             cu.execute('DROP INDEX IF EXISTS crossed_areas_area;')
@@ -971,6 +1002,7 @@ class Command(BaseCommand):
         if options['pois']:
 
             self.out2('Eliminando indices viejos de la base de datos')
+            cu = connection.cursor()
             # cu.execute('DROP INDEX IF EXISTS catastrocalle_nomnormal_gin;')
             cu.execute('DROP INDEX IF EXISTS catastropoi_nomnormal_gin;')
 
@@ -1096,6 +1128,7 @@ class Command(BaseCommand):
         if options['intersections']:
 
             self.out1('Generando Intersecciones')
+            cu = connection.cursor()
             cu.execute('delete from catastro_interseccion')
             cu.execute('''
                 SELECT
