@@ -206,6 +206,14 @@ kings = {
     #     'country_code': 'pt',
     #     'lang': 'pt_PT',
     # },
+    'switzerland': {
+        'name': 'switzerland',
+        'url': 'https://download.geofabrik.de/europe/switzerland-latest.osm.pbf',
+        'id': 51701,
+        'paradas_completas': True,
+        'country_code': 'ch',
+        'lang': 'de_CH',
+    },
 }
 
 

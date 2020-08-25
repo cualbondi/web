@@ -1,6 +1,8 @@
-FROM ubuntu:eoan
+FROM ubuntu:20.04
 
+ENV TZ Etc/UTC
 ENV PYTHONUNBUFFERED 1
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \

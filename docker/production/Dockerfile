@@ -1,5 +1,6 @@
-FROM ubuntu:eoan
+FROM ubuntu:20.04
 
+ENV TZ Etc/UTC
 ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
 
