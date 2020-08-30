@@ -1,0 +1,486 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Julian Perelli <jperelli@gmail.com>, 2020
+# Julian Perelli <jperelli@gmail.com>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-15 18:42+0000\n"
+"PO-Revision-Date: 2020-03-07 00:17+0000\n"
+"Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
+"Language-Team: Japanese (https://www.transifex.com/cualbondi/teams/107940/ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/catastro/views.py:41
+msgctxt "an amenity type"
+msgid "restaurant"
+msgstr "レストラン"
+
+#: apps/catastro/views.py:42
+msgctxt "an amenity type"
+msgid "school"
+msgstr "スクール"
+
+#: apps/catastro/views.py:43
+msgctxt "an amenity type"
+msgid "pharmacy"
+msgstr "薬局"
+
+#: apps/catastro/views.py:44
+msgctxt "an amenity type"
+msgid "Kindergarten"
+msgstr "幼稚園"
+
+#: apps/catastro/views.py:45
+msgctxt "an amenity type"
+msgid "cafe"
+msgstr "カフェテリア"
+
+#: apps/catastro/views.py:46
+msgctxt "an amenity type"
+msgid "fast_food"
+msgstr "ファストフード"
+
+#: apps/catastro/views.py:47
+msgctxt "an amenity type"
+msgid "bar"
+msgstr "バー"
+
+#: apps/catastro/views.py:48
+msgctxt "an amenity type"
+msgid "place_of_worship"
+msgstr "礼拝所"
+
+#: apps/catastro/views.py:49
+msgctxt "an amenity type"
+msgid "college"
+msgstr "カレッジ"
+
+#: apps/catastro/views.py:50
+msgctxt "an amenity type"
+msgid "ice_cream"
+msgstr "アイスクリーム"
+
+#: apps/catastro/views.py:51
+msgctxt "an amenity type"
+msgid "police"
+msgstr "ポリス"
+
+#: apps/catastro/views.py:52
+msgctxt "an amenity type"
+msgid "hospital"
+msgstr "ホスピタル"
+
+#: apps/catastro/views.py:53
+msgctxt "an amenity type"
+msgid "clinic"
+msgstr "クリニック"
+
+#: apps/catastro/views.py:54
+msgctxt "an amenity type"
+msgid "community_centre"
+msgstr "コミュニティーセンター"
+
+#: apps/catastro/views.py:55
+msgctxt "an amenity type"
+msgid "veterinary"
+msgstr "獣医"
+
+#: apps/catastro/views.py:56
+msgctxt "an amenity type"
+msgid "doctors"
+msgstr "医者"
+
+#: apps/catastro/views.py:57
+msgctxt "an amenity type"
+msgid "bicycle_rental"
+msgstr "自転車レンタル"
+
+#: apps/catastro/views.py:58
+msgctxt "an amenity type"
+msgid "taxi"
+msgstr "タクシー"
+
+#: apps/catastro/views.py:59
+msgctxt "an amenity type"
+msgid "library"
+msgstr "図書館"
+
+#: apps/catastro/views.py:60
+msgctxt "an amenity type"
+msgid "dentist"
+msgstr "歯科医"
+
+#: apps/catastro/views.py:61
+msgctxt "an amenity type"
+msgid "bank"
+msgstr "バンク"
+
+#: apps/catastro/views.py:62
+msgctxt "an amenity type"
+msgid "theatre"
+msgstr "劇場"
+
+#: apps/catastro/views.py:63
+msgctxt "an amenity type"
+msgid "car_wash"
+msgstr "洗車"
+
+#: apps/catastro/views.py:64
+msgctxt "an amenity type"
+msgid "pub"
+msgstr "パブ"
+
+#: apps/catastro/views.py:65
+msgctxt "an amenity type"
+msgid "university"
+msgstr "大学"
+
+#: apps/reviews/forms.py:12 apps/reviews/templates/reviews/form.html:19
+msgid "Terrible"
+msgstr "ひどい"
+
+#: apps/reviews/forms.py:13 apps/reviews/templates/reviews/form.html:20
+msgid "Poor"
+msgstr "悪い"
+
+#: apps/reviews/forms.py:14 apps/reviews/templates/reviews/form.html:21
+msgid "Average"
+msgstr "平均"
+
+#: apps/reviews/forms.py:15
+msgid "Very Good"
+msgstr "とても良い"
+
+#: apps/reviews/forms.py:16 apps/reviews/templates/reviews/form.html:23
+msgid "Excellent"
+msgstr "優れた"
+
+#: apps/reviews/forms.py:25 apps/reviews/templates/reviews/form.html:18
+msgid "Select a rating"
+msgstr "評価を選択してください"
+
+#: apps/reviews/forms.py:26
+msgid "Rating"
+msgstr "評価"
+
+#: apps/reviews/templates/reviews/aggregate.html:8
+#, python-format
+msgid "see %(comment_count)s reviews"
+msgstr "%(comment_count)s件のレビューを見る"
+
+#: apps/reviews/templates/reviews/aggregate.html:13
+msgid "write the first review"
+msgstr "最初のレビューを書く"
+
+#: apps/reviews/templates/reviews/form.html:15
+msgid "Name"
+msgstr "名前"
+
+#: apps/reviews/templates/reviews/form.html:22
+msgid "Very"
+msgstr "非常に"
+
+#: apps/reviews/templates/reviews/form.html:30
+msgid "Post"
+msgstr "投稿する"
+
+#: apps/reviews/templates/reviews/list.html:12
+msgid "at"
+msgstr "で"
+
+#: templates/404.html:5
+msgid "Oops! The page could not be found..."
+msgstr "おっとっと！ ページが見つかりませんでした..."
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "Go back to"
+msgstr "帰ります"
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "home"
+msgstr "ホームページ"
+
+#: templates/500.html:5
+msgid "Oops! Something went wrong..."
+msgstr "おっとっと！ エラーが発生しました..."
+
+#: templates/base.html:10 templates/parts/base/top.html:9
+msgid "Search engine of public transportation bus, train,  subway, tram."
+msgstr "公共交通機関のバス、電車、地下鉄、路面電車の検索エンジン。"
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/parts/catastro/ver_administrativearea/top.html:4
+msgid "Public transportation in"
+msgstr "の公共交通機関"
+
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+#: templates/parts/catastro/ver_administrativearea/top.html:13
+msgid "How to get around in"
+msgstr "移動する方法"
+
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:8
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+msgid "and what lines and routes of buses go through"
+msgstr "バスの路線とルート"
+
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
+msgid "List of all the public transport that go through"
+msgstr "通過するすべての公共交通機関のリスト"
+
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
+msgid "See how to get from where you are"
+msgstr "現在地からの移動方法を見る"
+
+#: templates/catastro/ver_administrativearea.html:24
+#: templates/catastro/ver_poi.html:25 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:24
+#: templates/parts/catastro/ver_administrativearea/content.html:9
+msgid "Home"
+msgstr "ホーム"
+
+#: templates/catastro/ver_administrativearea.html:64
+#: templates/catastro/ver_poi.html:83 templates/core/ver_recorrido.html:90
+#: templates/parts/catastro/ver_administrativearea/content.html:49
+msgid "See in interactive map"
+msgstr "インタラクティブマップで見る"
+
+#: templates/catastro/ver_administrativearea.html:76
+#: templates/parts/catastro/ver_administrativearea/content.html:61
+msgid "Lines of public transport"
+msgstr "公共交通機関"
+
+#: templates/catastro/ver_administrativearea.html:98
+#: templates/parts/catastro/ver_administrativearea/content.html:83
+msgid "Routes of public transport"
+msgstr "公共交通機関のルート"
+
+#: templates/catastro/ver_administrativearea.html:128
+#: templates/parts/catastro/ver_administrativearea/content.html:113
+msgid "Places"
+msgstr "場所"
+
+#: templates/catastro/ver_administrativearea.html:142
+#: templates/core/ver_recorrido.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:127
+msgid "Stops"
+msgstr "ストップ"
+
+#: templates/catastro/ver_administrativearea.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:136
+msgid "Points of interest"
+msgstr "興味がある点"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:48
+msgid "How to get to"
+msgstr "に取得する方法"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:17
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:95
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16
+msgid "in"
+msgstr "に"
+
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:48
+msgid "?"
+msgstr "?"
+
+#: templates/catastro/ver_interseccion.html:43
+msgid "Routes of public transport that pass through this intersection"
+msgstr "この交差点を通過する公共交通機関のルート"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:47 templates/core/ver_recorrido.html:57
+#: templates/core/ver_recorrido.html:106
+msgid "from"
+msgstr "から"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16 templates/core/ver_recorrido.html:47
+#: templates/core/ver_recorrido.html:57 templates/core/ver_recorrido.html:106
+msgid "to"
+msgstr "に"
+
+#: templates/catastro/ver_interseccion.html:64
+#: templates/catastro/ver_poi.html:117
+msgid "Nearby stops"
+msgstr "近くの停留所"
+
+#: templates/catastro/ver_interseccion.html:73
+#: templates/catastro/ver_poi.html:126
+msgid "Other points of interest nearby"
+msgstr "近くの他の見どころ"
+
+#: templates/catastro/ver_poi-404.html:7
+msgid "Could not find"
+msgstr "見つけることができませんでした"
+
+#: templates/catastro/ver_poi-404.html:12
+msgid "But we did everything possible to find similar places"
+msgstr "しかし、同様の場所を見つけるために可能な限りのことをしました"
+
+#: templates/catastro/ver_poi.html:64
+msgid "Go to website"
+msgstr "ウェブサイトに行く"
+
+#: templates/catastro/ver_poi.html:69
+msgid "Phone"
+msgstr "フォン"
+
+#: templates/catastro/ver_poi.html:96
+msgid "Public transport routes that pass next to this place"
+msgstr "この場所の隣を通過する公共交通機関のルート"
+
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:16
+msgid "Line"
+msgstr "ライン"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid ""
+"All the information about routes, trips, stops, schedules and fares of the "
+"line"
+msgstr "路線のルート、旅行、停留所、スケジュール、運賃に関するすべての情報"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid "that passes through"
+msgstr "通過する"
+
+#: templates/core/ver_linea.html:49
+msgid "Company information"
+msgstr "企業情報"
+
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:62
+msgid "Places that travel to"
+msgstr "旅行する場所"
+
+#: templates/core/ver_linea.html:64
+msgid "Routes of the line"
+msgstr "路線"
+
+#: templates/core/ver_linea.html:95
+msgid "Public transportation coverage of the line"
+msgstr "路線の公共交通カバレッジ"
+
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_parada.html:43
+msgid "Stop"
+msgstr "やめる"
+
+#: templates/core/ver_parada.html:6
+msgid "and what lines of routes of buses, train and subway stop in the stop"
+msgstr "バス、電車、地下鉄の路線が停車する場所"
+
+#: templates/core/ver_parada.html:62
+msgid "Public transport routes that stop in this stop"
+msgstr "この停留所で停止する公共交通機関のルート"
+
+#: templates/core/ver_parada.html:79
+msgid ""
+"Public transport routes that pass nearby of this stop (do not stop here)"
+msgstr "この停留所の近くを通る公共交通機関のルート（ここで止まらないでください）"
+
+#: templates/core/ver_parada.html:100
+msgid "Points of interest nearby"
+msgstr "近くの名所"
+
+#: templates/core/ver_parada.html:117
+msgid "Neighborhoods nearby"
+msgstr "近くの地域"
+
+#: templates/core/ver_parada.html:126
+msgid "Other stops near"
+msgstr "近くの他の停留所"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:55
+msgid "Route"
+msgstr "ルート"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+msgid "of the line"
+msgstr "ラインの"
+
+#: templates/core/ver_recorrido.html:7
+msgid "All the information on stops, schedules and fares of the route"
+msgstr "ルートのストップ、スケジュール、運賃に関するすべての情報"
+
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
+msgid "Description of the route of the bus"
+msgstr "バスの路線の説明"
+
+#: templates/core/ver_recorrido.html:16
+msgid "branch"
+msgstr "ブランチ"
+
+#: templates/core/ver_recorrido.html:16
+msgid "Route from"
+msgstr "からのルート"
+
+#: templates/core/ver_recorrido.html:71 templates/core/ver_recorrido.html:81
+msgid "Streets that compose this route"
+msgstr "このルートを構成する通り"
+
+#: templates/core/ver_recorrido.html:100
+msgid "Similar routes"
+msgstr "同様のルート"
+
+#: templates/core/ver_recorrido.html:122
+msgid "Points of interest near the route"
+msgstr "ルートの近くの興味のあるポイント"
+
+#: templates/leaflet/admin/widget.html:29
+msgid "Reset view"
+msgstr "表示方法をリセットする"
+
+#: templates/navbar.html:28 templates/parts/base/top.html:52
+msgid "Go to the search engine"
+msgstr "検索エンジンに行く"
+
+#: templates/navbar.html:37 templates/parts/base/top.html:61
+msgid "Login"
+msgstr "ログインする"
+
+#: templates/navbar.html:41 templates/parts/base/top.html:65
+msgid "Star users"
+msgstr "スターユーザー"
+
+#: templates/navbar.html:42 templates/parts/base/top.html:66
+msgid "Poll"
+msgstr "投票"

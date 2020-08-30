@@ -78,14 +78,6 @@ kings = {
     #     'country_code': 'pe',
     #     'lang': 'es_PE',
     # },
-    # 'cuba': {
-    #     'name': 'cuba',
-    #     'url': 'http://download.geofabrik.de/south-america/cuba-latest.osm.pbf',
-    #     'id': 288247,
-    #     'paradas_completas': False,
-    #     'country_code': 'cu',
-    #     'lang': 'es_CU',
-    # },
     'brazil': {
         'name': 'brasil',
         'url': 'https://download.geofabrik.de/south-america/brazil-latest.osm.pbf',
@@ -166,14 +158,6 @@ kings = {
         'country_code': 'kr',
         'lang': 'ko_KR',
     },
-    # 'usa': {
-    #     'name': 'usa',
-    #     'url': 'https://download.geofabrik.de/north-america/us-latest.osm.pbf',
-    #     'id': 148838,
-    #     'paradas_completas': False,
-    #     'country_code': 'us',
-    #     'lang': 'en_US',
-    # },
     'newzealand': {
         'name': 'newzealand',
         'url': 'https://download.geofabrik.de/australia-oceania/new-zealand-latest.osm.pbf',
@@ -213,6 +197,39 @@ kings = {
         'paradas_completas': True,
         'country_code': 'ch',
         'lang': 'de_CH',
+    },
+    'nicaragua': {
+        'name': 'nicaragua',
+        'url': 'https://download.geofabrik.de/central-america/nicaragua-latest.osm.pbf',
+        # 'url_adminareas': 'https://download.geofabrik.de/africa-latest.osm.pbf',
+        'id': 287666,
+        'paradas_completas': False,
+        'country_code': 'ni',
+        'lang': 'es_NI',
+    },
+    'cuba': {
+        'name': 'cuba',
+        'url': 'http://download.geofabrik.de/central-america/cuba-latest.osm.pbf',
+        'id': 307833,
+        'paradas_completas': False,
+        'country_code': 'cu',
+        'lang': 'es_CU',
+    },
+    'japan': {
+        'name': 'japan',
+        'url': 'https://download.geofabrik.de/asia/japan-latest.osm.pbf',
+        'id': 382313,
+        'paradas_completas': True,
+        'country_code': 'jp',
+        'lang': 'ja_JP',
+    },
+    'usa': {
+        'name': 'usa',
+        'url': 'https://download.geofabrik.de/north-america/us-latest.osm.pbf',
+        'id': 148838,
+        'paradas_completas': False,
+        'country_code': 'us',
+        'lang': 'en_US',
     },
 }
 
@@ -341,6 +358,7 @@ class Command(BaseCommand):
         run_timestamp = datetime.now()
 
         inputfile = f'/tmp/osm-{king["name"]}.pbf'
+        inputfile_adminareas = inputfile
 
         if options['download']:
 
@@ -349,6 +367,14 @@ class Command(BaseCommand):
             url = king['url']
             self.out2(url)
             f, d = request.urlretrieve(url, inputfile, lambda nb, bs, fs, url=url: self.reporthook(nb, bs, fs, url))
+
+            if 'url_adminareas' in king and king['url_adminareas']:
+                inputfile_adminareas = f'/tmp/osm-{king["name"]}-adminareas.pbf'
+                self.out1(f'Descargando mapa de {king["name"]} de geofabrik (para adminareas)')
+                url = king['url_adminareas']
+                self.out2(url)
+                f, d = request.urlretrieve(url, inputfile_adminareas, lambda nb, bs, fs, url=url: self.reporthook(nb, bs, fs, url))
+
 
         #######################
         #  Adminareas de osm  #
@@ -451,12 +477,12 @@ class Command(BaseCommand):
                                     if wid == w.id:
                                         admin_relations[rel_id]['ways'][i] = linestring
 
-            self.out2(f'Collecting rels, using {inputfile}')
+            self.out2(f'Collecting rels, using {inputfile_adminareas}')
             h = RelsHandler()
-            h.apply_file(inputfile)
+            h.apply_file(inputfile_adminareas)
             self.out2('Collecting ways & nodes')
             h = WaysHandler()
-            h.apply_file(inputfile, locations=True)
+            h.apply_file(inputfile_adminareas, locations=True)
 
             admin_count_ok = 0
             admin_count_all = 0
@@ -515,7 +541,7 @@ class Command(BaseCommand):
                                 self.out2(f" {e2}, error")
                         if v['osm_id'] == KING_ID:
                             KING = v
-            self.out2(f"TOTALS: {admin_count_all} {admin_count} {admin_count_ok}, {len(admin_areas)}")
+            self.out2(f"TOTALS: all({admin_count_all}) tried({admin_count}) ok({admin_count_ok}), really_ok({len(admin_areas)})")
 
             def fuzzy_contains(out_geom, in_geom, buffer=0, attempts=3):
                 try:
@@ -824,8 +850,9 @@ class Command(BaseCommand):
                 counters[pt.status.code] += 1
                 self.out2('{}: {} > {}'.format(pt.status.code, pt.status.detail, pt.tags['name'], start=''))
 
+            self.out2('status | count')
             for key, counter in sorted(counters.items(), key=lambda e: e[1], reverse=True):
-                self.out2('{} | {}'.format(counter, key))
+                self.out2('{} | {}'.format(key, counter))
 
             # HINT: run migrations in order to have osmbot in the db
             user_bot_osm = get_user_model().objects.get(username='osmbot')
@@ -1073,13 +1100,16 @@ class Command(BaseCommand):
                                 'latlng': point,
                                 'country_code': king['country_code'],
                             }
-                            Poi.objects.update_or_create(
-                                osm_id=n.id,
-                                osm_type='n',
-                                defaults=defaults
-                            )
-                            self.nodes_added += 1
-                            print(f'[{self.nodes_current*100/nodes_count:7.3f}%] / Nodes added: {self.nodes_added} | processed: {self.nodes_current} / {nodes_count}')
+                            try:
+                                Poi.objects.update_or_create(
+                                    osm_id=n.id,
+                                    osm_type='n',
+                                    defaults=defaults
+                                )
+                                self.nodes_added += 1
+                                print(f'[{self.nodes_current*100/nodes_count:7.3f}%] / Nodes added: {self.nodes_added} | processed: {self.nodes_current} / {nodes_count}')
+                            except Exception as e:
+                                print(f'Could not save, exception {e}')
 
             self.out2('POIS from ways and nodes with osmosis')
             h = POIsHandler()
