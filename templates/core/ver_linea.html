@@ -91,8 +91,8 @@
 
     {% if obj.img_panorama %}
     <div class="thumbnail">
-        <div id="map" style="background:lightblue;">
-            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="{% blocktrans %}Public transportation coverage of the line{% endblocktrans %} {{ obj.nombre }} {% blocktrans %}in{% endblocktrans %} {{ adminarea.name }}." />
+        <div id="map" style="background:lightblue;min-height:300px;">
+            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="{% blocktrans %}Public transportation coverage of the line{% endblocktrans %} {{ obj.nombre }} {% blocktrans %}in{% endblocktrans %} {{ adminarea.name }}." />
         </div>
     </div>
     {% endif %}

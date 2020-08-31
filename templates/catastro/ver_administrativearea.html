@@ -64,8 +64,8 @@
             {% blocktrans %}See in interactive map{% endblocktrans %}
         </a>
         {% if obj.img_panorama %}
-        <div id="map" style="background:lightblue;">
-            <img src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
+        <div id="map" style="background:lightblue;min-height:300px;">
+            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
         </div>
         {% endif %}
     </div>
