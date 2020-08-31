@@ -62,7 +62,7 @@ form {
 }
 
 .breadcrumb a {
-    color: #999;
+    color: #666;
 }
 
 button.btn {
@@ -75,7 +75,7 @@ button.btn {
 :-ms-input-placeholder { font-size: 16px; }
 
 .light {
-    color: #999;
+    color: #666;
     display:block;
 }
 
