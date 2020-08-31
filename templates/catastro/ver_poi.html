@@ -61,7 +61,7 @@
                 <span style="float:right" class="label label-default">{{amenity}}</span>
             {% endif %}
             {% if poi.tags.website %}
-                <a href="{{poi.tags.website}}" target="_blank">{% blocktrans %}Go to website{% endblocktrans %}</a>
+                <a href="{{poi.tags.website}}" target="_blank" rel="noopener">{% blocktrans %}Go to website{% endblocktrans %}</a>
             {% endif %}
         </div>
         <div>
