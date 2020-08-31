@@ -88,3 +88,7 @@ h1 > small {
 .nav-pills>li>a {
     line-height: 18px !important;
 }
+
+.breadcrumb a {
+    color: #666;
+}
