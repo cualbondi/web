@@ -30,6 +30,7 @@ import geopandas as gpd
 from datetime import datetime
 from urllib import request
 from psycopg2.extras import execute_values
+from .utils_admin_areas import get_admin_area, get_admin_areas, make_poly_file
 
 
 class Nonegetter():
@@ -201,7 +202,6 @@ kings = {
     'nicaragua': {
         'name': 'nicaragua',
         'url': 'https://download.geofabrik.de/central-america/nicaragua-latest.osm.pbf',
-        # 'url_adminareas': 'https://download.geofabrik.de/africa-latest.osm.pbf',
         'id': 287666,
         'paradas_completas': False,
         'country_code': 'ni',
@@ -230,6 +230,24 @@ kings = {
         'paradas_completas': False,
         'country_code': 'us',
         'lang': 'en_US',
+    },
+    'malaysia': {
+        'name': 'malaysia',
+        'url': 'https://download.geofabrik.de/asia/malaysia-singapore-brunei-latest.osm.pbf',
+        'id': 2108121,
+        'clip_country': True,
+        'paradas_completas': False,
+        'country_code': 'my',
+        'lang': 'ms_MY',
+    },
+    'singapore': {
+        'name': 'singapore',
+        'url': 'https://download.geofabrik.de/asia/malaysia-singapore-brunei-latest.osm.pbf',
+        'id': 536780,
+        'clip_country': True,
+        'paradas_completas': False,
+        'country_code': 'sg',
+        'lang': 'en_SG',
     },
 }
 
@@ -358,7 +376,6 @@ class Command(BaseCommand):
         run_timestamp = datetime.now()
 
         inputfile = f'/tmp/osm-{king["name"]}.pbf'
-        inputfile_adminareas = inputfile
 
         if options['download']:
 
@@ -368,13 +385,17 @@ class Command(BaseCommand):
             self.out2(url)
             f, d = request.urlretrieve(url, inputfile, lambda nb, bs, fs, url=url: self.reporthook(nb, bs, fs, url))
 
-            if 'url_adminareas' in king and king['url_adminareas']:
-                inputfile_adminareas = f'/tmp/osm-{king["name"]}-adminareas.pbf'
-                self.out1(f'Descargando mapa de {king["name"]} de geofabrik (para adminareas)')
-                url = king['url_adminareas']
-                self.out2(url)
-                f, d = request.urlretrieve(url, inputfile_adminareas, lambda nb, bs, fs, url=url: self.reporthook(nb, bs, fs, url))
-
+        if 'clip_country' in king and king['clip_country'] == True:
+            self.out1('Clip big pbf file to the country adminarea')
+            self.out2('get full country admin area polygon')
+            KING_ADMIN_AREA = get_admin_area(inputfile, king['id'], self.out2)
+            self.out2('make poly file for osmconvert')
+            filename = make_poly_file(KING_ADMIN_AREA['geometry'].buffer(0.001))
+            self.out2(f'generated temp poly file at {filename}')
+            self.out2('run osmconvert to clip pbf file')
+            result = subprocess.run(['osmconvert', inputfile, f'-B={filename}', '--complete-ways', '--complete-multipolygons', f'-o={inputfile}-cropped.pbf'], stdout=subprocess.PIPE)
+            inputfile = f'{inputfile}-cropped.pbf'
+            self.out2(f'pbf clipped at {inputfile}')
 
         #######################
         #  Adminareas de osm  #
@@ -385,163 +406,12 @@ class Command(BaseCommand):
         if options['admin_areas']:
             self.out1('Admin Areas')
 
-            ADMIN_LEVEL_MIN = 1
-            ADMIN_LEVEL_MAX = 8
             KING_ID = king['id']  # osm_id king
 
             OLD_KING = list(AdministrativeArea.objects.filter(osm_id=KING_ID))
-            KING = None
 
-            admin_areas = [[] for i in range(12)]  # index: admin_level, value
-            admin_relations = {}  # index: admin_level, value
-            admin_relations_ways_ids = {}
-            # this = self
-
-            class RelsHandler(osmium.SimpleHandler):
-                def relation(self, r):
-                    if 'boundary' in r.tags and r.tags['boundary'] == 'administrative' and 'name' in r.tags and 'admin_level' in r.tags:  # and r.id == KING_ID:
-                        ways = []
-                        for m in r.members:
-                            # outer (parts and exclaves) / inner (hole)
-                            if m.type == 'w' and m.role in ['outer']:
-                                ways.append(m.ref)
-                                admin_relations_ways_ids.setdefault(m.ref, []).append(r.id)
-                        try:
-                            admin_level = int(r.tags['admin_level'])
-                        except ValueError:
-                            return
-                        admin_relations[r.id] = {
-                            'import_timestamp': run_timestamp,
-                            'osm_id': r.id,
-                            'osm_type': 'r',
-                            'ways': ways,
-                            'admin_level': admin_level,
-                            'name': r.tags['name'],  # .encode('utf-8').strip(),
-                            'tags': {k:v for k,v in r.tags},
-                            'country_code': king['country_code'],
-                        }
-                        # this.out2(f"REL {r.id} {r.tags['name'].encode('utf-8').strip()}")
-
-            def make_valid(geom):
-                cursor = connection._cursor()
-                try:
-                    try:
-                        cursor.execute('SELECT ST_MakeValid(%s)', (PostGISAdapter(geom),))
-                        row = cursor.fetchone()
-                    except:
-                        # Responsibility of callers to perform error handling.
-                        raise
-                finally:
-                    # Close out the connection.  See #9437.
-                    connection.close()
-                return GEOSGeometry(row[0])
-
-            def maybe_make_valid(geom):
-                if not geom.valid:
-                    return make_valid(geom)
-                else:
-                    return geom
-
-            class WaysHandler(osmium.SimpleHandler):
-                def way(self, w):
-
-                    # ways that are admin areas
-                    if 'boundary' in w.tags and w.tags['boundary'] == 'administrative' and 'name' in w.tags and 'admin_level' in w.tags:
-                        linestring = []
-                        for node in w.nodes:
-                            linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
-                        if linestring[0][0] == linestring[-1][0] and linestring[0][1] == linestring[-1][1]:
-                            if int(w.tags['admin_level']) >= ADMIN_LEVEL_MIN and int(w.tags['admin_level']) <= ADMIN_LEVEL_MAX:
-                                poly = Polygon(linestring)
-                                admin_areas[int(w.tags['admin_level'])].append({
-                                    'import_timestamp': run_timestamp,
-                                    'osm_id': w.id,
-                                    'osm_type': 'w',
-                                    'geometry': maybe_make_valid(poly),
-                                    'geometry_simple': maybe_make_valid(poly.simplify(0.001, True)),
-                                    'admin_level': int(w.tags['admin_level']),
-                                    'name': w.tags['name'],  # .encode('utf-8').strip(),
-                                    'tags': {k:v for k,v in w.tags},
-                                    'country_code': king['country_code'],
-                                })
-
-                    # fill relations that are admin areas
-                    if w.id in admin_relations_ways_ids:
-                        linestring = []
-                        for node in w.nodes:
-                            linestring.append([float(node.x) / 10000000, float(node.y) / 10000000])
-
-                        for rel_id in admin_relations_ways_ids[w.id]:
-                            if rel_id in admin_relations and 'ways' in admin_relations[rel_id]:
-                                for i, wid in enumerate(admin_relations[rel_id]['ways']):
-                                    if wid == w.id:
-                                        admin_relations[rel_id]['ways'][i] = linestring
-
-            self.out2(f'Collecting rels, using {inputfile_adminareas}')
-            h = RelsHandler()
-            h.apply_file(inputfile_adminareas)
-            self.out2('Collecting ways & nodes')
-            h = WaysHandler()
-            h.apply_file(inputfile_adminareas, locations=True)
-
-            admin_count_ok = 0
-            admin_count_all = 0
-            admin_count = 0
-            self.out2('Joining ways')
-            for (k, v) in admin_relations.items():
-                admin_count_all = admin_count_all + 1
-                dbadminarea = AdministrativeArea.objects.filter(osm_id=v['osm_id'], osm_type=v['osm_type'])
-                if dbadminarea:
-                    dbadminarea = dbadminarea[0]
-                    v['img_panorama'] = dbadminarea.img_panorama
-                    v['img_cuadrada'] = dbadminarea.img_cuadrada
-
-                if v['admin_level'] >= ADMIN_LEVEL_MIN and v['admin_level'] <= ADMIN_LEVEL_MAX:
-                    self.out2(f"osmid={k} level={v['admin_level']} name={v['name']}", end="")
-                    wfull = [w for w in v['ways'] if not isinstance(w, int)]
-                    if len(wfull) == 0 or float(len(wfull)) / float(len(v['ways'])) < 0.8:
-                        self.out2(f" NOK skipping adminarea, less than 80% of fragments")
-                        continue
-                    way, status = fix_polygon(wfull, 1000)
-                    if way is None:
-                        # si esta roto, buscar en la base de datos si hay uno con ese id y usar ese way
-                        self.out2(f' ERROR: {status}')
-                        if dbadminarea:
-                            way = dbadminarea.geometry
-                    else:
-                        admin_count = admin_count + 1
-                        self.out2(f" OK -> {len(way)}")
-                        # last point equals first
-                        admin_count_ok = admin_count_ok + 1
-                        try:
-                            poly = Polygon(way)
-                            v['geometry'] = maybe_make_valid(poly)
-                            v['geometry_simple'] = maybe_make_valid(poly.simplify(0.01, True))
-                            if v['osm_id'] != KING_ID:
-                                admin_areas[v['admin_level']].append(v)
-                        except Exception as e:
-                            try:
-                                self.out2(f" {e}, retrying as multipolygon")
-                                mp = []
-                                for p in way:
-                                    p_fixed, status = fix_polygon(p, 1000)
-                                    if p_fixed:
-                                        try:
-                                            mp.append(Polygon(p_fixed + [p_fixed[0]]))
-                                        except Exception as e3:
-                                            self.out2(f" {e3} {status}, skipping fragment. ({len(p_fixed)} nodes) [{status}]")
-                                poly = MultiPolygon(mp)
-                                v['geometry'] = maybe_make_valid(poly)
-                                v['geometry_simple'] = maybe_make_valid(poly.simplify(0.01, True))
-                                if v['osm_id'] != KING_ID:
-                                    admin_areas[v['admin_level']].append(v)
-                                self.out2('-> ok')
-                            except Exception as e2:
-                                traceback.print_exc()
-                                self.out2(f" {e2}, error")
-                        if v['osm_id'] == KING_ID:
-                            KING = v
-            self.out2(f"TOTALS: all({admin_count_all}) tried({admin_count}) ok({admin_count_ok}), really_ok({len(admin_areas)})")
+            admin_areas, KING = get_admin_areas(run_timestamp, inputfile, king['country_code'], KING_ID, self.out2)
+            KING_GEOM_BUFF = KING['geometry_simple'].buffer(0.01)
 
             def fuzzy_contains(out_geom, in_geom, buffer=0, attempts=3):
                 try:
@@ -560,9 +430,6 @@ class Command(BaseCommand):
                         return fuzzy_contains(maybe_make_valid(out_geom), maybe_make_valid(in_geom), buffer, attempts - 1)
                     else:
                         raise
-
-
-            KING_GEOM_BUFF = KING['geometry_simple'].buffer(0.01)
 
             def get_parent_aa(node, geometry):
                 try:
@@ -834,7 +701,7 @@ class Command(BaseCommand):
             # https://wiki.openstreetmap.org/wiki/Buses
 
             p = pyosmptparser.Parser(inputfile)
-            pts = p.get_public_transports(150)
+            pts = p.get_public_transports(500)
             routetypes_stops = ['train', 'subway', 'monorail', 'tram', 'light_rail']
             routetypes = routetypes_stops + ['bus', 'trolleybus']
             buses = {}
@@ -1100,7 +967,7 @@ class Command(BaseCommand):
                                     'nom_normal': Substr(Trim(Upper(Unaccent(Value(n.tags['name'])))), 1, 200),
                                     'latlng': point,
                                     'country_code': king['country_code'],
-                                 }
+                                }
                                 Poi.objects.update_or_create(
                                     osm_id=n.id,
                                     osm_type='n',

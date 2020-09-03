@@ -1,0 +1,492 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Julian Perelli <jperelli@gmail.com>, 2020
+# Julian Perelli <jperelli@gmail.com>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-15 18:42+0000\n"
+"PO-Revision-Date: 2020-03-07 00:17+0000\n"
+"Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
+"Language-Team: Malay (https://www.transifex.com/cualbondi/teams/107940/ms/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ms\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/catastro/views.py:41
+msgctxt "an amenity type"
+msgid "restaurant"
+msgstr "restoran"
+
+#: apps/catastro/views.py:42
+msgctxt "an amenity type"
+msgid "school"
+msgstr "sekolah"
+
+#: apps/catastro/views.py:43
+msgctxt "an amenity type"
+msgid "pharmacy"
+msgstr "farmasi"
+
+#: apps/catastro/views.py:44
+msgctxt "an amenity type"
+msgid "Kindergarten"
+msgstr "Tadika"
+
+#: apps/catastro/views.py:45
+msgctxt "an amenity type"
+msgid "cafe"
+msgstr "kedai kopi"
+
+#: apps/catastro/views.py:46
+msgctxt "an amenity type"
+msgid "fast_food"
+msgstr "makanan segera"
+
+#: apps/catastro/views.py:47
+msgctxt "an amenity type"
+msgid "bar"
+msgstr "bar"
+
+#: apps/catastro/views.py:48
+msgctxt "an amenity type"
+msgid "place_of_worship"
+msgstr "tempat beribadat"
+
+#: apps/catastro/views.py:49
+msgctxt "an amenity type"
+msgid "college"
+msgstr "kolej"
+
+#: apps/catastro/views.py:50
+msgctxt "an amenity type"
+msgid "ice_cream"
+msgstr "ais krim"
+
+#: apps/catastro/views.py:51
+msgctxt "an amenity type"
+msgid "police"
+msgstr "polis"
+
+#: apps/catastro/views.py:52
+msgctxt "an amenity type"
+msgid "hospital"
+msgstr "hospital"
+
+#: apps/catastro/views.py:53
+msgctxt "an amenity type"
+msgid "clinic"
+msgstr "klinik"
+
+#: apps/catastro/views.py:54
+msgctxt "an amenity type"
+msgid "community_centre"
+msgstr "Pusat Komuniti"
+
+#: apps/catastro/views.py:55
+msgctxt "an amenity type"
+msgid "veterinary"
+msgstr "doktor haiwan"
+
+#: apps/catastro/views.py:56
+msgctxt "an amenity type"
+msgid "doctors"
+msgstr "doktor"
+
+#: apps/catastro/views.py:57
+msgctxt "an amenity type"
+msgid "bicycle_rental"
+msgstr "sewa basikal"
+
+#: apps/catastro/views.py:58
+msgctxt "an amenity type"
+msgid "taxi"
+msgstr "teksi"
+
+#: apps/catastro/views.py:59
+msgctxt "an amenity type"
+msgid "library"
+msgstr "perpustakaan"
+
+#: apps/catastro/views.py:60
+msgctxt "an amenity type"
+msgid "dentist"
+msgstr "doktor gigi"
+
+#: apps/catastro/views.py:61
+msgctxt "an amenity type"
+msgid "bank"
+msgstr "bank"
+
+#: apps/catastro/views.py:62
+msgctxt "an amenity type"
+msgid "theatre"
+msgstr "teater"
+
+#: apps/catastro/views.py:63
+msgctxt "an amenity type"
+msgid "car_wash"
+msgstr "cuci kereta"
+
+#: apps/catastro/views.py:64
+msgctxt "an amenity type"
+msgid "pub"
+msgstr "pub"
+
+#: apps/catastro/views.py:65
+msgctxt "an amenity type"
+msgid "university"
+msgstr "universiti"
+
+#: apps/reviews/forms.py:12 apps/reviews/templates/reviews/form.html:19
+msgid "Terrible"
+msgstr "Dahsyat"
+
+#: apps/reviews/forms.py:13 apps/reviews/templates/reviews/form.html:20
+msgid "Poor"
+msgstr "Buruk"
+
+#: apps/reviews/forms.py:14 apps/reviews/templates/reviews/form.html:21
+msgid "Average"
+msgstr "Rata-rata"
+
+#: apps/reviews/forms.py:15
+msgid "Very Good"
+msgstr "Sangat bagus"
+
+#: apps/reviews/forms.py:16 apps/reviews/templates/reviews/form.html:23
+msgid "Excellent"
+msgstr "Cemerlang"
+
+#: apps/reviews/forms.py:25 apps/reviews/templates/reviews/form.html:18
+msgid "Select a rating"
+msgstr "Pilih penilaian"
+
+#: apps/reviews/forms.py:26
+msgid "Rating"
+msgstr "Penarafan"
+
+#: apps/reviews/templates/reviews/aggregate.html:8
+#, python-format
+msgid "see %(comment_count)s reviews"
+msgstr "lihat %(comment_count)s ulasan"
+
+#: apps/reviews/templates/reviews/aggregate.html:13
+msgid "write the first review"
+msgstr "tulis ulasan pertama"
+
+#: apps/reviews/templates/reviews/form.html:15
+msgid "Name"
+msgstr "Nama"
+
+#: apps/reviews/templates/reviews/form.html:22
+msgid "Very"
+msgstr "Sangat"
+
+#: apps/reviews/templates/reviews/form.html:30
+msgid "Post"
+msgstr "Hantar"
+
+#: apps/reviews/templates/reviews/list.html:12
+msgid "at"
+msgstr "di"
+
+#: templates/404.html:5
+msgid "Oops! The page could not be found..."
+msgstr "Alamak! Halaman tidak dapat dijumpai ..."
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "Go back to"
+msgstr "Kembali kepada"
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "home"
+msgstr "laman utama"
+
+#: templates/500.html:5
+msgid "Oops! Something went wrong..."
+msgstr "Alamak! Ada yang tidak kena ..."
+
+#: templates/base.html:10 templates/parts/base/top.html:9
+msgid "Search engine of public transportation bus, train,  subway, tram."
+msgstr ""
+"Mesin carian bas pengangkutan awam, kereta api, kereta bawah tanah, trem."
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/parts/catastro/ver_administrativearea/top.html:4
+msgid "Public transportation in"
+msgstr "Pengangkutan awam di"
+
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+#: templates/parts/catastro/ver_administrativearea/top.html:13
+msgid "How to get around in"
+msgstr "Cara berkeliling"
+
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:8
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+msgid "and what lines and routes of buses go through"
+msgstr "dan laluan dan laluan bas apa yang dilalui"
+
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
+msgid "List of all the public transport that go through"
+msgstr "Senarai semua pengangkutan awam yang dilalui"
+
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
+msgid "See how to get from where you are"
+msgstr "Lihat bagaimana untuk pergi dari tempat anda berada"
+
+#: templates/catastro/ver_administrativearea.html:24
+#: templates/catastro/ver_poi.html:25 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:24
+#: templates/parts/catastro/ver_administrativearea/content.html:9
+msgid "Home"
+msgstr "Laman utama"
+
+#: templates/catastro/ver_administrativearea.html:64
+#: templates/catastro/ver_poi.html:83 templates/core/ver_recorrido.html:90
+#: templates/parts/catastro/ver_administrativearea/content.html:49
+msgid "See in interactive map"
+msgstr "Lihat di peta interaktif"
+
+#: templates/catastro/ver_administrativearea.html:76
+#: templates/parts/catastro/ver_administrativearea/content.html:61
+msgid "Lines of public transport"
+msgstr "Talian pengangkutan awam"
+
+#: templates/catastro/ver_administrativearea.html:98
+#: templates/parts/catastro/ver_administrativearea/content.html:83
+msgid "Routes of public transport"
+msgstr "Laluan pengangkutan awam"
+
+#: templates/catastro/ver_administrativearea.html:128
+#: templates/parts/catastro/ver_administrativearea/content.html:113
+msgid "Places"
+msgstr "Tempat"
+
+#: templates/catastro/ver_administrativearea.html:142
+#: templates/core/ver_recorrido.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:127
+msgid "Stops"
+msgstr "Perhentian"
+
+#: templates/catastro/ver_administrativearea.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:136
+msgid "Points of interest"
+msgstr "Tempat menarik"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:48
+msgid "How to get to"
+msgstr "Bagaimana menuju ke"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:17
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:95
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16
+msgid "in"
+msgstr "dalam"
+
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:48
+msgid "?"
+msgstr "?"
+
+#: templates/catastro/ver_interseccion.html:43
+msgid "Routes of public transport that pass through this intersection"
+msgstr "Laluan pengangkutan awam yang melalui persimpangan ini"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:47 templates/core/ver_recorrido.html:57
+#: templates/core/ver_recorrido.html:106
+msgid "from"
+msgstr "dari"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16 templates/core/ver_recorrido.html:47
+#: templates/core/ver_recorrido.html:57 templates/core/ver_recorrido.html:106
+msgid "to"
+msgstr "ke"
+
+#: templates/catastro/ver_interseccion.html:64
+#: templates/catastro/ver_poi.html:117
+msgid "Nearby stops"
+msgstr "Hentian berdekatan"
+
+#: templates/catastro/ver_interseccion.html:73
+#: templates/catastro/ver_poi.html:126
+msgid "Other points of interest nearby"
+msgstr "Tempat menarik lain yang berdekatan"
+
+#: templates/catastro/ver_poi-404.html:7
+msgid "Could not find"
+msgstr "Tidak dapat mencari"
+
+#: templates/catastro/ver_poi-404.html:12
+msgid "But we did everything possible to find similar places"
+msgstr "Tetapi kami berusaha sedaya mungkin untuk mencari tempat yang serupa"
+
+#: templates/catastro/ver_poi.html:64
+msgid "Go to website"
+msgstr "Pergi ke laman web"
+
+#: templates/catastro/ver_poi.html:69
+msgid "Phone"
+msgstr "Telefon"
+
+#: templates/catastro/ver_poi.html:96
+msgid "Public transport routes that pass next to this place"
+msgstr "Laluan pengangkutan awam yang melintas di sebelah tempat ini"
+
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:16
+msgid "Line"
+msgstr "Garisan"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid ""
+"All the information about routes, trips, stops, schedules and fares of the "
+"line"
+msgstr ""
+"Semua maklumat mengenai laluan, perjalanan, hentian, jadual dan tambang "
+"talian"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid "that passes through"
+msgstr "yang melalui"
+
+#: templates/core/ver_linea.html:49
+msgid "Company information"
+msgstr "Maklumat Syarikat"
+
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:62
+msgid "Places that travel to"
+msgstr "Tempat yang melancong ke"
+
+#: templates/core/ver_linea.html:64
+msgid "Routes of the line"
+msgstr "Laluan talian"
+
+#: templates/core/ver_linea.html:95
+msgid "Public transportation coverage of the line"
+msgstr "Liputan pengangkutan awam talian"
+
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_parada.html:43
+msgid "Stop"
+msgstr "Perhentian"
+
+#: templates/core/ver_parada.html:6
+msgid "and what lines of routes of buses, train and subway stop in the stop"
+msgstr ""
+"dan laluan laluan bas, kereta api dan kereta bawah tanah yang mana berhenti "
+"di perhentian"
+
+#: templates/core/ver_parada.html:62
+msgid "Public transport routes that stop in this stop"
+msgstr "Laluan pengangkutan awam yang berhenti di perhentian ini"
+
+#: templates/core/ver_parada.html:79
+msgid ""
+"Public transport routes that pass nearby of this stop (do not stop here)"
+msgstr ""
+"Laluan pengangkutan awam yang melewati hentian ini (jangan berhenti di sini)"
+
+#: templates/core/ver_parada.html:100
+msgid "Points of interest nearby"
+msgstr "Tempat menarik berdekatan"
+
+#: templates/core/ver_parada.html:117
+msgid "Neighborhoods nearby"
+msgstr "Kejiranan berdekatan"
+
+#: templates/core/ver_parada.html:126
+msgid "Other stops near"
+msgstr "Perhentian lain berhampiran"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:55
+msgid "Route"
+msgstr "Laluan"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+msgid "of the line"
+msgstr "dari garis"
+
+#: templates/core/ver_recorrido.html:7
+msgid "All the information on stops, schedules and fares of the route"
+msgstr "Semua maklumat mengenai perhentian, jadual dan harga laluan"
+
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
+msgid "Description of the route of the bus"
+msgstr "Penerangan mengenai laluan bas"
+
+#: templates/core/ver_recorrido.html:16
+msgid "branch"
+msgstr "cawangan"
+
+#: templates/core/ver_recorrido.html:16
+msgid "Route from"
+msgstr "Laluan dari"
+
+#: templates/core/ver_recorrido.html:71 templates/core/ver_recorrido.html:81
+msgid "Streets that compose this route"
+msgstr "Jalan-jalan yang menyusun laluan ini"
+
+#: templates/core/ver_recorrido.html:100
+msgid "Similar routes"
+msgstr "Laluan serupa"
+
+#: templates/core/ver_recorrido.html:122
+msgid "Points of interest near the route"
+msgstr "Tempat menarik berhampiran laluan"
+
+#: templates/leaflet/admin/widget.html:29
+msgid "Reset view"
+msgstr "Tetapkan semula paparan"
+
+#: templates/navbar.html:28 templates/parts/base/top.html:52
+msgid "Go to the search engine"
+msgstr "Pergi ke enjin carian"
+
+#: templates/navbar.html:37 templates/parts/base/top.html:61
+msgid "Login"
+msgstr "Log masuk"
+
+#: templates/navbar.html:41 templates/parts/base/top.html:65
+msgid "Star users"
+msgstr "Pengguna bintang"
+
+#: templates/navbar.html:42 templates/parts/base/top.html:66
+msgid "Poll"
+msgstr "Undian"

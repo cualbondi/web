@@ -25,6 +25,7 @@ RUN \
         libpq-dev \
         osmium-tool \
         gettext \
+        osmctools \
 && \
     rm -rf /var/lib/apt/lists/* \
 && \
