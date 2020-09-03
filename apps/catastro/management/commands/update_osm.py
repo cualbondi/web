@@ -1083,24 +1083,24 @@ class Command(BaseCommand):
                     self.nodes_current += 1
                     # TODO: add 'shop' in n.tags also, more info in https://github.com/gravitystorm/openstreetmap-carto/blob/96c64fa5b0449e79c17e39626f3b8f38c96a12bb/project.mml#L1504
                     if 'amenity' in n.tags and 'name' in n.tags and len(n.tags['name']) > 2:
-                        point = Point([float(n.location.x) / 10000000, float(n.location.y) / 10000000], srid=4326)
-                        # this is a little slow, but it uses indexes :)
-                        # TODO: improve this by using in-memory pandas queries like we did with the 'cross'
-                        q = Recorrido.objects \
-                            .order_by() \
-                            .annotate(cond=RawSQL("ST_Intersects(ST_Buffer(%s::geography, 400, 2)::geometry, ruta)", (point.ewkb,), output_field=BooleanField())) \
-                            .filter(cond=True) \
-                            .only('id') \
-                            .exists()
-                        if q:
-                            defaults = {
-                                'tags': {k:v for k,v in n.tags},
-                                'nom': n.tags['name'][:200],
-                                'nom_normal': Substr(Trim(Upper(Unaccent(Value(n.tags['name'])))), 1, 200),
-                                'latlng': point,
-                                'country_code': king['country_code'],
-                            }
-                            try:
+                        try:
+                            point = Point([float(n.location.x) / 10000000, float(n.location.y) / 10000000], srid=4326)
+                            # this is a little slow, but it uses indexes :)
+                            # TODO: improve this by using in-memory pandas queries like we did with the 'cross'
+                            q = Recorrido.objects \
+                                .order_by() \
+                                .annotate(cond=RawSQL("ST_Intersects(ST_Buffer(%s::geography, 400, 2)::geometry, ruta)", (point.ewkb,), output_field=BooleanField())) \
+                                .filter(cond=True) \
+                                .only('id') \
+                                .exists()
+                            if q:
+                                defaults = {
+                                    'tags': {k:v for k,v in n.tags},
+                                    'nom': n.tags['name'][:200],
+                                    'nom_normal': Substr(Trim(Upper(Unaccent(Value(n.tags['name'])))), 1, 200),
+                                    'latlng': point,
+                                    'country_code': king['country_code'],
+                                 }
                                 Poi.objects.update_or_create(
                                     osm_id=n.id,
                                     osm_type='n',
@@ -1108,8 +1108,8 @@ class Command(BaseCommand):
                                 )
                                 self.nodes_added += 1
                                 print(f'[{self.nodes_current*100/nodes_count:7.3f}%] / Nodes added: {self.nodes_added} | processed: {self.nodes_current} / {nodes_count}')
-                            except Exception as e:
-                                print(f'Could not save, exception {e}')
+                        except Exception as e:
+                            print(f'Could not save, exception {e}')
 
             self.out2('POIS from ways and nodes with osmosis')
             h = POIsHandler()

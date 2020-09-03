@@ -1,6 +1,7 @@
 {% extends "contenido.html" %}
 {% load bootstrap_tags %}
 {% load i18n %}
+{% load pngtowebp %}
 
 {% block title %}{% blocktrans %}Line{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
 {% block meta_description %}{% blocktrans %}All the information about routes, trips, stops, schedules and fares of the line{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}that passes through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
@@ -92,7 +93,7 @@
     {% if obj.img_panorama %}
     <div class="thumbnail">
         <div id="map" style="background:lightblue;min-height:300px;">
-            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="{% blocktrans %}Public transportation coverage of the line{% endblocktrans %} {{ obj.nombre }} {% blocktrans %}in{% endblocktrans %} {{ adminarea.name }}." />
+            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama | pngorwebpurl }}" alt="{% blocktrans %}Public transportation coverage of the line{% endblocktrans %} {{ obj.nombre }} {% blocktrans %}in{% endblocktrans %} {{ adminarea.name }}." />
         </div>
     </div>
     {% endif %}
