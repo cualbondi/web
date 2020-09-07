@@ -6,8 +6,8 @@
 {% load lang_list %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% blocktrans %}Public transportation in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea.name|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
+{% block title %}{% blocktrans %}Public transportation in{% endblocktrans %} {{adminarea|i18name|title}}{% for a in adminareaancestors %}, {{a|i18name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea|i18name|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{adminarea|i18name|title}}{% for a in adminareaancestors %}, {{a|i18name|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -21,8 +21,8 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:administrative_area" />
     <meta property="og:url"    content="{{ obj.get_absolute_url | add_lang_qs:request }}" />
-    <meta property="og:title"  content="{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
-    <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
+    <meta property="og:title"  content="{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea|i18name|title}}{% for a in adminareaancestors %}, {{a|i18name|title}}{% endfor %}" />
+    <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{adminarea|i18name|title}}{% for a in adminareaancestors %}, {{a|i18name|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
@@ -38,7 +38,7 @@
         {% for a in adminareaancestors reversed %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{ a.get_absolute_url | add_lang_qs:request }}">
-                <span itemprop="name">{{a.name}}</span>
+                <span itemprop="name">{{a|i18name}}</span>
             </a>
             <meta itemprop="position" content="{{forloop.counter|add:'1'}}" />
             <span class="divider">&gt;</span>
@@ -46,14 +46,14 @@
         {% endfor %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{obj.get_absolute_url | add_lang_qs:request}}">
-                <span itemprop="name">{{obj.name}}</span>
+                <span itemprop="name">{{obj|i18name}}</span>
             </a>
             <meta itemprop="position" content="{{adminareaancestors|length|add:'2'}}" />
         </li>
     </ul>
 
     <div itemscope itemtype="http://schema.org/AdministrativeArea">
-        <h1><span itemprop="name">{{obj.name|title}}</span></h1>
+        <h1><span itemprop="name">{{obj|i18name|title}}</span></h1>
         <link itemprop="url" content="{{obj.get_absolute_url | add_lang_qs:request }}" />
         <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
             <meta itemprop="latitude" content="{{aacentroid.1|stringformat:'f'}}" />
@@ -66,7 +66,7 @@
 
     <div class="thumbnail">
         <a
-            href="/mapa/{{adminarea.name|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea.name}}"
+            href="/mapa/{{adminarea|i18name|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea|i18name}}"
             class="btn btn-primary"
             style="z-index:1;position:absolute; margin:6px"
         >
@@ -74,7 +74,7 @@
         </a>
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;min-height:300px;">
-            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
+            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ obj|i18name }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
         </div>
         {% endif %}
     </div>
@@ -138,7 +138,7 @@
             <ul>
                 {% for child in children %}
                 <li>
-                    <a href="{{child.get_absolute_url | add_lang_qs:request }}">{{child.name}}</a>
+                    <a href="{{child.get_absolute_url | add_lang_qs:request }}">{{child|i18name}}</a>
                     <small>({{child.recorridos_count}})</small>
                 </li>
                 {% endfor %}
@@ -162,7 +162,7 @@
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
                 <a itemprop="url" href="{{p.get_absolute_url | add_lang_qs:request }}">
-                    <span itemprop="name">{{ p.nom }}</span>
+                    <span itemprop="name">{{ p|i18name }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
                     <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />

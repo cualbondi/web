@@ -13,7 +13,6 @@ from apps.catastro.models import AdministrativeArea, Ciudad, Interseccion, Poi
 from apps.core.models import Linea, Parada, Recorrido
 from apps.utils.parallel_query import parallelize
 from apps.utils.slugify import slugify
-from apps.utils.get_lang import get_lang_from_qs, transform_name_lang
 from apps.core.templatetags.lang_list import add_lang_qs
 
 
@@ -159,19 +158,6 @@ def poiORint(request, slug=None, country_code=None):
         'pois': near_pois
     }
 
-    qlang = get_lang_from_qs(request)
-    if qlang:
-        context = {
-            'obj': transform_name_lang(poi, qlang),
-            'amenity': amenity,
-            'schemaorg_itemtype': schemaorg_itemtype,
-            'adminareas': transform_name_lang(aas, qlang),
-            'paradas': transform_name_lang(ps, qlang),
-            'poi': transform_name_lang(poi, qlang),
-            'recorridos': transform_name_lang(recorridos, qlang),
-            'pois': transform_name_lang(near_pois, qlang)
-        }
-
     return render(request, 'catastro/ver_poi.html', context)
 
 
@@ -237,21 +223,6 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_c
             'recorridos': recorridos,
             'pois': pois
         }
-
-        qlang = get_lang_from_qs(request)
-        if qlang:
-            context = {
-                'request': request,
-                'obj': transform_name_lang(aa, qlang),
-                'adminarea': transform_name_lang(aa, qlang),
-                'adminareaancestors': transform_name_lang(aaancestors, qlang),
-                'aacentroid': aa.geometry_simple.centroid,
-                'children': transform_name_lang(children, qlang),
-                'paradas': transform_name_lang(ps, qlang),
-                'lineas': transform_name_lang(lineas, qlang),
-                'recorridos': transform_name_lang(recorridos, qlang),
-                'pois': transform_name_lang(pois, qlang)
-            }
 
         # jinja: parallelize=300, no parallel=480, streaming=30/600
 

@@ -16,7 +16,6 @@ from apps.catastro.models import Ciudad, Poi, AdministrativeArea
 from apps.utils import data
 from apps.utils.parallel_query import parallelize
 from apps.utils.slugify import slugify
-from apps.utils.get_lang import get_lang_from_qs, transform_name_lang
 from apps.core.templatetags.lang_list import add_lang_qs
 
 
@@ -334,21 +333,6 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
         'recorridos_similares': recorridos_similares,
     }
 
-    qlang = get_lang_from_qs(request)
-    if qlang:
-        context = {
-            'schemaorg_itemtype': schemaorg_itemtype,
-            'obj': recorrido,
-            'linea': recorrido.linea,
-            'adminarea': transform_name_lang(aa, qlang),
-            'adminareaancestors': transform_name_lang(aaancestors, qlang),
-            'calles': calles_fin,
-            'pois': transform_name_lang(pois, qlang),
-            'adminareas': transform_name_lang(aas, qlang),
-            'horarios': horarios,
-            'recorridos_similares': recorridos_similares,
-        }
-
     return render(request, "core/ver_recorrido.html", context)
 
 
@@ -391,16 +375,6 @@ def ver_parada(request, id=None, country_code=None):
         'recorridosp': recorridosp,
         'pois': pois,
     }
-    qlang = get_lang_from_qs(request)
-    if qlang:
-        context = {
-            'adminareas': transform_name_lang(aas, qlang),
-            'parada': transform_name_lang(p, qlang),
-            'paradas': transform_name_lang(ps, qlang),
-            'recorridosn': recorridosn,
-            'recorridosp': recorridosp,
-            'pois': transform_name_lang(pois, qlang),
-        }
     return render(request, "core/ver_parada.html", context)
 
 

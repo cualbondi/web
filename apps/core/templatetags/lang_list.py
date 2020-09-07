@@ -28,3 +28,16 @@ def add_lang_qs(url, request):
     if qlang:
         return url + '?lang=' + qlang
     return url
+
+@register.filter()
+def i18name(obj, request):
+    qlang = get_lang_from_qs(request)
+    if qlang:
+        attr = 'name:' + qlang
+        if hasattr(obj, 'tags') and attr in obj.tags and obj.tags[attr]:
+            return obj.tags[attr]
+    if hasattr(obj, 'name'):
+        return obj.name
+    if hasattr(obj, 'nom'):
+        return obj.nom
+    return ''

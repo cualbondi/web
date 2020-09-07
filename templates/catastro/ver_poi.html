@@ -7,8 +7,8 @@
 {% load lang_list %}
 {% get_current_language as LANGUAGE_CODE %}
 
-{% block title %}{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}.{% endblock %}
+{% block title %}{% blocktrans %}How to get to{% endblocktrans %} {{poi|i18name:request|title}}{% if amenity %} ({{amenity}}) {% endif %} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}How to get to{% endblocktrans %} {{poi|i18name:request|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{poi|i18name:request|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -22,8 +22,8 @@
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:punto_de_interes" />
     <meta property="og:url"    content="{{ poi.get_absolute_url | add_lang_qs:request }}" />
-    <meta property="og:title"  content="{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
-    <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
+    <meta property="og:title"  content="{% blocktrans %}How to get to{% endblocktrans %} {{poi|i18name:request|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}" />
+    <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{poi|i18name:request|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
     {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ poi.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
@@ -39,7 +39,7 @@
         {% for a in adminareas %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{a.get_absolute_url | add_lang_qs:request}}">
-                <span itemprop="name">{{a.name}}</span>
+                <span itemprop="name">{{a|i18name:request}}</span>
             </a>
             <meta itemprop="position" content="{{forloop.counter|add:'1'}}" />
             <span class="divider">&gt;</span>
@@ -47,14 +47,14 @@
         {% endfor %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{poi.get_absolute_url | add_lang_qs:request}}">
-                <span itemprop="name">{{poi.nom}}</span>
+                <span itemprop="name">{{poi|i18name:request}}</span>
             </a>
             <meta itemprop="position" content="{{adminareas|length|add:'2'}}" />
         </li>
     </ul>
 
     <div itemprop="itemReviewed" itemscope itemtype="http://schema.org/{{schemaorg_itemtype}}" id="mainitemid">
-        <h1>{% blocktrans %}How to get to{% endblocktrans %} <span itemprop="name">{{poi.nom}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
+        <h1>{% blocktrans %}How to get to{% endblocktrans %} <span itemprop="name">{{poi|i18name:request}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
         <link itemprop="url" content="{{poi.get_absolute_url | add_lang_qs:request}}" />
         <div>
             {% render_review_aggregate for poi %}
@@ -89,10 +89,10 @@
         {% endif %}
 
         <div class="thumbnail">
-            <a href="/mapa/{{adminareas.0.name|uslugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi.nom}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
+            <a href="/mapa/{{adminareas.0|i18name:request|uslugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi|i18name:request}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
             {% if poi.img_panorama %}
             <div id="map" style="background:lightblue;min-height:300px;">
-                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}/{{ poi.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ poi.nom }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}." />
+                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}/{{ poi.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ poi|i18name:request }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}." />
             </div>
             {% endif %}
         </div>
@@ -137,7 +137,7 @@
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
                 <a itemprop="url" href="{{p.get_absolute_url | add_lang_qs:request}}">
-                    <span itemprop="name">{{ p.nom }}</span>
+                    <span itemprop="name">{{ p|i18name:request }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
                     <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />
@@ -149,7 +149,7 @@
     {% endif %}
 
 {% comment %} 
-    <h2 id="reviews">{% blocktrans %}Reviews of{% endblocktrans %} {{poi.nom|title}}</h2>
+    <h2 id="reviews">{% blocktrans %}Reviews of{% endblocktrans %} {{poi|i18name:request|title}}</h2>
     {% render_review_form for poi %}
     {% render_review_list for poi %}
 {% endcomment %} 
