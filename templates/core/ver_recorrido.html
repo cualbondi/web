@@ -6,8 +6,8 @@
 {% load pngtowebp %}
 {% load lang_list %}
 
-{% block title %}{% blocktrans %}Route{% endblocktrans %} {{obj.nombre|title}} {% if obj.inicio and obj.fin %} {% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}of the line{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name|title}}{% for a in adminareaancestors %}, {{a|i18name|title}}{% endfor %} - Cualbondi{% endblock %}
-{% block meta_description %}{% blocktrans %}All the information on stops, schedules and fares of the route{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}of the line{% endblocktrans %} {{linea.nombre|title}} {% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name|title}}{% for a in adminareaancestors %}, {{a|i18name|title}}{% endfor %}: {% blocktrans %}Description of the route of the bus{% endblocktrans %}.{% endblock %}
+{% block title %}{% blocktrans %}Route{% endblocktrans %} {{obj.nombre|title}} {% if obj.inicio and obj.fin %} {% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}of the line{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name:request|title}}{% for a in adminareaancestors %}, {{a|i18name:request|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block meta_description %}{% blocktrans %}All the information on stops, schedules and fares of the route{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}of the line{% endblocktrans %} {{linea.nombre|title}} {% blocktrans %}from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name:request|title}}{% for a in adminareaancestors %}, {{a|i18name:request|title}}{% endfor %}: {% blocktrans %}Description of the route of the bus{% endblocktrans %}.{% endblock %}
 
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
@@ -22,7 +22,7 @@
     <meta property="og:type"   content="cualbondi:recorrido" />
     <meta property="og:url"    content="{{ obj.get_absolute_url | add_lang_qs:request }}" />
     <meta property="og:title"  content="{{linea.nombre|title}} - {{obj.nombre|title}}" />
-    <meta property="og:description"  content="{% blocktrans %}Line{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}branch{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name|title}}{% for a in adminareaancestors %}, {{a|i18name|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, {% blocktrans %}Route from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name|title}}: {% blocktrans %}Description of the route of the bus{% endblocktrans %}" />
+    <meta property="og:description"  content="{% blocktrans %}Line{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}branch{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name:request|title}}{% for a in adminareaancestors %}, {{a|i18name:request|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, {% blocktrans %}Route from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name:request|title}}: {% blocktrans %}Description of the route of the bus{% endblocktrans %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
@@ -37,7 +37,7 @@
         </li>
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{adminarea.get_absolute_url | add_lang_qs:request}}">
-                <span itemprop="name">{{adminarea|i18name}}</span>
+                <span itemprop="name">{{adminarea|i18name:request}}</span>
             </a>
             <meta itemprop="position" content="2" />
             <span class="divider">&gt;</span>
@@ -75,7 +75,7 @@
             <ul>
                 {% for a in adminareas %}
                 <li itemprop="itinerary" itemtype="http://schema.org/AdministrativeArea" itemscope>
-                    <a href="{{a.get_absolute_url | add_lang_qs:request}}" itemprop="name">{{ a|i18name }}</a>
+                    <a href="{{a.get_absolute_url | add_lang_qs:request}}" itemprop="name">{{ a|i18name:request }}</a>
                 </li>
                 {% endfor %}
             </ul>
@@ -101,9 +101,9 @@
 
         {% if obj.img_panorama %}
         <div class="thumbnail">
-        <a href="/mapa/{{adminarea|i18name|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
+        <a href="/mapa/{{adminarea|i18name:request|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
             <div id="map" style="background:lightblue;min-height:300px;">
-                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}/{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea|i18name }}." />
+                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}/{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea|i18name:request }}." />
             </div>
         </div>
         <br />
@@ -144,7 +144,7 @@
                         {% for p in columna %}
                             <li itemscope itemtype="http://schema.org/Place">
                                 <a itemprop="url" href="{{p.get_absolute_url | add_lang_qs:request}}">
-                                    <span itemprop="name">{{ p|i18name }}</span>
+                                    <span itemprop="name">{{ p|i18name:request }}</span>
                                 </a>
                                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
                                     <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />

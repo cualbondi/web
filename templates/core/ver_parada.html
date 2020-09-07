@@ -39,7 +39,7 @@
         {% for a in adminareas reversed %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
             <a itemprop="item" href="{{a.get_absolute_url | add_lang_qs:request}}">
-                <span itemprop="name">{{a|i18name}}</span>
+                <span itemprop="name">{{a|i18name:request}}</span>
             </a>
             <meta itemprop="position" content="{{forloop.counter|add:'1'}}" />
             <span class="divider">&gt;</span>
@@ -116,7 +116,7 @@
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
                 <a itemprop="url" href="{{p.get_absolute_url | add_lang_qs:request}}">
-                    <span itemprop="name">{{ p|i18name }}</span>
+                    <span itemprop="name">{{ p|i18name:request }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">
                     <meta itemprop="latitude" content="{{p.latlng.1|stringformat:'f'}}" />
@@ -131,7 +131,7 @@
         <h2>{% blocktrans %}Neighborhoods nearby{% endblocktrans %}</h2>
         <ul>
             {% for z in zonas %}
-            <li>{{ z|i18name }}</li>
+            <li>{{ z|i18name:request }}</li>
             {% endfor %}
         </ul>
     {% endif %}
