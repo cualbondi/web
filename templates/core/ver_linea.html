@@ -2,6 +2,7 @@
 {% load bootstrap_tags %}
 {% load i18n %}
 {% load pngtowebp %}
+{% load lang_list %}
 
 {% block title %}{% blocktrans %}Line{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}in{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
 {% block meta_description %}{% blocktrans %}All the information about routes, trips, stops, schedules and fares of the line{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}that passes through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
@@ -9,9 +10,15 @@
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block custom_top_scripts %}
+    {% get_lang_list obj as LANGS %}
+    {% for LANG in LANGS %}
+        <link rel="{% if LANGUAGE_CODE == LANG.0 %}canonical{% else %}alternate{% endif %}" href="{{ obj.get_absolute_url }}{% if not LANG.2 %}?lang={{ LANG.0 }}{% endif %}" hreflang="{{ LANG.0 }}" />
+    {% endfor %}
+    <link rel="alternate" href="{{ obj.get_absolute_url }}" hreflang="x-default" />
+
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:linea" />
-    <meta property="og:url"    content="{{ obj.get_absolute_url }}" />
+    <meta property="og:url"    content="{{ obj.get_absolute_url | add_lang_qs:request }}" />
     <meta property="og:title"  content="{% blocktrans %}Line{% endblocktrans %} {{obj.nombre|title}}" />
     <meta property="og:description"  content="{% blocktrans %}All the information about routes, trips, stops, schedules and fares of the line{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}that passes through{% endblocktrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
     {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
@@ -27,14 +34,14 @@
             <span class="divider">&gt;</span>
         </li>
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-            <a itemprop="item" href="{{adminarea.get_absolute_url}}">
+            <a itemprop="item" href="{{adminarea.get_absolute_url | add_lang_qs:request}}">
                 <span itemprop="name">{{adminarea.name}}</span>
             </a>
             <meta itemprop="position" content="2" />
             <span class="divider">&gt;</span>
         </li>
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-            <a itemprop="item" href="{{obj.get_absolute_url}}">
+            <a itemprop="item" href="{{obj.get_absolute_url | add_lang_qs:request}}">
                 <span itemprop="name">{{obj.nombre}}</span>
             </a>
             <meta itemprop="position" content="3" />
@@ -56,7 +63,7 @@
         <h2>{% blocktrans %}Places that travel to{% endblocktrans %}</h2>
         <ul>
             {% for a in adminareas %}
-            <li><a href="{{a.get_absolute_url}}">{{ a.name }}</a></li>
+            <li><a href="{{a.get_absolute_url | add_lang_qs:request}}">{{ a.name }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -69,7 +76,7 @@
                     <ul class="nav nav-pills nav-stacked">
                     {% for recorrido in columna %}
                         <li style="text-align:left">
-                            <a href={{recorrido.get_absolute_url}}>
+                            <a href={{recorrido.get_absolute_url | add_lang_qs:request}}>
                                 {{recorrido.nombre}}
                                 {% if recorrido.inicio and recorrido.fin %}
                                     <span class="light">{% blocktrans %}from{% endblocktrans %} {{recorrido.inicio}} {% blocktrans %}to{% endblocktrans %} {{recorrido.fin}}</span>

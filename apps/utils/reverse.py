@@ -1,5 +1,6 @@
 from django.urls import reverse as djreverse
 from django.conf import settings
+from django.utils.http import urlencode
 
 def reverse(name, kwargs={}):
 
@@ -10,7 +11,10 @@ def reverse(name, kwargs={}):
     else:
         baseurl = 'https://cualbondi.org'
 
+    get = kwargs.pop('get', {})
     r = djreverse(name, kwargs=kwargs)
+    if get:
+        r += '?' + urlencode(get)
 
     # baseurl = ''
     # if argentina == True:

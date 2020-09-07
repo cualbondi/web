@@ -16,6 +16,8 @@ from apps.catastro.models import Ciudad, Poi, AdministrativeArea
 from apps.utils import data
 from apps.utils.parallel_query import parallelize
 from apps.utils.slugify import slugify
+from apps.utils.get_lang import get_lang_from_qs, transform_name_lang
+from apps.core.templatetags.lang_list import add_lang_qs
 
 
 @csrf_exempt
@@ -132,7 +134,7 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None, country_code=None)
     # linea found, check if url is ok
     correct_url = linea.get_absolute_url()
     if correct_url not in request.build_absolute_uri():
-        return HttpResponsePermanentRedirect(correct_url)
+        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
 
     # Zonas por las que pasa el recorrido
     aas = AdministrativeArea.objects \
@@ -200,7 +202,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
     # recorrido found, check if url is ok
     correct_url = recorrido.get_absolute_url()
     if correct_url not in request.build_absolute_uri():
-        return HttpResponsePermanentRedirect(correct_url)
+        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
 
     # Calles por las que pasa el recorrido
     """
@@ -319,22 +321,35 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
     except:
         schemaorg_itemtype = 'Trip'
 
-    return render(
-        request,
-        "core/ver_recorrido.html",
-        {
+    context = {
+        'schemaorg_itemtype': schemaorg_itemtype,
+        'obj': recorrido,
+        'linea': recorrido.linea,
+        'adminarea': aa,
+        'adminareaancestors': aaancestors,
+        'calles': calles_fin,
+        'pois': pois,
+        'adminareas': aas,
+        'horarios': horarios,
+        'recorridos_similares': recorridos_similares,
+    }
+
+    qlang = get_lang_from_qs(request)
+    if qlang:
+        context = {
             'schemaorg_itemtype': schemaorg_itemtype,
             'obj': recorrido,
             'linea': recorrido.linea,
-            'adminarea': aa,
-            'adminareaancestors': aaancestors,
+            'adminarea': transform_name_lang(aa, qlang),
+            'adminareaancestors': transform_name_lang(aaancestors, qlang),
             'calles': calles_fin,
-            'pois': pois,
-            'adminareas': aas,
+            'pois': transform_name_lang(pois, qlang),
+            'adminareas': transform_name_lang(aas, qlang),
             'horarios': horarios,
-            'recorridos_similares': recorridos_similares
+            'recorridos_similares': recorridos_similares,
         }
-    )
+
+    return render(request, "core/ver_recorrido.html", context)
 
 
 @csrf_exempt
@@ -349,7 +364,7 @@ def ver_parada(request, id=None, country_code=None):
     # p found, check if url is ok
     correct_url = p.get_absolute_url()
     if correct_url not in request.build_absolute_uri():
-        return HttpResponsePermanentRedirect(correct_url)
+        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
 
     recorridosn = Recorrido.objects \
         .filter(ruta__dwithin=(p.latlng, 0.00111)) \
@@ -368,18 +383,25 @@ def ver_parada(request, id=None, country_code=None):
     # Recorrido.objects.filter(horarios_set__parada=p).select_related('linea').order_by('linea__nombre', 'nombre')
     pois = Poi.objects.filter(latlng__dwithin=(p.latlng, 300))  # este esta en metros en vez de degrees... no se por que, pero esta genial!
     ps = Parada.objects.filter(latlng__dwithin=(p.latlng, 0.004)).exclude(id=p.id)
-    return render(
-        request,
-        "core/ver_parada.html",
-        {
-            'adminareas': aas,
-            'parada': p,
-            'paradas': ps,
+    context = {
+        'adminareas': aas,
+        'parada': p,
+        'paradas': ps,
+        'recorridosn': recorridosn,
+        'recorridosp': recorridosp,
+        'pois': pois,
+    }
+    qlang = get_lang_from_qs(request)
+    if qlang:
+        context = {
+            'adminareas': transform_name_lang(aas, qlang),
+            'parada': transform_name_lang(p, qlang),
+            'paradas': transform_name_lang(ps, qlang),
             'recorridosn': recorridosn,
             'recorridosp': recorridosp,
-            'pois': pois
+            'pois': transform_name_lang(pois, qlang),
         }
-    )
+    return render(request, "core/ver_parada.html", context)
 
 
 @csrf_exempt

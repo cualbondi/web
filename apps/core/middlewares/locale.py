@@ -6,9 +6,10 @@ from django.utils import translation
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from apps.catastro.management.commands.update_osm import kings
+from apps.utils.get_lang import get_lang_from_qs
 from re import compile as re_compile
 
-language_code_prefix_re = re_compile(r'^/([a-z][a-z])/')
+country_code_prefix_re = re_compile(r'^/([a-z][a-z])/')
 
 
 class LocaleMiddleware(MiddlewareMixin):
@@ -20,10 +21,13 @@ class LocaleMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         country_code = 'ar'
-        regex_match = language_code_prefix_re.match(request.path_info)
+        regex_match = country_code_prefix_re.match(request.path_info)
         if regex_match:
             country_code = regex_match.group(1)
         language = next((v['lang'] for k,v in kings.items() if v['country_code'] == country_code), 'es')
+        qlang = get_lang_from_qs(request)
+        if qlang:
+            language = qlang
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
 

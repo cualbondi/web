@@ -13,6 +13,8 @@ from apps.catastro.models import AdministrativeArea, Ciudad, Interseccion, Poi
 from apps.core.models import Linea, Parada, Recorrido
 from apps.utils.parallel_query import parallelize
 from apps.utils.slugify import slugify
+from apps.utils.get_lang import get_lang_from_qs, transform_name_lang
+from apps.core.templatetags.lang_list import add_lang_qs
 
 
 def fuzzy_like_query(q):
@@ -68,7 +70,7 @@ amenities_schemaorg_itemtype = {
 def poi(request, osm_type, osm_id, slug):
     poi = get_object_or_404(Poi, osm_type=osm_type, osm_id=osm_id)
     if slug != slugify(poi.nom):
-        return HttpResponsePermanentRedirect(poi.get_absolute_url())
+        return HttpResponsePermanentRedirect(add_lang_qs(poi.get_absolute_url(), request))
 
 
 def poiORint(request, slug=None, country_code=None):
@@ -94,7 +96,7 @@ def poiORint(request, slug=None, country_code=None):
         raise Http404
     correct_url = poi.get_absolute_url()
     if correct_url not in request.build_absolute_uri():
-        return HttpResponsePermanentRedirect(correct_url)
+        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
 
     # TODO: resolver estas queries en 4 threads
     #       ver https://stackoverflow.com/a/12542927/912450
@@ -146,20 +148,31 @@ def poiORint(request, slug=None, country_code=None):
         schemaorg_itemtype = 'Organization'
 
 
-    return render(
-        request,
-        'catastro/ver_poi.html',
-        {
-            'obj': poi,
+    context = {
+        'obj': poi,
+        'amenity': amenity,
+        'schemaorg_itemtype': schemaorg_itemtype,
+        'adminareas': aas,
+        'paradas': ps,
+        'poi': poi,
+        'recorridos': recorridos,
+        'pois': near_pois
+    }
+
+    qlang = get_lang_from_qs(request)
+    if qlang:
+        context = {
+            'obj': transform_name_lang(poi, qlang),
             'amenity': amenity,
             'schemaorg_itemtype': schemaorg_itemtype,
-            'adminareas': aas,
-            'paradas': ps,
-            'poi': poi,
-            'recorridos': recorridos,
-            'pois': near_pois
+            'adminareas': transform_name_lang(aas, qlang),
+            'paradas': transform_name_lang(ps, qlang),
+            'poi': transform_name_lang(poi, qlang),
+            'recorridos': transform_name_lang(recorridos, qlang),
+            'pois': transform_name_lang(near_pois, qlang)
         }
-    )
+
+    return render(request, 'catastro/ver_poi.html', context)
 
 
 class Simplify(GeoFunc):
@@ -171,7 +184,7 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_c
     aa = get_object_or_404(qs, osm_type=osm_type, osm_id=osm_id)
     correct_url = aa.get_absolute_url()
     if correct_url not in request.build_absolute_uri():
-        return HttpResponsePermanentRedirect(correct_url)
+        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
     else:
         lineas = None
         pois = None
@@ -224,6 +237,21 @@ def administrativearea(request, osm_type=None, osm_id=None, slug=None, country_c
             'recorridos': recorridos,
             'pois': pois
         }
+
+        qlang = get_lang_from_qs(request)
+        if qlang:
+            context = {
+                'request': request,
+                'obj': transform_name_lang(aa, qlang),
+                'adminarea': transform_name_lang(aa, qlang),
+                'adminareaancestors': transform_name_lang(aaancestors, qlang),
+                'aacentroid': aa.geometry_simple.centroid,
+                'children': transform_name_lang(children, qlang),
+                'paradas': transform_name_lang(ps, qlang),
+                'lineas': transform_name_lang(lineas, qlang),
+                'recorridos': transform_name_lang(recorridos, qlang),
+                'pois': transform_name_lang(pois, qlang)
+            }
 
         # jinja: parallelize=300, no parallel=480, streaming=30/600
 

@@ -4,6 +4,8 @@
 {% load i18n %}
 {% load reviews %}
 {% load pngtowebp %}
+{% load lang_list %}
+{% get_current_language as LANGUAGE_CODE %}
 
 {% block title %}{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}}{% if amenity %} ({{amenity}}) {% endif %} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
 {% block meta_description %}{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}and what lines and routes of buses go through{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}.{% endblock %}
@@ -11,9 +13,15 @@
 {% block head-attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block custom_top_scripts %}
+    {% get_lang_list poi as LANGS %}
+    {% for LANG in LANGS %}
+        <link rel="{% if LANGUAGE_CODE == LANG.0 %}canonical{% else %}alternate{% endif %}" href="{{ poi.get_absolute_url }}{% if not LANG.2 %}?lang={{ LANG.0 }}{% endif %}" hreflang="{{ LANG.0 }}" />
+    {% endfor %}
+    <link rel="alternate" href="{{ poi.get_absolute_url }}" hreflang="x-default" />
+
     <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
     <meta property="og:type"   content="cualbondi:punto_de_interes" />
-    <meta property="og:url"    content="{{ poi.get_absolute_url }}" />
+    <meta property="og:url"    content="{{ poi.get_absolute_url | add_lang_qs:request }}" />
     <meta property="og:title"  content="{% blocktrans %}How to get to{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}" />
     <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{poi.nom|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a.name|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
     {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ poi.img_cuadrada.url }}" />{% endif %}
@@ -30,7 +38,7 @@
         </li>
         {% for a in adminareas %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-            <a itemprop="item" href="{{a.get_absolute_url}}">
+            <a itemprop="item" href="{{a.get_absolute_url | add_lang_qs:request}}">
                 <span itemprop="name">{{a.name}}</span>
             </a>
             <meta itemprop="position" content="{{forloop.counter|add:'1'}}" />
@@ -38,7 +46,7 @@
         </li>
         {% endfor %}
         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-            <a itemprop="item" href="{{poi.get_absolute_url}}">
+            <a itemprop="item" href="{{poi.get_absolute_url | add_lang_qs:request}}">
                 <span itemprop="name">{{poi.nom}}</span>
             </a>
             <meta itemprop="position" content="{{adminareas|length|add:'2'}}" />
@@ -47,7 +55,7 @@
 
     <div itemprop="itemReviewed" itemscope itemtype="http://schema.org/{{schemaorg_itemtype}}" id="mainitemid">
         <h1>{% blocktrans %}How to get to{% endblocktrans %} <span itemprop="name">{{poi.nom}}</span>{% blocktrans %}?{% endblocktrans %}</h1>
-        <link itemprop="url" content="{{poi.get_absolute_url}}" />
+        <link itemprop="url" content="{{poi.get_absolute_url | add_lang_qs:request}}" />
         <div>
             {% render_review_aggregate for poi %}
         </div>
@@ -100,7 +108,7 @@
                 <div class="span4">
                     <ul class="nav nav-pills nav-stacked">
                     {% for rs in columna %}
-                        <li><a href="{{rs.get_absolute_url}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}from{% endblocktrans %} {{rs.inicio}} {% blocktrans %}to{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
+                        <li><a href="{{rs.get_absolute_url | add_lang_qs:request}}" style="text-align:left">{{rs.linea.nombre}} - {{rs.nombre}}{% if rs.inicio and rs.fin %} <span class="light">{% blocktrans %}from{% endblocktrans %} {{rs.inicio}} {% blocktrans %}to{% endblocktrans %} {{rs.fin}}</span>{% endif %}</a></li>
                     {% endfor %}
                     </ul>
                 </div>
@@ -118,7 +126,7 @@
         <h2>{% blocktrans %}Nearby stops{% endblocktrans %}</h2>
         <ul>
             {% for p in paradas %}
-            <li><a href="{{p.get_absolute_url}}">{{ p }}</a></li>
+            <li><a href="{{p.get_absolute_url | add_lang_qs:request}}">{{ p }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -128,7 +136,7 @@
         <ul>
             {% for p in pois %}
             <li itemscope itemtype="http://schema.org/Place">
-                <a itemprop="url" href="{{p.get_absolute_url}}">
+                <a itemprop="url" href="{{p.get_absolute_url | add_lang_qs:request}}">
                     <span itemprop="name">{{ p.nom }}</span>
                 </a>
                 <div itemprop="geo" itemscope itemtype="http://schema.org/GeoCoordinates">

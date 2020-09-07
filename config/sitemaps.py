@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
 from apps.core.models import Recorrido, Linea, Parada
 from apps.catastro.models import Poi, AdministrativeArea
+from apps.catastro.management.commands.update_osm import kings
 import datetime
 from calendar import timegm
 from functools import wraps
@@ -13,6 +15,20 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.http import http_date
 from django.contrib.sitemaps.views import x_robots_tag
+
+
+def get_alternates(loc):
+    alternates = []
+    for (lang_code, lang_name) in settings.LANGUAGES:
+        cc = loc.split('/')[3]
+        if len(cc) != 2:
+            cc = 'ar'
+        language_default = next((v['lang'] for k,v in kings.items() if v['country_code'] == cc), 'en')
+        if language_default[:2] == lang_code[:2]:
+            alternates.append({'location': loc, 'lang': lang_code})
+            alternates.append({'location': loc, 'lang': 'x-default'})
+        alternates.append({'location': loc + '?lang=' + lang_code, 'lang': lang_code})
+    return alternates
 
 
 class CBSitemap(Sitemap):
@@ -64,6 +80,7 @@ class CBSitemap(Sitemap):
                 'lastmod': lastmod,
                 'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
+                'alternates': get_alternates(loc),
             }
             if domain in loc:
                 urls.append(url_info)
