@@ -20,17 +20,21 @@ from django.contrib.sitemaps.views import x_robots_tag
 def get_alternates(loc, sitemap_lang_code):
     alternates = []
     for (lang_code, lang_name) in settings.LANGUAGES:
+        cc = loc.split('/')[3]
+        if len(cc) != 2:
+            cc = 'ar'
+        language_default = next((v['lang'] for k,v in kings.items() if v['country_code'] == cc), 'en')
         if lang_code[:2] != sitemap_lang_code:
             # only add as alternate if this url is not the sitemap_lang_code
             # (if this url is the sitemap_lang_code, then it goes directly in <loc></loc> (not alternate))
-            cc = loc.split('/')[3]
-            if len(cc) != 2:
-                cc = 'ar'
-            language_default = next((v['lang'] for k,v in kings.items() if v['country_code'] == cc), 'en')
             if language_default[:2] == lang_code[:2]:
                 alternates.append({'location': loc, 'lang': lang_code})
                 alternates.append({'location': loc, 'lang': 'x-default'})
             alternates.append({'location': loc + '?lang=' + lang_code, 'lang': lang_code})
+        else:
+            if language_default[:2] == lang_code[:2]:
+                alternates.append({'location': loc, 'lang': lang_code})
+                alternates.append({'location': loc, 'lang': 'x-default'})
     return alternates
 
 
