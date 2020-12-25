@@ -1,5 +1,5 @@
 Pillow==6.2.2  # https://github.com/python-pillow/Pillow
-pytz==2019.1  # https://github.com/stub42/pytz
+pytz==2020.5  # https://github.com/stub42/pytz
 argon2-cffi==19.1.0  # https://github.com/hynek/argon2_cffi
 
 # Django
