@@ -36,4 +36,4 @@ osmium==3.0.1 #
 pyosmptparser==1.2.2
 
 # warning, pinned! test before changing this one
-urllib3==1.25.2
+urllib3==1.26.3
