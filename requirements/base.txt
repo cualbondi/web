@@ -21,7 +21,7 @@ django-contrib-comments==1.9.2
 
 geopy==1.20.0 # https://github.com/geopy/geopy
 
-django-treebeard==4.3 # https://github.com/django-treebeard/django-treebeard
+django-treebeard==4.5 # https://github.com/django-treebeard/django-treebeard
 
 git+git://github.com/jperelli/django-rest-framework-social-oauth2.git@django3_compatible
 geopandas==0.6.0
