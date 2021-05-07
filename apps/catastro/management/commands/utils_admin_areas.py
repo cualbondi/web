@@ -195,4 +195,5 @@ def make_poly_file(mpoly):
                     file.write('\t%s\t%s\n' %(node[0], node[1]))
                 file.write('END\n')
                 n = n + 1
+        file.write('END\n')
     return path

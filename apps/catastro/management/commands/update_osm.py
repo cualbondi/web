@@ -231,6 +231,24 @@ kings = {
         'country_code': 'us',
         'lang': 'en_US',
     },
+    'unitedkingdom': {
+        'name': 'unitedkingdom',
+        'url': 'https://download.geofabrik.de/europe/britain-and-ireland-latest.osm.pbf',
+        'id': 62149,
+        'clip_country': True,
+        'paradas_completas': False,
+        'country_code': 'gb',
+        'lang': 'en_GB',
+    },
+    'ireland': {
+        'name': 'ireland',
+        'url': 'https://download.geofabrik.de/europe/ireland-and-northern-ireland-latest.osm.pbf',
+        'id': 62273,
+        'clip_country': True,
+        'paradas_completas': False,
+        'country_code': 'ie',
+        'lang': 'en_IE',
+    },
     'malaysia': {
         'name': 'malaysia',
         'url': 'https://download.geofabrik.de/asia/malaysia-singapore-brunei-latest.osm.pbf',
@@ -248,6 +266,62 @@ kings = {
         'paradas_completas': False,
         'country_code': 'sg',
         'lang': 'en_SG',
+    },
+    'germany': {
+        'name': 'germany',
+        'url': 'https://download.geofabrik.de/europe/germany-latest.osm.pbf',
+        'id': 51477,
+        'paradas_completas': True,
+        'country_code': 'de',
+        'lang': 'de_DE',
+    },
+    'france': {
+        'name': 'france',
+        'url': 'https://download.geofabrik.de/europe/france-latest.osm.pbf',
+        'id': 2202162,
+        'paradas_completas': True,
+        'country_code': 'fr',
+        'lang': 'fr_FR',
+    },
+    'italy': {
+        'name': 'italy',
+        'url': 'https://download.geofabrik.de/europe/italy-latest.osm.pbf',
+        'id': 365331,
+        'paradas_completas': False,
+        'country_code': 'it',
+        'lang': 'it_IT',
+    },
+    'austria': {
+        'name': 'austria',
+        'url': 'https://download.geofabrik.de/europe/austria-latest.osm.pbf',
+        'id': 16239,
+        'paradas_completas': False,
+        'country_code': 'at',
+        'lang': 'de_AT',
+    },
+    'turkey': {
+        'name': 'turkey',
+        'url': 'https://download.geofabrik.de/europe/turkey-latest.osm.pbf',
+        'id': 174737,
+        'paradas_completas': False,
+        'country_code': 'tr',
+        'lang': 'tr_TR',
+    },
+    'ethiopia': {
+        'name': 'ethiopia',
+        'url': 'https://download.geofabrik.de/africa/ethiopia-latest.osm.pbf',
+        'id': 192800,
+        'paradas_completas': False,
+        'country_code': 'et',
+        'lang': 'am_ET',
+    },
+    'philippines': {
+        'name': 'philippines',
+        'url': 'https://download.geofabrik.de/asia/philippines-latest.osm.pbf',
+        'id': 443174,
+        'paradas_completas': False,
+        'country_code': 'ph',
+        'lang': 'en_PH',
     },
 }
 
@@ -393,7 +467,8 @@ class Command(BaseCommand):
             filename = make_poly_file(KING_ADMIN_AREA['geometry'].buffer(0.001))
             self.out2(f'generated temp poly file at {filename}')
             self.out2('run osmconvert to clip pbf file')
-            result = subprocess.run(['osmconvert', inputfile, f'-B={filename}', '--complete-ways', '--complete-multipolygons', f'-o={inputfile}-cropped.pbf'], stdout=subprocess.PIPE)
+            # result = subprocess.run(['osmconvert', inputfile, f'-B={filename}', '--complete-ways', '--complete-multipolygons', f'-o={inputfile}-cropped.pbf'], stdout=subprocess.PIPE)
+            result = subprocess.run(['osmium', 'extract', f'-p{filename}', inputfile, f'-o{inputfile}-cropped.pbf'], stdout=subprocess.PIPE)
             inputfile = f'{inputfile}-cropped.pbf'
             self.out2(f'pbf clipped at {inputfile}')
 
@@ -740,7 +815,7 @@ class Command(BaseCommand):
 
                     # set proposal fields
                     # rp.paradas_completas = len(bus['stops']) > options['paradas_completas_threshold'] o usar una config en el pais KINGs
-                    rp = RecorridoProposed(nombre=bus['pt'].tags['name'])
+                    rp = RecorridoProposed(nombre=bus['pt'].tags['name'][:199])
                     rp.osm_id = bus['pt'].id
                     rp.ruta = bus['way']
                     rp.ruta_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=pytz.utc)

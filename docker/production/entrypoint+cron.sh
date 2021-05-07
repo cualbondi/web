@@ -8,6 +8,8 @@ set -o nounset
 printenv >> /etc/environment
 
 # start cron
-cron
+
+# wait until fixing adminareas duplication
+# cron
 
 /entrypoint.sh $@

@@ -185,14 +185,19 @@ class Poi(models.Model):
 
         if not self.slug:
             baseslug = slugify(self.nom)
-            allslugs = [p.slug for p in alphanumeric_sort(Poi.objects.filter(slug__startswith=baseslug).filter(slug__regex=baseslug + r'(-\d*)?$'), 'slug')]
+            allslugs = [p.slug for p in alphanumeric_sort(Poi.objects.only('slug').filter(slug__startswith=baseslug).filter(slug__regex=r'^' + baseslug + r'(-\d*)?$'), 'slug')]
             if len(allslugs) == 0:
                 self.slug = baseslug
             elif len(allslugs) == 1:
                 self.slug = baseslug + '-2'
             else:
                 try:
-                    self.slug = baseslug + '-' + str(int(allslugs[0].split('-')[-1]) + 1)
+                    num = allslugs[0].split('-')[-1]
+                    try:
+                        num = int(num)
+                    except ValueError as e:
+                        num = 0
+                    self.slug = baseslug + '-' + str(num + 1)
                 except Exception as e:
                     print('BASE: ' + baseslug)
                     print(allslugs)

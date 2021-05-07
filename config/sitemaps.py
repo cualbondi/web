@@ -52,6 +52,7 @@ class CBSitemap(Sitemap):
 
     priority = None
     changefreq = None
+    limit = 10000
 
     def __init__(self, info_dict, priority=None, changefreq=None, protocol=None, lang='en'):
         self.queryset = info_dict['queryset']

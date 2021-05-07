@@ -1,0 +1,489 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Julian Perelli <jperelli@gmail.com>, 2020
+# Julian Perelli <jperelli@gmail.com>, 2020
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-15 18:42+0000\n"
+"PO-Revision-Date: 2020-03-07 00:17+0000\n"
+"Last-Translator: Julian Perelli <jperelli@gmail.com>, 2020\n"
+"Language-Team: Turkish (https://www.transifex.com/cualbondi/teams/107940/tr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: apps/catastro/views.py:41
+msgctxt "an amenity type"
+msgid "restaurant"
+msgstr "restoran"
+
+#: apps/catastro/views.py:42
+msgctxt "an amenity type"
+msgid "school"
+msgstr "okul"
+
+#: apps/catastro/views.py:43
+msgctxt "an amenity type"
+msgid "pharmacy"
+msgstr "eczane"
+
+#: apps/catastro/views.py:44
+msgctxt "an amenity type"
+msgid "Kindergarten"
+msgstr "Çocuk Yuvası"
+
+#: apps/catastro/views.py:45
+msgctxt "an amenity type"
+msgid "cafe"
+msgstr "kafe"
+
+#: apps/catastro/views.py:46
+msgctxt "an amenity type"
+msgid "fast_food"
+msgstr "Fast food"
+
+#: apps/catastro/views.py:47
+msgctxt "an amenity type"
+msgid "bar"
+msgstr "bar"
+
+#: apps/catastro/views.py:48
+msgctxt "an amenity type"
+msgid "place_of_worship"
+msgstr "ibadethane"
+
+#: apps/catastro/views.py:49
+msgctxt "an amenity type"
+msgid "college"
+msgstr "kolej"
+
+#: apps/catastro/views.py:50
+msgctxt "an amenity type"
+msgid "ice_cream"
+msgstr "dondurma"
+
+#: apps/catastro/views.py:51
+msgctxt "an amenity type"
+msgid "police"
+msgstr "polis"
+
+#: apps/catastro/views.py:52
+msgctxt "an amenity type"
+msgid "hospital"
+msgstr "hastane"
+
+#: apps/catastro/views.py:53
+msgctxt "an amenity type"
+msgid "clinic"
+msgstr "klinik"
+
+#: apps/catastro/views.py:54
+msgctxt "an amenity type"
+msgid "community_centre"
+msgstr "toplum Merkezi"
+
+#: apps/catastro/views.py:55
+msgctxt "an amenity type"
+msgid "veterinary"
+msgstr "Veteriner"
+
+#: apps/catastro/views.py:56
+msgctxt "an amenity type"
+msgid "doctors"
+msgstr "doktorlar"
+
+#: apps/catastro/views.py:57
+msgctxt "an amenity type"
+msgid "bicycle_rental"
+msgstr "bisiklet kiralama"
+
+#: apps/catastro/views.py:58
+msgctxt "an amenity type"
+msgid "taxi"
+msgstr "taksi"
+
+#: apps/catastro/views.py:59
+msgctxt "an amenity type"
+msgid "library"
+msgstr "kütüphane"
+
+#: apps/catastro/views.py:60
+msgctxt "an amenity type"
+msgid "dentist"
+msgstr "diş doktoru"
+
+#: apps/catastro/views.py:61
+msgctxt "an amenity type"
+msgid "bank"
+msgstr "banka"
+
+#: apps/catastro/views.py:62
+msgctxt "an amenity type"
+msgid "theatre"
+msgstr "tiyatro"
+
+#: apps/catastro/views.py:63
+msgctxt "an amenity type"
+msgid "car_wash"
+msgstr "araba yıkama"
+
+#: apps/catastro/views.py:64
+msgctxt "an amenity type"
+msgid "pub"
+msgstr "pub"
+
+#: apps/catastro/views.py:65
+msgctxt "an amenity type"
+msgid "university"
+msgstr "Üniversite"
+
+#: apps/reviews/forms.py:12 apps/reviews/templates/reviews/form.html:19
+msgid "Terrible"
+msgstr "Korkunç"
+
+#: apps/reviews/forms.py:13 apps/reviews/templates/reviews/form.html:20
+msgid "Poor"
+msgstr "Yoksul"
+
+#: apps/reviews/forms.py:14 apps/reviews/templates/reviews/form.html:21
+msgid "Average"
+msgstr "Ortalama"
+
+#: apps/reviews/forms.py:15
+msgid "Very Good"
+msgstr "Çok iyi"
+
+#: apps/reviews/forms.py:16 apps/reviews/templates/reviews/form.html:23
+msgid "Excellent"
+msgstr "Mükemmel"
+
+#: apps/reviews/forms.py:25 apps/reviews/templates/reviews/form.html:18
+msgid "Select a rating"
+msgstr "Bir derecelendirme seçin"
+
+#: apps/reviews/forms.py:26
+msgid "Rating"
+msgstr "Değerlendirme"
+
+#: apps/reviews/templates/reviews/aggregate.html:8
+#, python-format
+msgid "see %(comment_count)s reviews"
+msgstr "%(comment_count)s incelemeye bakın"
+
+#: apps/reviews/templates/reviews/aggregate.html:13
+msgid "write the first review"
+msgstr "ilk incelemeyi yaz"
+
+#: apps/reviews/templates/reviews/form.html:15
+msgid "Name"
+msgstr "İsim"
+
+#: apps/reviews/templates/reviews/form.html:22
+msgid "Very"
+msgstr "Çok"
+
+#: apps/reviews/templates/reviews/form.html:30
+msgid "Post"
+msgstr "İleti"
+
+#: apps/reviews/templates/reviews/list.html:12
+msgid "at"
+msgstr "-"
+
+#: templates/404.html:5
+msgid "Oops! The page could not be found..."
+msgstr "Oops! Sayfa bulunamadı ..."
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "Go back to"
+msgstr "Geri dönmek"
+
+#: templates/404.html:6 templates/500.html:6
+#: templates/catastro/ver_poi-404.html:27
+msgid "home"
+msgstr "anasayfa"
+
+#: templates/500.html:5
+msgid "Oops! Something went wrong..."
+msgstr "Oops! Bir şeyler yanlış gitti..."
+
+#: templates/base.html:10 templates/parts/base/top.html:9
+msgid "Search engine of public transportation bus, train,  subway, tram."
+msgstr "Toplu taşıma otobüs, tren, metro, tramvay arama motoru."
+
+#: templates/catastro/ver_administrativearea.html:6
+#: templates/parts/catastro/ver_administrativearea/top.html:4
+msgid "Public transportation in"
+msgstr "Toplu taşıma"
+
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_administrativearea.html:15
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+#: templates/parts/catastro/ver_administrativearea/top.html:13
+msgid "How to get around in"
+msgstr "Nasıl gezinilir"
+
+#: templates/catastro/ver_administrativearea.html:7
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:8
+#: templates/parts/catastro/ver_administrativearea/top.html:5
+msgid "and what lines and routes of buses go through"
+msgstr "ve hangi otobüs hatlarından ve güzergahlarından geçiyor"
+
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
+msgid "List of all the public transport that go through"
+msgstr "Geçen tüm toplu taşıma araçlarının listesi"
+
+#: templates/catastro/ver_administrativearea.html:16
+#: templates/catastro/ver_poi.html:17
+#: templates/parts/catastro/ver_administrativearea/top.html:14
+msgid "See how to get from where you are"
+msgstr "Bulunduğunuz yerden nasıl gideceğinizi görün"
+
+#: templates/catastro/ver_administrativearea.html:24
+#: templates/catastro/ver_poi.html:25 templates/core/ver_linea.html:23
+#: templates/core/ver_parada.html:20 templates/core/ver_recorrido.html:24
+#: templates/parts/catastro/ver_administrativearea/content.html:9
+msgid "Home"
+msgstr "anasayfa"
+
+#: templates/catastro/ver_administrativearea.html:64
+#: templates/catastro/ver_poi.html:83 templates/core/ver_recorrido.html:90
+#: templates/parts/catastro/ver_administrativearea/content.html:49
+msgid "See in interactive map"
+msgstr "Etkileşimli haritada görüntüle"
+
+#: templates/catastro/ver_administrativearea.html:76
+#: templates/parts/catastro/ver_administrativearea/content.html:61
+msgid "Lines of public transport"
+msgstr "Toplu taşıma hatları"
+
+#: templates/catastro/ver_administrativearea.html:98
+#: templates/parts/catastro/ver_administrativearea/content.html:83
+msgid "Routes of public transport"
+msgstr "Toplu taşıma yolları"
+
+#: templates/catastro/ver_administrativearea.html:128
+#: templates/parts/catastro/ver_administrativearea/content.html:113
+msgid "Places"
+msgstr "Yerler"
+
+#: templates/catastro/ver_administrativearea.html:142
+#: templates/core/ver_recorrido.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:127
+msgid "Stops"
+msgstr "Durur"
+
+#: templates/catastro/ver_administrativearea.html:151
+#: templates/parts/catastro/ver_administrativearea/content.html:136
+msgid "Points of interest"
+msgstr "İlgi noktaları"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:48
+msgid "How to get to"
+msgstr "Nasıl gidilir"
+
+#: templates/catastro/ver_interseccion.html:5
+#: templates/catastro/ver_interseccion.html:6
+#: templates/catastro/ver_poi.html:7 templates/catastro/ver_poi.html:8
+#: templates/catastro/ver_poi.html:16 templates/catastro/ver_poi.html:17
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:95
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16
+msgid "in"
+msgstr "-"
+
+#: templates/catastro/ver_interseccion.html:17
+#: templates/catastro/ver_poi.html:48
+msgid "?"
+msgstr "?"
+
+#: templates/catastro/ver_interseccion.html:43
+msgid "Routes of public transport that pass through this intersection"
+msgstr "Bu kavşaktan geçen toplu taşıma yolları"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:47 templates/core/ver_recorrido.html:57
+#: templates/core/ver_recorrido.html:106
+msgid "from"
+msgstr "itibaren"
+
+#: templates/catastro/ver_interseccion.html:49
+#: templates/catastro/ver_poi.html:102 templates/core/ver_linea.html:74
+#: templates/core/ver_parada.html:67 templates/core/ver_parada.html:85
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+#: templates/core/ver_recorrido.html:16 templates/core/ver_recorrido.html:47
+#: templates/core/ver_recorrido.html:57 templates/core/ver_recorrido.html:106
+msgid "to"
+msgstr "karşı"
+
+#: templates/catastro/ver_interseccion.html:64
+#: templates/catastro/ver_poi.html:117
+msgid "Nearby stops"
+msgstr "Yakındaki duraklar"
+
+#: templates/catastro/ver_interseccion.html:73
+#: templates/catastro/ver_poi.html:126
+msgid "Other points of interest nearby"
+msgstr "Yakındaki diğer ilgi çekici yerler"
+
+#: templates/catastro/ver_poi-404.html:7
+msgid "Could not find"
+msgstr "Bulamadı"
+
+#: templates/catastro/ver_poi-404.html:12
+msgid "But we did everything possible to find similar places"
+msgstr "Ama benzer yerler bulmak için mümkün olan her şeyi yaptık"
+
+#: templates/catastro/ver_poi.html:64
+msgid "Go to website"
+msgstr "Web sitesine git"
+
+#: templates/catastro/ver_poi.html:69
+msgid "Phone"
+msgstr "Telefon"
+
+#: templates/catastro/ver_poi.html:96
+msgid "Public transport routes that pass next to this place"
+msgstr "Bu yerin yanından geçen toplu taşıma güzergahları"
+
+#: templates/core/ver_linea.html:5 templates/core/ver_linea.html:14
+#: templates/core/ver_linea.html:44 templates/core/ver_recorrido.html:16
+msgid "Line"
+msgstr "Hat"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid ""
+"All the information about routes, trips, stops, schedules and fares of the "
+"line"
+msgstr ""
+"Hattın rotaları, gezileri, durakları, tarifeleri ve ücretleri hakkında tüm "
+"bilgiler"
+
+#: templates/core/ver_linea.html:6 templates/core/ver_linea.html:15
+msgid "that passes through"
+msgstr "içinden geçer"
+
+#: templates/core/ver_linea.html:49
+msgid "Company information"
+msgstr "Şirket Bilgisi"
+
+#: templates/core/ver_linea.html:55 templates/core/ver_recorrido.html:62
+msgid "Places that travel to"
+msgstr "Ziyaret edilen yerler"
+
+#: templates/core/ver_linea.html:64
+msgid "Routes of the line"
+msgstr "Hattın Güzergahları"
+
+#: templates/core/ver_linea.html:95
+msgid "Public transportation coverage of the line"
+msgstr "Hattın toplu taşıma kapsamı"
+
+#: templates/core/ver_parada.html:5 templates/core/ver_parada.html:6
+#: templates/core/ver_parada.html:43
+msgid "Stop"
+msgstr "durağı"
+
+#: templates/core/ver_parada.html:6
+msgid "and what lines of routes of buses, train and subway stop in the stop"
+msgstr "ve durakta hangi otobüs, tren ve metro güzergahlarının durduğu"
+
+#: templates/core/ver_parada.html:62
+msgid "Public transport routes that stop in this stop"
+msgstr "Bu durakta duran toplu taşıma güzergahları"
+
+#: templates/core/ver_parada.html:79
+msgid ""
+"Public transport routes that pass nearby of this stop (do not stop here)"
+msgstr ""
+"Bu durağın yakınından geçen toplu taşıma güzergahları (burada durmayın)"
+
+#: templates/core/ver_parada.html:100
+msgid "Points of interest nearby"
+msgstr "Yakındaki ilgi çekici yerler"
+
+#: templates/core/ver_parada.html:117
+msgid "Neighborhoods nearby"
+msgstr "Yakındaki mahalleler"
+
+#: templates/core/ver_parada.html:126
+msgid "Other stops near"
+msgstr "Yakınındaki diğer duraklar"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:55
+msgid "Route"
+msgstr "Rota"
+
+#: templates/core/ver_recorrido.html:6 templates/core/ver_recorrido.html:7
+msgid "of the line"
+msgstr "hattın"
+
+#: templates/core/ver_recorrido.html:7
+msgid "All the information on stops, schedules and fares of the route"
+msgstr "Rotanın durakları, programları ve ücretleri hakkında tüm bilgiler"
+
+#: templates/core/ver_recorrido.html:7 templates/core/ver_recorrido.html:16
+msgid "Description of the route of the bus"
+msgstr "Otobüs güzergahının açıklaması"
+
+#: templates/core/ver_recorrido.html:16
+msgid "branch"
+msgstr "şube"
+
+#: templates/core/ver_recorrido.html:16
+msgid "Route from"
+msgstr "Şuradan rota:"
+
+#: templates/core/ver_recorrido.html:71 templates/core/ver_recorrido.html:81
+msgid "Streets that compose this route"
+msgstr "Bu rotayı oluşturan sokaklar"
+
+#: templates/core/ver_recorrido.html:100
+msgid "Similar routes"
+msgstr "Benzer rotalar"
+
+#: templates/core/ver_recorrido.html:122
+msgid "Points of interest near the route"
+msgstr "Rotanın yakınındaki ilgi çekici yerler"
+
+#: templates/leaflet/admin/widget.html:29
+msgid "Reset view"
+msgstr "Ekran görünümünü sıfırla"
+
+#: templates/navbar.html:28 templates/parts/base/top.html:52
+msgid "Go to the search engine"
+msgstr "Arama motoruna git"
+
+#: templates/navbar.html:37 templates/parts/base/top.html:61
+msgid "Login"
+msgstr "Oturum aç"
+
+#: templates/navbar.html:41 templates/parts/base/top.html:65
+msgid "Star users"
+msgstr "Yıldız kullanıcılar"
+
+#: templates/navbar.html:42 templates/parts/base/top.html:66
+msgid "Poll"
+msgstr "Anket"
