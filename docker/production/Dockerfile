@@ -1,8 +1,8 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
-ENV TZ Etc/UTC
-ENV PYTHONUNBUFFERED 1
-ENV DEBIAN_FRONTEND noninteractive
+ENV TZ Etc/UTC \
+    PYTHONUNBUFFERED 1 \
+    DEBIAN_FRONTEND noninteractive
 
 RUN \
     apt-get update \
@@ -26,10 +26,12 @@ RUN \
         osmium-tool \
         gettext \
         osmctools \
+        cargo \
+        cmake \
 && \
     rm -rf /var/lib/apt/lists/* \
 && \
-    pip3 install --upgrade wheel pip \
+    pip3 install --upgrade wheel pip maturin \
 && \
     groupadd django && \
     useradd django -s /bin/bash -m -g django -G django
