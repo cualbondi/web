@@ -1,4 +1,5 @@
 services:
+
   web:
     build:
       context: .
@@ -8,15 +9,15 @@ services:
       - cache
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.production
-      env_file: .env
+    env_file: /root/volumes/cualbondi.org/.env
     volumes:
       - '/root/volumes/cualbondi.org/web_media:/app/apps/media'
       - '/root/volumes/cualbondi.org/web_static:/app/staticfiles'
     command: /uvicorn.sh
-    image: ''
+
   db:
     build: ./docker/postgres
-    env_file: .env
+    env_file: /root/volumes/cualbondi.org/.env
     volumes:
       - '/root/volumes/cualbondi.org/volume_db:/var/lib/postgresql/data'
     sysctls:
@@ -26,6 +27,6 @@ services:
     ports:
       - '127.0.0.1:5432:5432'
     shm_size: 4g
-    image: ''
+
   cache:
     image: 'memcached:alpine'

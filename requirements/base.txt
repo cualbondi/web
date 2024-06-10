@@ -1,39 +1,42 @@
-Pillow==6.2.2  # https://github.com/python-pillow/Pillow
-pytz==2019.1  # https://github.com/stub42/pytz
-argon2-cffi==19.1.0  # https://github.com/hynek/argon2_cffi
+Pillow==9.2.0  # https://github.com/python-pillow/Pillow
+argon2-cffi==21.3.0  # https://github.com/hynek/argon2_cffi
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.0.4  # https://www.djangoproject.com/
-django-environ==0.4.5  # https://github.com/joke2k/django-environ
+django==3.2.16  # https://www.djangoproject.com/
+django-environ==0.9.0  # https://github.com/joke2k/django-environ
 
-django-extensions==2.2.3  # https://github.com/django-extensions/django-extensions
-Jinja2==2.11.1
+django-extensions==3.2.1  # https://github.com/django-extensions/django-extensions
+Jinja2==3.1.2
+
+django-storages==1.13.1
+boto3==1.25.4
 
 # Django REST Framework
-djangorestframework==3.10.3  # https://github.com/encode/django-rest-framework
-coreapi==2.3.3  # https://github.com/core-api/python-client
+djangorestframework==3.14.0  # https://github.com/encode/django-rest-framework
 
-django-imagekit==4.0.2 # https://github.com/matthewwithanm/django-imagekit
+django-imagekit==4.1.0 # https://github.com/matthewwithanm/django-imagekit
 geobuf==1.1.1 # https://github.com/pygeobuf/pygeobuf
-django-cors-headers==3.1.1 # https://github.com/ottoyiu/django-cors-headers
-django-contrib-comments==1.9.2
+protobuf==3.20.1 # pinned because of geobuf==1.1.1, see https://github.com/pygeobuf/pygeobuf/issues/53
+django-cors-headers==3.13.0 # https://github.com/ottoyiu/django-cors-headers
+django-contrib-comments==2.2.0
 
-geopy==1.20.0 # https://github.com/geopy/geopy
+geopy==2.2.0 # https://github.com/geopy/geopy
 
-django-treebeard==4.3 # https://github.com/django-treebeard/django-treebeard
+django-treebeard==4.5.1 # https://github.com/django-treebeard/django-treebeard
 
-git+git://github.com/jperelli/django-rest-framework-social-oauth2.git@django3_compatible
-geopandas==0.6.0
-pandas==0.25.1
-Shapely==1.6.4.post2
-Rtree==0.8.3
 
-unidecode==1.1.1
+git+https://github.com/jperelli/django-rest-framework-social-oauth2.git@django3_compatible
+geopandas==0.12.1
+pandas==1.5.1
+# Shapely==1.6.4.post2
+# Rtree==0.8.3
+
+unidecode==1.3.6
 
 # warning, pinned! test before changing this one
-osmium==3.0.1 #
+osmium==3.7.0 #
 pyosmptparser==1.2.2
 
 # warning, pinned! test before changing this one
-urllib3==1.25.2
+urllib3==1.25.4
