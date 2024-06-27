@@ -12,7 +12,10 @@ def pngtowebp(path):
 
 @register.filter
 def pngorwebpurl(filefield):
-    if filefield.storage.exists(pngtowebp(filefield.file.name)):
-        return pngtowebp(filefield.url)
-    else:
+    try:
+        if filefield.storage.exists(pngtowebp(filefield.file.name)):
+            return pngtowebp(filefield.url)
+        else:
+            return filefield.url
+    except FileNotFoundError as e:
         return filefield.url
