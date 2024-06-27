@@ -1,4 +1,4 @@
-from django.forms.forms import BoundField
+from django.forms import BoundField
 from django.forms.widgets import CheckboxInput, RadioSelect
 from django.template import Context
 from django.template.loader import get_template
