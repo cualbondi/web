@@ -1,6 +1,3 @@
-from django.db.models import signals
-from django.db.models.fields import FieldDoesNotExist
-
 from django.conf import settings
 from django.contrib.auth.middleware import AuthenticationMiddleware as DjangoAuthenticationMiddleware
 import re
