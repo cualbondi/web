@@ -476,4 +476,4 @@ LANGUAGES = [
 
 # This is to stop the engine doing a SELECT postgis_version() on every request
 # remember to change the version when upgrading postgis
-POSTGIS_VERSION = (3, 0, 0, )
+POSTGIS_VERSION = (3, 4, 2, )
