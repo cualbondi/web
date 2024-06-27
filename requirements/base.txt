@@ -29,6 +29,7 @@ django-treebeard==4.5.1 # https://github.com/django-treebeard/django-treebeard
 git+https://github.com/jperelli/django-rest-framework-social-oauth2.git@django3_compatible
 geopandas==0.12.1
 pandas==1.5.1
+numpy==1.26.4 # this should not be here, but it's pinned because of pandas and geopandas compatibility
 # Shapely==1.6.4.post2
 # Rtree==0.8.3
 
