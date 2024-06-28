@@ -12,7 +12,7 @@ STATICFILES_DIRS = []
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['cualbondi.org', 'api.cualbondi.org', 'cualbondi.com.ar', 'api3.cualbondi.com.ar', 'api.cualbondi.com.ar', 'www.cualbondi.com.ar'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['cualbondi.org', 'api.cualbondi.org', 'cualbondi.com.ar', 'api3.cualbondi.com.ar', 'api.cualbondi.com.ar', 'www.cualbondi.com.ar', 'localhost'])
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -21,20 +21,20 @@ DATABASES['default']['CONN_MAX_AGE'] = env.int('CONN_MAX_AGE', default=60)  # no
 
 # CACHES
 # ------------------------------------------------------------------------------
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': env('MEMCACHED_HOST'),
-    }
-}
-CACHE_TIMEOUT = 60*60
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION': env('MEMCACHED_HOST'),
+#     }
+# }
+# CACHE_TIMEOUT = 60*60
 
 # SECURITY
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-ssl-redirect
-SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT', default=True)
+SECURE_SSL_REDIRECT = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-secure
 SESSION_COOKIE_SECURE = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-httponly
@@ -46,11 +46,11 @@ CSRF_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
 # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
-SECURE_HSTS_SECONDS = 518400
-# https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True)
-# https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
-SECURE_HSTS_PRELOAD = env.bool('DJANGO_SECURE_HSTS_PRELOAD', default=True)
+# SECURE_HSTS_SECONDS = 518400
+# # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+# # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
+# SECURE_HSTS_PRELOAD = False
 # https://docs.djangoproject.com/en/dev/ref/middleware/#x-content-type-options-nosniff
 SECURE_CONTENT_TYPE_NOSNIFF = env.bool('DJANGO_SECURE_CONTENT_TYPE_NOSNIFF', default=True)
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-browser-xss-filter
@@ -151,9 +151,9 @@ sentry_sdk.init(
     dsn=env('SENTRY_DSN', default=''),
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
-    traces_sample_rate=1.0,
+    traces_sample_rate=0.05,
     # Set profiles_sample_rate to 1.0 to profile 100%
     # of sampled transactions.
     # We recommend adjusting this value in production.
-    profiles_sample_rate=0.1,
+    profiles_sample_rate=0.05,
 )
