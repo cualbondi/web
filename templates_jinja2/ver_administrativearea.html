@@ -11,7 +11,7 @@
   <meta property="og:url"    content="{{ obj.get_absolute_url() }}" />
   <meta property="og:title"  content="{% trans %}How to get around in{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
   <meta property="og:description"  content="{% trans %}List of all the public transport that go through{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% trans %}See how to get from where you are{% endtrans %}" />
-  {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
+  {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -62,7 +62,7 @@
         </a>
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;min-height:300px;">
-            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
+            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}{{ obj.img_panorama.url }}" alt="Mapa de ubicacion de {{ obj.nom }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
         </div>
         {% endif %}
     </div>

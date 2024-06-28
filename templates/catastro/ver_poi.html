@@ -24,7 +24,7 @@
     <meta property="og:url"    content="{{ poi.get_absolute_url | add_lang_qs:request }}" />
     <meta property="og:title"  content="{% blocktrans %}How to get to{% endblocktrans %} {{poi|i18name:request|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}" />
     <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{poi|i18name:request|title}} {% blocktrans %}in{% endblocktrans %} {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
-    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ poi.img_cuadrada.url }}" />{% endif %}
+    {% if poi.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ poi.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -92,7 +92,7 @@
             <a href="/mapa/{{adminareas.0|i18name:request|uslugify}}|{{adminareas.0.geometry.centroid.0|stringformat:'f'}},{{adminareas.0.geometry.centroid.1|stringformat:'f'}}/geolocation|{{poi.latlng.0|stringformat:'f'}},{{poi.latlng.1|stringformat:'f'}},{{poi|i18name:request}}" class="btn btn-primary" style="z-index:1;position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
             {% if poi.img_panorama %}
             <div id="map" style="background:lightblue;min-height:300px;">
-                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}/{{ poi.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ poi|i18name:request }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}." />
+                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}{{ poi.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ poi|i18name:request }} en {% for a in adminareas %}{% if not forloop.first %}, {% endif %}{{a|i18name:request|title}}{% endfor %}." />
             </div>
             {% endif %}
         </div>

@@ -23,7 +23,7 @@
     <meta property="og:url"    content="{{ obj.get_absolute_url | add_lang_qs:request }}" />
     <meta property="og:title"  content="{% blocktrans %}How to get around in{% endblocktrans %} {{adminarea|i18name:request|title}}{% for a in adminareaancestors %}, {{a|i18name:request|title}}{% endfor %}" />
     <meta property="og:description"  content="{% blocktrans %}List of all the public transport that go through{% endblocktrans %} {{adminarea|i18name:request|title}}{% for a in adminareaancestors %}, {{a|i18name:request|title}}{% endfor %}. {% blocktrans %}See how to get from where you are{% endblocktrans %}" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -74,7 +74,7 @@
         </a>
         {% if obj.img_panorama %}
         <div id="map" style="background:lightblue;min-height:300px;">
-            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}/{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ obj|i18name:request }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
+            <img style="height:300px;object-fit:cover" src="{{HOME_URL}}{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa de ubicacion de {{ obj|i18name:request }}{% if parent %} en {{parent.nombre|title}}{% endif %}." />
         </div>
         {% endif %}
     </div>

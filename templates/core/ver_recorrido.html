@@ -23,7 +23,7 @@
     <meta property="og:url"    content="{{ obj.get_absolute_url | add_lang_qs:request }}" />
     <meta property="og:title"  content="{{linea.nombre|title}} - {{obj.nombre|title}}" />
     <meta property="og:description"  content="{% blocktrans %}Line{% endblocktrans %} {{linea.nombre|title}}, {% blocktrans %}branch{% endblocktrans %} {{obj.nombre|title}} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name:request|title}}{% for a in adminareaancestors %}, {{a|i18name:request|title}}{% endfor %} - Cualbondi{% if obj.inicio and obj.fin %}, {% blocktrans %}Route from{% endblocktrans %} {{obj.inicio}} {% blocktrans %}to{% endblocktrans %} {{obj.fin}} {% endif %} {% blocktrans %}in{% endblocktrans %} {{adminarea|i18name:request|title}}: {% blocktrans %}Description of the route of the bus{% endblocktrans %}" />
-    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}/{{ obj.img_cuadrada.url }}" />{% endif %}
+    {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
 {% endblock %}
 
 {% block bloque_izquierda %}
@@ -103,7 +103,7 @@
         <div class="thumbnail">
         <a href="/mapa/{{adminarea|i18name:request|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
             <div id="map" style="background:lightblue;min-height:300px;">
-                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}/{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea|i18name:request }}." />
+                <img style="height:300px;object-fit:cover" itemprop="image" src="{{HOME_URL}}{{ obj.img_panorama | pngorwebpurl }}" alt="Mapa del recorrido {{ obj.nombre }} de la línea {{ linea.nombre }} en {{ adminarea|i18name:request }}." />
             </div>
         </div>
         <br />
