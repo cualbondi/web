@@ -41,7 +41,11 @@ urlpatterns = [
     url(r'^api/v3/', include(api3Urls)),
     url(r'^v3/', include(api3Urls)),
     url(r'^auth/', include('rest_framework_social_oauth2.urls', namespace='drfsocial')),
-    url('', include('social_django.urls', namespace='social'))
+
+    url(r'^robots.txt$', serve, {'document_root': settings.STATIC_ROOT, 'path': 'robots.txt', 'show_indexes': False}),
+    url(r'^ads.txt$', serve, {'document_root': settings.STATIC_ROOT, 'path': 'ads.txt', 'show_indexes': False}),
+
+    url(r'', include('social_django.urls', namespace='social'))
 ]
 
 
