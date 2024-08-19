@@ -28,6 +28,7 @@ class RecorridoProposed(models.Model):
     img_cuadrada = models.ImageField(max_length=200, upload_to='recorrido', blank=True, null=True)
     linea = models.ForeignKey('core.Linea', on_delete=models.CASCADE, null=True)
     ruta = models.LineStringField()
+    ruta_simple = models.LineStringField(null=True)
     sentido = models.CharField(max_length=200, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
     inicio = models.CharField(max_length=200, blank=True, null=True)
