@@ -254,6 +254,7 @@ class ImporterLog(models.Model):
     accepted = models.BooleanField()
     proposed_reason = models.TextField(blank=True, null=True)
     accepted_reason = models.TextField(blank=True, null=True)
+    type = models.CharField(max_length=30, blank=True, null=True)
     king = models.TextField(blank=True, null=True)
 
     # additional info to show log context and be able to search on something
