@@ -182,7 +182,11 @@ def get_admin_areas(run_timestamp, inputfile, country_code, KING_ID, printfn = p
     return admin_areas, KING
 
 
-def make_poly_file(mpoly):
+def make_poly_file(geom):
+    if isinstance(geom[0][0][0], float):
+        mpoly = [geom]
+    else:
+        mpoly = geom
     fd, path = tempfile.mkstemp(suffix = '.poly')
     with open(fd, 'w') as file:
         n = 1
