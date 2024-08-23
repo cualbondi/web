@@ -411,7 +411,7 @@ class Command(BaseCommand):
             action='store',
             dest='king',
             default='argentina',
-            help='Name of the country to import the data from osm'
+            help='Name of the country to import the data from osm or use "ALL" to iterate over all countries'
         )
 
     def reporthook(self, numblocks, blocksize, filesize, url=None):
@@ -436,12 +436,25 @@ class Command(BaseCommand):
         sys.stdout.flush()
 
     def handle(self, *args, **options):
-        if options['profile']:
-            profiler = Profile()
-            profiler.runcall(self._handle, *args, **options)
-            profiler.print_stats()
+        if options['king'] == 'ALL':
+            for kingid in kings:
+                options['king'] = kingid
+                if options['profile']:
+                    profiler = Profile()
+                    profiler.runcall(self._handle, *args, **options)
+                    profiler.print_stats()
+                else:
+                    try:
+                        self._handle(*args, **options)
+                    except Exception as e:
+                        print(f'ERROR in {kingid} {e}')
         else:
-            self._handle(*args, **options)
+            if options['profile']:
+                profiler = Profile()
+                profiler.runcall(self._handle, *args, **options)
+                profiler.print_stats()
+            else:
+                self._handle(*args, **options)
 
     def _handle(self, *args, **options):
 
@@ -868,7 +881,6 @@ class Command(BaseCommand):
                     name = bus['pt'].tags['name']
                     paradas_completas = bus['paradas_completas']
                     routetype = bus['pt'].tags['route']
-                    adminareas_str = ', '.join(AdministrativeArea.objects.filter(geometry__intersects=way).order_by('depth').values_list('name', flat=True))
 
                     ilog = ImporterLog(
                         osm_id=bus_osm_id,
@@ -880,7 +892,6 @@ class Command(BaseCommand):
                         status=status,
                         proposed_reason='',
                         accepted_reason='',
-                        osm_administrative=adminareas_str,
                         osm_name=name,
                         type=routetype,
                         king=king['name'],
@@ -888,31 +899,35 @@ class Command(BaseCommand):
 
                     # recorrido proposed creation checks
                     if way is None:
-                        self.out2('{} | {} : SKIP {}'.format(rec.id, osm_id, status))
+                        self.out2('{} | {} : SKIP {}'.format(None, bus_osm_id, status))
                         ilog.proposed_reason = 'broken'
                         ilog.save()
                         continue
 
+                    adminareas_str = ', '.join(AdministrativeArea.objects.filter(geometry__intersects=way).order_by('depth').values_list('name', flat=True))
+                    ilog.osm_administrative = adminareas_str
+                    ilog.save()
+
                     # TODO: review this for argentina, hay recorridos que tienen osm_id+king duplicado
                     # supongo que son recorridos circulares que los parti en ida+vuelta
                     rec = Recorrido.objects.filter(osm_id=bus_osm_id, king=king['id']).first()
-                    rp = RecorridoProposed.objects.filter(osm_id=bus_osm_id, king=king['id']).sort('-ruta_last_updated').first()
+                    rp = RecorridoProposed.objects.filter(osm_id=bus_osm_id, king=king['id']).order_by('-ruta_last_updated').first()
 
                     if rec:
                         if rec.ruta_last_updated >= osm_last_updated:
-                            self.out2('{} | {} : SKIP, older than current recorrido {}, ({} >= {})'.format(rec.id, osm_id, status, rec.ruta_last_updated, osm_last_updated))
+                            self.out2('{} | {} : SKIP, older than current recorrido {}, ({} >= {})'.format(rec.id, bus_osm_id, status, rec.ruta_last_updated, osm_last_updated))
                             ilog.proposed_reason = 'older than current recorrido'
                             ilog.save()
                             continue
                         if rp:
                             if rp.ruta_last_updated >= osm_last_updated:
-                                self.out2('{} | {} : SKIP, older than current recorridoProposed {}, ({} >= {})'.format(rec.id, osm_id, status, rec.ruta_last_updated, osm_last_updated))
+                                self.out2('{} | {} : SKIP, older than current recorridoProposed {}, ({} >= {})'.format(rec.id, bus_osm_id, status, rec.ruta_last_updated, osm_last_updated))
                                 ilog.proposed_reason = 'older than current recorridoProposed'
                                 ilog.save()
                                 continue
-                            if rp.user == user_bot_osm and rp.status == 'E':
+                            if rp.get_moderacion_last_user().id == user_bot_osm.id and rp.current_status == 'E':
                                 # update rp
-                                self.out2('{} | {} : UPDATE previous proposal'.format(rec.id, osm_id))
+                                self.out2('{} | {} : UPDATE previous proposal'.format(rec.id, bus_osm_id))
                                 ilog.proposed_reason = 'update previous proposal'
                                 rp.ruta = way
                                 rp.ruta_last_updated = osm_last_updated
@@ -924,42 +939,96 @@ class Command(BaseCommand):
                                     rp.save(user=user_bot_osm)
                                 ilog.proposed = True
                                 ilog.save()
-                                continue
-
-                        # create new rp
-                        self.out2('{} | {} : CREATE new proposal'.format(rec.id, osm_id))
-                        ilog.proposed_reason = 'create new proposal'
-                        rp_new = RecorridoProposed.from_recorrido(rec)
-                        rp_new.ruta = way
-                        rp_new.ruta_last_updated = osm_last_updated
-                        rp_new.osm_version = osm_osm_version
-                        rp_new.import_timestamp = run_timestamp
-                        rp_new.paradas_completas = paradas_completas
-                        rp_new.type = routetype
-                        if not options['dry-run']:
-                            rp_new.save(user=user_bot_osm)
-                        ilog.proposed = True
-                        ilog.save()
+                                
+                        else:
+                            # create new rp
+                            self.out2('{} | {} : CREATE new proposal'.format(rec.id, osm_id))
+                            ilog.proposed_reason = 'create new proposal'
+                            rp = RecorridoProposed.from_recorrido(rec)
+                            rp.ruta = way
+                            rp.ruta_last_updated = osm_last_updated
+                            rp.osm_version = osm_osm_version
+                            rp.import_timestamp = run_timestamp
+                            rp.paradas_completas = paradas_completas
+                            rp.type = routetype
+                            if not options['dry-run']:
+                                rp.save(user=user_bot_osm)
+                            ilog.proposed = True
+                            ilog.save()
                     
                         # AUTO ACCEPT CHECKS
                         if rec.osm_version is None:
-                            self.out2('{} | {} : {} | NOT auto accepted: previous accepted proposal does not come from osm'.format(rec.id, osm_id, proposal_info))
+                            self.out2('{} | {} | NOT auto accepted: previous accepted proposal does not come from osm'.format(rec.id, osm_id))
                             ilog.accepted_reason = 'previous accepted proposal does not come from osm'
                             ilog.save()
                             continue
 
                         if RecorridoProposed.objects.filter(parent=rec.uuid).count() > 1:
-                            self.out2('{} | {} : {} | NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, osm_id, proposal_info))
+                            self.out2('{} | {} | NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, osm_id))
                             ilog.accepted_reason = 'another not accepted proposal exists for this recorrido'
                             ilog.save()
                             continue
 
-                    self.out2('{} | {} : {} | AUTO ACCEPTED!'.format(rec.id, osm_id, proposal_info))
-                    if not options['dry-run']:
-                        rp.aprobar(user_bot_osm)
 
-                    ilog.accepted = True
-                    ilog.save()
+                        self.out2('{} | {} | AUTO ACCEPTED! (updated)'.format(rec.id, bus_osm_id))
+                        if not options['dry-run']:
+                            rp.aprobar(user_bot_osm)
+
+                        ilog.accepted = True
+                        ilog.save()
+
+                    else:
+                        # same code as add_routes
+                        # set proposal fields
+                        # rp.paradas_completas = len(bus['stops']) > options['paradas_completas_threshold'] o usar una config en el pais KINGs
+                        rp = RecorridoProposed(nombre=bus['pt'].tags['name'][:199])
+                        rp.osm_id = bus['pt'].id
+                        rp.ruta = bus['way']
+                        rp.ruta_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=pytz.utc)
+                        rp.osm_version = int(bus['pt'].info['version'])
+                        rp.import_timestamp = run_timestamp
+                        rp.paradas_completas = bus['paradas_completas']
+                        rp.type = bus['pt'].tags['route']
+                        rp.king = king['id']
+                        rp.country_code = king['country_code']
+                        if not options['dry-run']:
+                            rp.save(user=user_bot_osm)
+
+                        self.out2('{} | AUTO ACCEPTED (created)!'.format(bus['pt'].id))
+                        if not options['dry-run']:
+                            rp.aprobar(user_bot_osm)
+                        
+                        ilog.proposed_reason = 'new recorrido'
+                        ilog.proposed = True
+                        ilog.accepted_reason = 'new recorrido'
+                        ilog.accepted = True
+                        ilog.save()
+
+                        # add stops!
+                        if not options['dry-run'] and len(bus['pt'].stops) > 0:
+                            self.out2(f'ADDing STOPS {len(bus["pt"].stops)}', end=' > ')
+                            count_created = 0
+                            count_associated = 0
+                            for s in bus['pt'].stops:
+                                parada, created = Parada.objects.update_or_create(
+                                    osm_id=s.id,
+                                    defaults={
+                                        'import_timestamp': run_timestamp,
+                                        'nombre': s.tags['name'] if 'name' in s.tags else f'{s.lon}, {s.lat}',
+                                        'latlng': Point(s.lon, s.lat),
+                                        'tags': s.tags,
+                                        'country_code': king['country_code'],
+                                    }
+                                )
+                                if created:
+                                    count_created = count_created + 1
+                                horario, created = Horario.objects.update_or_create(
+                                    recorrido=rp.recorrido,
+                                    parada=parada,
+                                )
+                                if created:
+                                    count_associated = count_associated + 1
+                            self.out2(f'CREATED STOPS {count_created}, ASSOCIATED {count_associated}')
 
                 #
                 # TODO: think how to do "stops" change proposals
