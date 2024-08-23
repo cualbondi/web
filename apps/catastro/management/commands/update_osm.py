@@ -33,11 +33,6 @@ from psycopg2.extras import execute_values
 from .utils_admin_areas import get_admin_area, get_admin_areas, make_poly_file
 
 
-class Nonegetter():
-    def __getitem__(self, key):
-        return None
-
-
 kings = {
     'argentina': {
         'name': 'argentina',
@@ -323,6 +318,22 @@ kings = {
         'country_code': 'ph',
         'lang': 'en_PH',
     },
+    'netherlands': {
+        'name': 'netherlands',
+        'url': 'https://download.geofabrik.de/europe/netherlands-latest.osm.pbf',
+        'id': 2323309,
+        'paradas_completas': False,
+        'country_code': 'nl',
+        'lang': 'nl_NL',
+    },
+    'qatar': {
+        'name': 'qatar',
+        'url': 'https://download.geofabrik.de/asia/gcc-states-latest.osm.pbf',
+        'id': 305095,
+        'paradas_completas': False,
+        'country_code': 'qa',
+        'lang': 'ar_QA',
+    },
 }
 
 
@@ -425,14 +436,14 @@ class Command(BaseCommand):
         sys.stdout.write('%-66s%3d%%' % (base, percent))
 
     def out1(self, s):
-        print('[{}] => {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s))
+        print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] => {s}')
         sys.stdout.flush()
 
     def out2(self, s, start=None, end='\n'):
         if start is None:
-            print('[{}]    - {}'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), s), end=end)
+            print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}]    - {s}', end=end)
         else:
-            print('{}'.format(s), end=end)
+            print(f'{s}', end=end)
         sys.stdout.flush()
 
     def handle(self, *args, **options):
@@ -803,11 +814,11 @@ class Command(BaseCommand):
                 }
                 counters.setdefault(pt.status.code, 0)
                 counters[pt.status.code] += 1
-                self.out2('{}: {} > {}'.format(pt.status.code, pt.status.detail, pt.tags['name'], start=''))
+                self.out2(f'{pt.status.code}: {pt.status.detail} > {pt.tags["name"]}')
 
             self.out2('status | count')
             for key, counter in sorted(counters.items(), key=lambda e: e[1], reverse=True):
-                self.out2('{} | {}'.format(key, counter))
+                self.out2(f'{key} | {counter}')
 
             # HINT: run migrations in order to have osmbot in the db
             user_bot_osm = get_user_model().objects.get(username='osmbot')
@@ -823,7 +834,7 @@ class Command(BaseCommand):
 
                     # recorrido proposed creation checks
                     if bus['way'] is None:
-                        self.out2('{} : SKIP {}'.format(bus['pt'].id, bus['pt'].status.code))
+                        self.out2(f'{bus["pt"].id} : SKIP {bus["pt"].status.code}')
                         continue
 
                     # set proposal fields
@@ -841,7 +852,7 @@ class Command(BaseCommand):
                     if not options['dry-run']:
                         rp.save(user=user_bot_osm)
 
-                    self.out2('{} | AUTO ACCEPTED!'.format(bus['pt'].id))
+                    self.out2(f'{bus["pt"].id} | AUTO ACCEPTED!')
                     if not options['dry-run']:
                         rp.aprobar(user_bot_osm)
 
@@ -873,7 +884,10 @@ class Command(BaseCommand):
 
             else:
 
+                bus_total = len(buses)
+                bus_i = 0
                 for bus_osm_id, bus in buses.items():
+                    bus_i = bus_i + 1
                     way = bus['way']
                     status = bus['pt'].status.code
                     osm_osm_version = bus['pt'].info['version']
@@ -899,7 +913,7 @@ class Command(BaseCommand):
 
                     # recorrido proposed creation checks
                     if way is None:
-                        self.out2('{} | {} : SKIP {}'.format(None, bus_osm_id, status))
+                        self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {None} | {bus_osm_id} : SKIP {status}')
                         ilog.proposed_reason = 'broken'
                         ilog.save()
                         continue
@@ -915,19 +929,19 @@ class Command(BaseCommand):
 
                     if rec:
                         if rec.ruta_last_updated >= osm_last_updated:
-                            self.out2('{} | {} : SKIP, older than current recorrido {}, ({} >= {})'.format(rec.id, bus_osm_id, status, rec.ruta_last_updated, osm_last_updated))
+                            self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {rec.id} | {bus_osm_id} : SKIP, older than current recorrido {status}, ({rec.ruta_last_updated} >= {osm_last_updated})')
                             ilog.proposed_reason = 'older than current recorrido'
                             ilog.save()
                             continue
                         if rp:
                             if rp.ruta_last_updated >= osm_last_updated:
-                                self.out2('{} | {} : SKIP, older than current recorridoProposed {}, ({} >= {})'.format(rec.id, bus_osm_id, status, rec.ruta_last_updated, osm_last_updated))
+                                self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {rec.id} | {bus_osm_id} : SKIP, older than current recorridoProposed {status}, ({rec.ruta_last_updated} >= {osm_last_updated})')
                                 ilog.proposed_reason = 'older than current recorridoProposed'
                                 ilog.save()
                                 continue
                             if rp.get_moderacion_last_user().id == user_bot_osm.id and rp.current_status == 'E':
                                 # update rp
-                                self.out2('{} | {} : UPDATE previous proposal'.format(rec.id, bus_osm_id))
+                                self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {rec.id} | {bus_osm_id} : UPDATE previous proposal')
                                 ilog.proposed_reason = 'update previous proposal'
                                 rp.ruta = way
                                 rp.ruta_last_updated = osm_last_updated
@@ -942,7 +956,7 @@ class Command(BaseCommand):
                                 
                         else:
                             # create new rp
-                            self.out2('{} | {} : CREATE new proposal'.format(rec.id, osm_id))
+                            self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {rec.id} | {bus_osm_id} : CREATE new proposal')
                             ilog.proposed_reason = 'create new proposal'
                             rp = RecorridoProposed.from_recorrido(rec)
                             rp.ruta = way
@@ -958,19 +972,19 @@ class Command(BaseCommand):
                     
                         # AUTO ACCEPT CHECKS
                         if rec.osm_version is None:
-                            self.out2('{} | {} | NOT auto accepted: previous accepted proposal does not come from osm'.format(rec.id, osm_id))
+                            self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {rec.id} | {bus_osm_id} | NOT auto accepted: previous accepted proposal does not come from osm')
                             ilog.accepted_reason = 'previous accepted proposal does not come from osm'
                             ilog.save()
                             continue
 
                         if RecorridoProposed.objects.filter(parent=rec.uuid).count() > 1:
-                            self.out2('{} | {} | NOT auto accepted: another not accepted recorridoproposed exists for this recorrido'.format(rec.id, osm_id))
+                            self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {rec.id} | {bus_osm_id} | NOT auto accepted: another not accepted recorridoproposed exists for this recorrido')
                             ilog.accepted_reason = 'another not accepted proposal exists for this recorrido'
                             ilog.save()
                             continue
 
 
-                        self.out2('{} | {} | AUTO ACCEPTED! (updated)'.format(rec.id, bus_osm_id))
+                        self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {rec.id} | {bus_osm_id} | AUTO ACCEPTED! (updated)')
                         if not options['dry-run']:
                             rp.aprobar(user_bot_osm)
 
@@ -994,7 +1008,7 @@ class Command(BaseCommand):
                         if not options['dry-run']:
                             rp.save(user=user_bot_osm)
 
-                        self.out2('{} | AUTO ACCEPTED (created)!'.format(bus['pt'].id))
+                        self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] {bus["pt"].id} | AUTO ACCEPTED (created)!')
                         if not options['dry-run']:
                             rp.aprobar(user_bot_osm)
                         
@@ -1006,7 +1020,7 @@ class Command(BaseCommand):
 
                         # add stops!
                         if not options['dry-run'] and len(bus['pt'].stops) > 0:
-                            self.out2(f'ADDing STOPS {len(bus["pt"].stops)}', end=' > ')
+                            self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] ADDing STOPS {len(bus["pt"].stops)}', end=' > ')
                             count_created = 0
                             count_associated = 0
                             for s in bus['pt'].stops:
@@ -1028,7 +1042,7 @@ class Command(BaseCommand):
                                 )
                                 if created:
                                     count_associated = count_associated + 1
-                            self.out2(f'CREATED STOPS {count_created}, ASSOCIATED {count_associated}')
+                            self.out2(f'[{bus_i}/{bus_total} ({bus_i*100/bus_total:7.2f}%)] CREATED STOPS {count_created}, ASSOCIATED {count_associated}')
 
                 #
                 # TODO: think how to do "stops" change proposals
@@ -1150,7 +1164,7 @@ class Command(BaseCommand):
                 i = i + 1
                 if i % 50 == 0 and time.time() - start > 1:
                     start = time.time()
-                    self.out2('{}/{} ({:2.0f}%)'.format(i, total, i * 100.0 / total))
+                    self.out2(f'{i}/{total} ({(i * 100.0 / total):2.0f}%)')
 
             # unir catastro_poicb (13 y 60, 13 y 66, 13 y 44) con catastro_poi (osm_pois)
             # self.out2('Mergeando POIs propios de cualbondi')
@@ -1191,7 +1205,7 @@ class Command(BaseCommand):
                 i = i + 1
                 Interseccion.objects.create(nom=inter[0], nom_normal=inter[1], latlng=inter[2])
                 if (i * 100.0 / total) % 1 == 0:
-                    self.out2('{:2.0f}%'.format(i * 100.0 / total))
+                    self.out2(f'{(i * 100.0 / total):2.0f}%')
 
         # self.out1('Eliminando tablas no usadas')
         # cu.execute('drop table planet_osm_roads;')
