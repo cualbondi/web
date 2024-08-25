@@ -131,7 +131,7 @@ for (lang_code, lang_name) in settings.LANGUAGES:
 def getsitemaps(cc):
     sitemaps = {}
     cclang = next((v['lang'] for k,v in kings.items() if v['country_code'] == cc), '')[:2]
-    print('CCLANG:' + cclang)
+    # print('CCLANG:' + cclang)
     for (lang_code, lang_name) in settings.LANGUAGES:
         suffix = ''
         if cclang != lang_code[:2]:
