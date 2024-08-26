@@ -375,7 +375,7 @@ SHELL_PLUS_PRINT_SQL = True
 
 LANGUAGES = [
     # ('af', gettext_noop('Afrikaans')),
-    # ('ar', gettext_noop('Arabic')),
+    ('ar', 'العربية'),
     # ('ar-dz', gettext_noop('Algerian Arabic')),
     # ('ast', gettext_noop('Asturian')),
     # ('az', gettext_noop('Azerbaijani')),
