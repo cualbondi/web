@@ -186,8 +186,8 @@ class Command(BaseCommand):
                     params = {
                         'geojson': obj.geoJSON,
                         'attribution': 'cualbondi.org & openstreetmap contributors',
-                        'vectorserverUrl': 'https://tiles.cualbondi.com.ar/styles/osm-bright/style.json',
-                        'imagemin': 'true',
+                        'vectorserverUrl': 'https://tiles.cualbondi.org/api/maps/cualbondi/style.json',
+                        'oxipng': 'true',
                         'width': size[0],
                         'height': size[1],
                         'maxZoom': 16,
@@ -195,7 +195,7 @@ class Command(BaseCommand):
                     if prefix == 'recorrido':
                         params['arrows'] = 'true'
                     req = request.Request(
-                        'http://osm-static-maps:3000/',
+                        'https://osmsm.coffee.jperelli.com.ar/',
                         data=json.dumps(params).encode('utf8'),
                         headers={'content-type': 'application/json'},
                         method='POST'
