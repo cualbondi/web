@@ -52,9 +52,14 @@ DATABASES = {
         'PASSWORD': env.get_value("POSTGRES_PASSWORD"),
         'HOST': env.get_value("DB_HOST"),
         'PORT': '5432',
+        'OPTIONS': {
+            'pool': True,
+        },
+        'ATOMIC_REQUESTS': True,
     },
 }
-DATABASES['default']['ATOMIC_REQUESTS'] = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # URLS
 # ------------------------------------------------------------------------------

@@ -36,8 +36,6 @@
         map.setView([{{interseccion.latlng.1|stringformat:'f'}},{{interseccion.latlng.0|stringformat:'f'}}], 15);
     </script>
 
-    {% include "ad_contenido.html"%}
-
     {% if recorridos %}
         <div class="row-fluid">
             <h2>{% blocktrans %}Routes of public transport that pass through this intersection{% endblocktrans %}</h2>
@@ -53,7 +51,6 @@
                 {% endfor %}
                 {% if not forloop.last %}
                     <div class="span12 ad">
-                        {% include "ad_contenido_infeed.html"%}
                     </div>
                 {% endif %}
             {% endfor %}

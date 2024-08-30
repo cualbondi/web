@@ -66,7 +66,7 @@
 
     <div class="thumbnail">
         <a
-            href="/mapa/{{adminarea|i18name:request|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}},{{adminarea|i18name:request}}"
+            href="/mapa/{{adminarea|i18name:request|uslugify}}|{{adminarea.geometry_simple.centroid.0|stringformat:'f'}},{{adminarea.geometry_simple.centroid.1|stringformat:'f'}}/geolocation|{{adminarea.geometry_simple.centroid.0|stringformat:'f'}},{{adminarea.geometry_simple.centroid.1|stringformat:'f'}},{{adminarea|i18name:request}}"
             class="btn btn-primary"
             style="z-index:1;position:absolute; margin:6px"
         >
@@ -78,7 +78,6 @@
         </div>
         {% endif %}
     </div>
-    {% include "ad_contenido.html"%}
 
     {% if lineas %}
     <div class="row-fluid">
@@ -95,7 +94,6 @@
         {% endfor %}
         {% if not forloop.last %}
         <div class="span12 ad">
-            {% include "ad_contenido_infeed.html"%}
         </div>
         {% endif %}
         {% endfor %}
@@ -124,7 +122,6 @@
             {% endfor %}
             {% if not forloop.last %}
                 <div class="span12 ad">
-                    {% include "ad_contenido_infeed.html"%}
                 </div>
             {% endif %}
         {% endfor %}

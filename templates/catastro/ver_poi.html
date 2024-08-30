@@ -98,8 +98,6 @@
         </div>
 
     </div>
-    {% include "ad_contenido.html"%}
-
     {% if recorridos %}
         <div class="row-fluid">
             <h2>{% blocktrans %}Public transport routes that pass next to this place{% endblocktrans %}</h2>
@@ -115,7 +113,6 @@
                 {% endfor %}
                 {% if not forloop.last %}
                     <div class="span12 ad">
-                        {% include "ad_contenido_infeed.html"%}
                     </div>
                 {% endif %}
             {% endfor %}

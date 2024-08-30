@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}{% trans %}Public transportation in{% endtrans %} {{adminarea.name|title}} x {{adminareaancestors[0].name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
+{% block title %}{% trans %}Public transportation in{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %} - Cualbondi{% endblock %}
 {% block meta_description %}{% trans %}How to get around in{% endtrans %} {{adminarea.name|title}} {% trans %}and what lines and routes of buses go through{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}.{% endblock %}
 
 {% block head_attrs %} prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cualbondi: http://ogp.me/ns/fb/cualbondi#"{% endblock %}
 
 {% block custom_top_scripts %}
-  <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}" />
-  <meta property="og:type"   content="cualbondi:administrative_area" />
-  <meta property="og:url"    content="{{ obj.get_absolute_url() }}" />
-  <meta property="og:title"  content="{% trans %}How to get around in{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}" />
-  <meta property="og:description"  content="{% trans %}List of all the public transport that go through{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% trans %}See how to get from where you are{% endtrans %}" />
-  {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}" />{% endif %}
+  <meta property="fb:app_id" content="{{ FACEBOOK_APP_ID }}">
+  <meta property="og:type"   content="cualbondi:administrative_area">
+  <meta property="og:url"    content="{{ obj.get_absolute_url() }}">
+  <meta property="og:title"  content="{% trans %}How to get around in{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}">
+  <meta property="og:description"  content="{% trans %}List of all the public transport that go through{% endtrans %} {{adminarea.name|title}}{% for a in adminareaancestors %}, {{a.name|title}}{% endfor %}. {% trans %}See how to get from where you are{% endtrans %}">
+  {% if obj.img_cuadrada %}<meta property="og:image"  content="{{HOME_URL}}{{ obj.img_cuadrada.url }}">{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -54,7 +54,7 @@
 
     <div class="thumbnail">
         <a
-            href="/mapa/{{slugify(adminarea.name)}}|{{'{}'.format(adminarea.geometry.centroid.0)}},{{'{}'.format(adminarea.geometry.centroid.1)}}/geolocation|{{'{}'.format(adminarea.geometry.centroid.0)}},{{'{}'.format(adminarea.geometry.centroid.1)}},{{adminarea.name}}"
+            href="/mapa/{{slugify(adminarea.name)}}|{{'{}'.format(aacentroid.0)}},{{'{}'.format(aacentroid.1)}}/geolocation|{{'{}'.format(aacentroid.0)}},{{'{}'.format(aacentroid.1)}},{{adminarea.name}}"
             class="btn btn-primary"
             style="z-index:1;position:absolute; margin:6px"
         >
@@ -66,7 +66,6 @@
         </div>
         {% endif %}
     </div>
-    {% include "ad_contenido.html"%}
 
     {% if lineas %}
     <div class="row-fluid">
@@ -83,7 +82,6 @@
         {% endfor %}
         {% if not loop.last %}
         <div class="span12 ad">
-            {% include "ad_contenido_infeed.html"%}
         </div>
         {% endif %}
         {% endfor %}
@@ -112,7 +110,6 @@
             {% endfor %}
             {% if not loop.last %}
                 <div class="span12 ad">
-                    {% include "ad_contenido_infeed.html"%}
                 </div>
             {% endif %}
         {% endfor %}

@@ -1,5 +1,4 @@
-from django.conf.urls import include, url
-from django.urls import path
+from django.urls import path, re_path, include
 from django.contrib.gis import admin
 from django.conf import settings
 
@@ -22,30 +21,30 @@ from django.contrib.sites.models import Site
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-    url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
 
     # APPS de CualBondi
-    url(settings.ADMIN_URL, admin.site.urls),
-    url(r'^editor/', include(editorUrls)),
-    url(r'^usuarios/', include(usuariosUrls)),
-    url(r'^comments/', include('django_comments.urls')),
-    url(r'^revision/(?P<id_revision>[-\w]+)/$', revision, name='revision_externa'),
+    re_path(settings.ADMIN_URL, admin.site.urls),
+    re_path(r'^editor/', include(editorUrls)),
+    re_path(r'^usuarios/', include(usuariosUrls)),
+    re_path(r'^comments/', include('django_comments.urls')),
+    re_path(r'^revision/(?P<id_revision>[-\w]+)/$', revision, name='revision_externa'),
 
     # Ranking aka agradecimientos
-    url(r'^agradecimientos/$', agradecimientos, name='agradecimientos'),
+    re_path(r'^agradecimientos/$', agradecimientos, name='agradecimientos'),
 
-    path(r'sitemap.xml', sitemaps_views.index, {'sitemaps': sitemaps}),
+    path('sitemap.xml', sitemaps_views.index, {'sitemaps': sitemaps}),
     path('sitemap-<section>.xml', sitemaps_views.sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
-    url(r'^api/v3/', include(api3Urls)),
-    url(r'^v3/', include(api3Urls)),
-    url(r'^auth/', include('rest_framework_social_oauth2.urls', namespace='drfsocial')),
+    re_path(r'^api/v3/', include(api3Urls)),
+    re_path(r'^v3/', include(api3Urls)),
+    re_path(r'^auth/', include('rest_framework_social_oauth2.urls', namespace='drfsocial')),
 
-    url(r'^robots.txt$', serve, {'document_root': settings.STATIC_ROOT, 'path': 'robots.txt', 'show_indexes': False}),
-    url(r'^ads.txt$', serve, {'document_root': settings.STATIC_ROOT, 'path': 'ads.txt', 'show_indexes': False}),
+    re_path(r'^robots.txt$', serve, {'document_root': settings.STATIC_ROOT, 'path': 'robots.txt', 'show_indexes': False}),
+    re_path(r'^ads.txt$', serve, {'document_root': settings.STATIC_ROOT, 'path': 'ads.txt', 'show_indexes': False}),
 
-    url(r'', include('social_django.urls', namespace='social'))
+    re_path(r'', include('social_django.urls', namespace='social'))
 ]
 
 
@@ -55,20 +54,20 @@ for name,k in kings.items():
     urlpatterns.append(path(f'{cc}/sitemap-<section>.xml', sitemaps_views.sitemap, {'sitemaps': getsitemaps(cc)}, name=f'django.contrib.sitemaps.views.sitemap-{cc}'))
 
 
-if settings.DEBUG:
-    import debug_toolbar
+# if settings.DEBUG:
+#     import debug_toolbar
 
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+#     urlpatterns += [
+#         re_path(r'^__debug__/', include(debug_toolbar.urls)),
+#     ]
 
 urlpatterns += [
-    url(r'^$', index, name='index'),
-    url(r'^como-llegar/', include(oldurlpatternsCatastro)),
-    url(r'^(?P<country_code>[a-z][a-z])/', include(urlpatternsCatastro)),
-    url(r'^(?P<country_code>[a-z][a-z])/', include(urlpatternsCore)),
-    url(r'^', include(urlpatternsCatastro)),
-    url(r'^', include(urlpatternsCore)),
+    re_path(r'^$', index, name='index'),
+    re_path(r'^como-llegar/', include(oldurlpatternsCatastro)),
+    re_path(r'^(?P<country_code>[a-z][a-z])/', include(urlpatternsCatastro)),
+    re_path(r'^(?P<country_code>[a-z][a-z])/', include(urlpatternsCore)),
+    re_path(r'^', include(urlpatternsCatastro)),
+    re_path(r'^', include(urlpatternsCore)),
 ]
 
 handler500 = 'apps.core.views.server_error'

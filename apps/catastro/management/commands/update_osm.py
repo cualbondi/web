@@ -1,9 +1,8 @@
-import traceback
 import subprocess
 import os
 import sys
 import time
-import pytz
+from zoneinfo import ZoneInfo
 from cProfile import Profile
 
 from django.core.management.base import BaseCommand
@@ -13,23 +12,19 @@ from django.db.models import F, Func, Value
 from django.db.models import BooleanField
 from django.db.models.functions import Upper, Trim, Substr
 from django.db.models.expressions import RawSQL
-from django.contrib.gis.geos import LineString, Polygon, MultiPolygon, Point
-from django.contrib.gis.geos.geometry import GEOSGeometry
+from django.contrib.gis.geos import LineString, Point
 from django.contrib.gis.db.models.functions import MakeValid
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
 
 from apps.catastro.models import Poi, Interseccion, AdministrativeArea
 from apps.core.models import Recorrido, ImporterLog, Parada, Horario
 from apps.editor.models import RecorridoProposed
-from apps.utils.fix_way import fix_way, fix_polygon
 
 import osmium
 import pyosmptparser
 import geopandas as gpd
 from datetime import datetime
 from urllib import request
-from psycopg2.extras import execute_values
 from .utils_admin_areas import get_admin_area, get_admin_areas, make_poly_file
 
 
@@ -778,7 +773,7 @@ class Command(BaseCommand):
                 )
                 VALUES %s
             """
-            execute_values(cu, insert_query, data)
+            cu.execute(insert_query, data)
 
             self.out2('Commit insert query')
             connection.commit()
@@ -799,7 +794,7 @@ class Command(BaseCommand):
             # https://wiki.openstreetmap.org/w/index.php?oldid=625726
             # https://wiki.openstreetmap.org/wiki/Buses
 
-            p = pyosmptparser.Parser(inputfile)
+            p = pyosmptparser.Parser.new_ptv2(inputfile)
             pts = p.get_public_transports(500)
             routetypes_stops = ['train', 'subway', 'monorail', 'tram', 'light_rail']
             routetypes = routetypes_stops + ['bus', 'trolleybus']
@@ -842,7 +837,7 @@ class Command(BaseCommand):
                     rp = RecorridoProposed(nombre=bus['pt'].tags['name'][:199])
                     rp.osm_id = bus['pt'].id
                     rp.ruta = bus['way']
-                    rp.ruta_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=pytz.utc)
+                    rp.ruta_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=ZoneInfo('UTC'))
                     rp.osm_version = int(bus['pt'].info['version'])
                     rp.import_timestamp = run_timestamp
                     rp.paradas_completas = bus['paradas_completas']
@@ -891,7 +886,7 @@ class Command(BaseCommand):
                     way = bus['way']
                     status = bus['pt'].status.code
                     osm_osm_version = bus['pt'].info['version']
-                    osm_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=pytz.utc)
+                    osm_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=ZoneInfo('UTC'))
                     name = bus['pt'].tags['name']
                     paradas_completas = bus['paradas_completas']
                     routetype = bus['pt'].tags['route']
@@ -998,7 +993,7 @@ class Command(BaseCommand):
                         rp = RecorridoProposed(nombre=bus['pt'].tags['name'][:199])
                         rp.osm_id = bus['pt'].id
                         rp.ruta = bus['way']
-                        rp.ruta_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=pytz.utc)
+                        rp.ruta_last_updated = datetime.utcfromtimestamp(int(bus['pt'].info['timestamp'])).replace(tzinfo=ZoneInfo('UTC'))
                         rp.osm_version = int(bus['pt'].info['version'])
                         rp.import_timestamp = run_timestamp
                         rp.paradas_completas = bus['paradas_completas']

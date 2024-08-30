@@ -1,20 +1,21 @@
-FROM ubuntu:20.04
+FROM ubuntu:24.04
 
-ENV TZ Etc/UTC
-ENV PYTHONUNBUFFERED 1
-ENV DEBIAN_FRONTEND noninteractive
+ENV TZ Etc/UTC \
+  PYTHONUNBUFFERED 1 \
+  DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-setuptools \
     python3-pip \
+    python3-venv \
     libgeos-dev \
     gdal-bin \
     libspatialindex-dev \
     postgresql-client \
+    cron \
     libboost-python-dev \
     libbz2-dev \
-    zlib1g-dev \
     gcc \
     g++ \
     git \
@@ -22,12 +23,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     osmium-tool \
     gettext \
     osmctools \
+    cargo \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install wheel
+  && python3 -m venv /venv \
+  && /venv/bin/pip install --upgrade wheel pip
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
-RUN pip3 install -r /requirements/local.txt
+RUN /venv/bin/pip install --no-cache-dir -r /requirements/local.txt
 
 COPY ./docker/production/entrypoint.sh /entrypoint.sh
 COPY ./docker/local/start.sh /start.sh

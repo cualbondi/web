@@ -69,6 +69,8 @@ def editor_recorrido(request, id_recorrido):
             return HttpResponse(json.dumps(data), content_type="application/json")
         else:
             return HttpResponse(json.dumps(data), content_type="application/json", status=403)
+    else:
+        return HttpResponse(status=405)
 
 
 @permission_required('editor.moderate_recorridos', login_url="/usuarios/login/", raise_exception=True)

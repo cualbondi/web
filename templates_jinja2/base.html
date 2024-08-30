@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ get_current_language() }}">
-    <head{% block head_attrs %}{% endblock %}>
+  <head{% block head_attrs %}{% endblock %}>
     <meta charset="utf-8">
-    <link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}img/favicon.png" />
-    <title>{% block title %}Cualbondi{% endblock %}</title>
-		<meta name="description" content="{% block meta_description %}{% trans %}Search engine of public transportation bus, train,  subway, tram.{% endtrans %}.{% endblock %}">
+    <link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}img/favicon.png">
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{ STATIC_URL }}css/merged-orig-purified.css" rel="stylesheet" type="text/css" />
+    <link href="{{ STATIC_URL }}css/merged-orig-purified.css" rel="stylesheet" type="text/css">
 
     <meta name="google-site-verification" content="NVSk_0zcZdYua2ILJ4L0DvspOCmHujouihZPlo3mDco">
     <link href="https://plus.google.com/117455886911192315188" rel="publisher">
@@ -19,16 +17,19 @@
     <link rel="preconnect" href="https://stats.g.doubleclick.net">
     <link rel="preconnect" href="https://tpc.googlesyndication.com">
     <link rel="preconnect" href="https://pagead2.googlesyndication.com">
-    <link rel="preconnect" href="https://fundingchoicesmessages.google.com/">"
+    <link rel="preconnect" href="https://fundingchoicesmessages.google.com/">
 
-    {% comment %}
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    {% endcomment %}
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8627660641805224" crossorigin="anonymous"></script>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8627660641805224" crossorigin></script>
 
-	</head>
+    {% include "tracking.html" %}
+
+    <title>{% block title %}Cualbondi{% endblock %}</title>
+		<meta name="description" content="{% block meta_description %}{% trans %}Search engine of public transportation bus, train,  subway, tram.{% endtrans %}.{% endblock %}">
+	
+    {% block custom_top_scripts %}{% endblock %}
+  
+  </head>
 	<body style="padding-bottom:0">
-
     <div class="navbar navbar-fixed-top navbar-inverse">
       <div class="navbar-inner">
         <div class="container">
@@ -84,18 +85,10 @@
       </div>
     </div>
 
-    {% include "facebook_sdk.html" %}
-
     <div class="container">
       <div class="row-fluid">
         <div class="span9">
           <!-- adaptable_2 -->
-          {% comment %}
-          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1193419141108967" data-ad-slot="8086662791" data-ad-format="auto"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
-          {% endcomment %}
           {% block content %}{% endblock %}
         </div>
         <div id="bloque_derecha" class="span3">
@@ -120,8 +113,6 @@
         <br>
       </div>
     </footer>
-
-    {% include "tracking.html" %}
 
 	</body>
 </html>

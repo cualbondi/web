@@ -5,12 +5,12 @@ from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 
-class CustomAdmin(admin.OSMGeoAdmin):
+class CustomAdmin(admin.GISModelAdmin):
     search_fields = ['nombre', 'variantes_nombre']
     exclude = ()
 
 
-class ZonaAdmin(admin.OSMGeoAdmin):
+class ZonaAdmin(admin.GISModelAdmin):
     search_fields = ['name']
 
 
