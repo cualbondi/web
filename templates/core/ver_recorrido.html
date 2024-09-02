@@ -97,8 +97,6 @@
             {% endif %}
         {% endif %}
 
-        {% include "ad_contenido.html"%}
-
         {% if obj.img_panorama %}
         <div class="thumbnail">
         <a href="/mapa/{{adminarea|i18name:request|uslugify}}|{{adminarea.geometry.centroid.0|stringformat:'f'}},{{adminarea.geometry.centroid.1|stringformat:'f'}}/recorridos/{% if linea %}{{linea.nombre}} {% endif %}{{obj.nombre}}/" class="btn btn-primary" style="position:absolute; margin:6px">{% blocktrans %}See in interactive map{% endblocktrans %}</a>
@@ -127,7 +125,6 @@
                 {% endfor %}
                 {% if not forloop.last %}
                     <div class="span12 ad">
-                        {% include "ad_contenido_infeed.html"%}
                     </div>
                 {% endif %}
             {% endfor %}
@@ -157,7 +154,6 @@
                 {% endfor %}
                 {% if not forloop.last %}
                     <div class="span12 ad">
-                        {% include "ad_contenido_infeed.html"%}
                     </div>
                 {% endif %}
             {% endfor %}

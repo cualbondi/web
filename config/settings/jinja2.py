@@ -49,7 +49,7 @@ def environment(**options):
         'STATIC_URL': settings.STATIC_URL,
         'dividir_columnas': dividir_columnas,
         'partition_horizontal': partition_horizontal,
-        'uslugify': slugify,
+        'slugify': slugify,
         'get_current_language': translation.get_language,
     })
     env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)

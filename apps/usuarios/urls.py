@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import re_path
 from . import views
 
 urlpatterns = [
-    url(r'^logout/$', views.cerrar_sesion),
-    # url(r'^login_ajax/(?P<backend>[^/]+)/$', views.ajax_auth, name='ajax_auth'),
-    url(r'^(?P<username>[^/]+)/$', views.ver_perfil, name="ver_perfil"),
+    re_path(r'^logout/$', views.cerrar_sesion),
+    # re_path(r'^login_ajax/(?P<backend>[^/]+)/$', views.ajax_auth, name='ajax_auth'),
+    re_path(r'^(?P<username>[^/]+)/$', views.ver_perfil, name="ver_perfil"),
 ]

@@ -89,13 +89,10 @@
             {% endfor %}
             {% if not forloop.last %}
                 <div class="span12 ad">
-                    {% include "ad_contenido_infeed.html"%}
                 </div>
             {% endif %}
         {% endfor %}
     </div>
-
-    {% include "ad_contenido.html"%}
 
     {% if obj.img_panorama %}
     <div class="thumbnail">

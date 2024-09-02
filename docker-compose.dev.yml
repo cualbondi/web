@@ -1,0 +1,35 @@
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/local/Dockerfile
+    depends_on:
+      - db
+      - cache
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.local
+    env_file: .env
+    volumes:
+      - '.:/app'
+      - '.volumes/web_media:/app/apps/media'
+      - '.volumes/web_static:/app/staticfiles'
+    command: /start.sh
+    ports:
+      - '8000:8000'
+
+  db:
+    build: ./docker/postgres
+    env_file: .env
+    volumes:
+      - '.volumes/volume_db:/var/lib/postgresql/data'
+    sysctls:
+      - kernel.shmmax=4294967296
+      - kernel.shmall=4194304
+    command: "postgres -c shared_buffers=2GB -c work_mem=128MB -c statement_timeout=300000 -c max_parallel_workers_per_gather=16 -c max_worker_processes=32 -c max_connections=7000 -c shared_preload_libraries='pg_stat_statements'"
+    ports:
+      - '127.0.0.1:5432:5432'
+    shm_size: 4g
+
+  cache:
+    image: 'memcached:alpine'

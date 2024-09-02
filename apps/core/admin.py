@@ -13,7 +13,7 @@ UserAdmin.list_display += ('last_login',)
 UserAdmin.list_filter += ('last_login',)
 
 
-class CustomAdmin(admin.OSMGeoAdmin):
+class CustomAdmin(admin.GISModelAdmin):
     default_lon = -6428013
     default_lat = -4177742
     search_fields = ['nombre', 'recorrido__nombre']
@@ -24,14 +24,14 @@ class HorarioAdminInline(admin.TabularInline):
     model = Horario
 
 
-class RecorridoCustomAdmin(admin.OSMGeoAdmin):
+class RecorridoCustomAdmin(admin.GISModelAdmin):
     display_raw = True
     search_fields = ['nombre', 'linea__nombre']
     inlines = (HorarioAdminInline,)
     exclude = ('horarios',)
 
 
-# class ParadaCustomAdmin(admin.OSMGeoAdmin):
+# class ParadaCustomAdmin(admin.GISModelAdmin):
 #     display_raw = True
 #     search_fields = ['nombre', 'codigo']
 #     # inlines = (HorarioAdminInline,)

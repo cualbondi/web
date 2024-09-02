@@ -19,16 +19,16 @@ postgres_ready() {
 /venv/bin/python3 << END
 import sys
 
-import psycopg2
+import psycopg
 
 try:
-    psycopg2.connect(
+    psycopg.connect(
         dbname="${POSTGRES_DB}",
         user="${POSTGRES_USER}",
         password="${POSTGRES_PASSWORD}",
         host="${DB_HOST}"
     )
-except psycopg2.OperationalError:
+except psycopg.OperationalError:
     sys.exit(-1)
 sys.exit(0)
 

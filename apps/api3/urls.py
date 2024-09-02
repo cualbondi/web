@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import re_path, include
 from rest_framework import routers
 
 from . import views
@@ -15,10 +15,10 @@ router.register(r'me', views.UserViewSet, basename='me')
 router.register(r'importerlog', views.ImporterLogViewSet, basename='importerlog')
 
 urlpatterns = [
-    url(r'^recorridos-por-ciudad/(?P<ciudad_id>\d+)/$', views.RecorridosPorCiudad.as_view({'get': 'list'})),
-    url(r'^recorridos-best-matches/(?P<ciudad_id>\d+)/$', views.best_matches),
-    url(r'^match-recorridos/(?P<recorrido_id>\d+)/$', views.match_recorridos),
-    url(r'^importerlog-stats/$', views.importerlog_stats),
-    url(r'^display-recorridos/', views.display_recorridos),
-    url(r'^', include((router.urls, 'v3'), namespace='v3')),
+    re_path(r'^recorridos-por-ciudad/(?P<ciudad_id>\d+)/$', views.RecorridosPorCiudad.as_view({'get': 'list'})),
+    re_path(r'^recorridos-best-matches/(?P<ciudad_id>\d+)/$', views.best_matches),
+    re_path(r'^match-recorridos/(?P<recorrido_id>\d+)/$', views.match_recorridos),
+    re_path(r'^importerlog-stats/$', views.importerlog_stats),
+    re_path(r'^display-recorridos/', views.display_recorridos),
+    re_path(r'^', include((router.urls, 'v3'), namespace='v3')),
 ]

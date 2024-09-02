@@ -279,3 +279,4 @@ web/media/
 osm/*.pbf
 /notebooks
 
+.volumes

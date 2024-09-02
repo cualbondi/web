@@ -1,11 +1,11 @@
 # -*- coding: utf-8 *-*
 """Migra los datos de la BD colectivos a los nuevos modelos de django"""
 
-import psycopg2
+import psycopg
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 from django.db import connection
-from psycopg2.extras import RealDictCursor
+from psycopg.rows import dict_row
 
 from apps.catastro.models import Provincia, Ciudad
 from apps.core.models import Linea, Recorrido
@@ -14,13 +14,13 @@ from apps.core.models import Linea, Recorrido
 class Command(BaseCommand):
     def handle(self, *args, **options):
         cursor = connection.cursor()
-        db = psycopg2.connect(
+        db = psycopg.connect(
             host='127.0.0.1',
             database='colectivos',
             user='web_colectivos',
             password='soylawebcolectivos'
         )
-        cursor = db.cursor(cursor_factory=RealDictCursor)
+        cursor = db.cursor(row_factory=dict_row)
         stats = {'ciudades': 0, 'lineas': 0, 'recorridos': 0}
 
         # agrego una provincia falsa para referenciar las ciudades

@@ -6,8 +6,6 @@
 {% block bloque_izquierda %}
     <h1>{% blocktrans %}Could not find{% endblocktrans %} {{ slug }}</h1>
 
-    {% include "ad_contenido.html"%}
-
     {% if pois %}
         <h2>{% blocktrans %}But we did everything possible to find similar places{% endblocktrans %}</h2>
         <ul>
