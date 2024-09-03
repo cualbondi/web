@@ -52,9 +52,10 @@ DATABASES = {
         'PASSWORD': env.get_value("POSTGRES_PASSWORD"),
         'HOST': env.get_value("DB_HOST"),
         'PORT': '5432',
-        'OPTIONS': {
-            'pool': {'min_size': 10, 'max_size': 100},
-        },
+        # 'OPTIONS': {
+        #     'pool': {'min_size': 10, 'max_size': 100},
+        # },
+        'CONN_MAX_AGE': env.int('CONN_MAX_AGE', default=60),
         'ATOMIC_REQUESTS': True,
     },
 }

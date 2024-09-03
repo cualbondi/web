@@ -112,7 +112,7 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None, country_code=None)
         .filter(geometry_simple__intersects=linea__envolvente) \
         .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), linea__envolvente)) / (Area(F('geometry_simple')) + Area(linea__envolvente))) \
         .annotate(intersection_area=Area(Intersection(F('geometry_simple'), linea__envolvente)) / Area(linea__envolvente)) \
-        .filter(intersection_area__gt=A(sq_m=0.8)) \
+        .filter(intersection_area__gt=0.8) \
         .order_by('symdiff_area')
 
     # for a in aa:
@@ -188,7 +188,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
         .filter(geometry_simple__intersects=recorrido_buffer) \
         .annotate(symdiff_area=Area(SymDifference(F('geometry_simple'), recorrido_buffer)) / (Area(F('geometry_simple')) + Area(recorrido_buffer))) \
         .annotate(intersection_area=Area(Intersection(F('geometry_simple'), recorrido_buffer)) / Area(recorrido_buffer)) \
-        .filter(intersection_area__gt=A(sq_m=0.8)) \
+        .filter(intersection_area__gt=0.8) \
         .order_by('symdiff_area')
 
     if aa:
