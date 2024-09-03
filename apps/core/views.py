@@ -255,6 +255,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
         cursor.execute(
             '''
                 SELECT
+                    cc.id        as id,
                     (dp).path[1] as idp,
                     cc.nom       as nom
                 FROM
