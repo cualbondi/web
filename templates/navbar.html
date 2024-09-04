@@ -8,8 +8,13 @@
     <span class="icon-bar"></span>
     <span class="icon-bar"></span>
 </a>
-<a class="brand" href="/" aria-label="Cualbondi" style="background:url({{ STATIC_URL }}img/logo-navbar.png); height:25px; width:132px; padding:0; margin: 5px 20px 0 0;" alt="Cualbondi"></a>
-<div class="nav-collapse">
+<a class="brand" href="/" alt="Cualbondi">
+    <picture alt="Cualbondi">
+        <source srcset="{{ STATIC_URL }}img/logo-navbar.webp" type="image/webp">
+        <img src="{{ STATIC_URL }}img/logo-navbar.png" alt="Cualbondi" class="brand" style="height:25px; width:132px; padding:0;">
+    </picture>
+</a>
+  <div class="nav-collapse">
     {% comment %} <ul class="nav">
         <form>
             <select class="language-selector">
@@ -21,15 +26,15 @@
     </ul> {% endcomment %}
     <ul class="nav pull-right">
         {% if request.user.is_authenticated %}
-            <li><a href="{% url "ver_perfil" username=user.username %}"><i class="icon-user icon-white"></i> {{ request.user }}</a></li>
+            <li><a href="{% url "ver_perfil" username=user.username %}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> {{ request.user }}</a></li>
         {% else %}
             <li>
                 <a href="{% url 'social:begin' 'facebook' %}">
-                    <i class="icon-user icon-white"></i> {% blocktrans %}Login{% endblocktrans %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> {% blocktrans %}Login{% endblocktrans %}
                 </a>
             </li>
         {% endif %}
-        <li><a href="{% url "agradecimientos" %}"><i class="icon-star icon-white"></i> {% blocktrans %}Star users{% endblocktrans %}</a></li>
-        <li><a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dFJERlREQjUyaE1iSkFDYnhOa2Nnbmc6MQ+"><i class="icon-pencil icon-white"></i> {% blocktrans %}Poll{% endblocktrans %}</a></li>
+        <li><a href="{% url "agradecimientos" %}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" stroke="#fff"  stroke-width="2" viewBox="0 0 24 24"><path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg> {% blocktrans %}Star users{% endblocktrans %}</a></li>
+        <li><a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dFJERlREQjUyaE1iSkFDYnhOa2Nnbmc6MQ+"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="m14 2 4 4L7 17H3v-4L14 2zM3 22h18"/></svg> {% blocktrans %}Poll{% endblocktrans %}</a></li>
     </ul>
 </div>
