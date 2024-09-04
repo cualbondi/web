@@ -496,8 +496,6 @@ FROM
         params = {"r2ruta": ruta.ewkb}
         query = """
             SELECT
-                set_limit(0.01);
-            SELECT
                 r.id,
                 r.nombre as nombre,
                 r.inicio as inicio,
