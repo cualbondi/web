@@ -13,7 +13,7 @@ services:
     volumes:
       - '/root/volumes/cualbondi.org/web_media:/app/apps/media'
       - '/root/volumes/cualbondi.org/web_static:/app/staticfiles'
-    command: /uvicorn.sh
+    command: /gunicorn.sh
 
   db:
     build: ./docker/postgres

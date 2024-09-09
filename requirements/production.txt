@@ -2,8 +2,8 @@
 
 -r base.txt
 
-# gunicorn==19.9.0  # https://github.com/benoitc/gunicorn
-uvicorn==0.30.6
+gunicorn==23.0.0  # https://github.com/benoitc/gunicorn
+# uvicorn==0.30.6
 Collectfast==2.2.0  # https://github.com/antonagestam/collectfast
 
 python-memcached==1.62  # https://github.com/linsomniac/python-memcached
