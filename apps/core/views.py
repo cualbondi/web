@@ -306,7 +306,7 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
 
     recorridos_similares = Recorrido.objects.similar_hausdorff(recorrido_simplified)
 
-    aaancestors, calles_fin, pois, aas, horarios, recorridos_similares = parallelize(aaancestors, calles_fin, pois, aas, horarios, recorridos_similares)
+    # aaancestors, calles_fin, pois, aas, horarios, recorridos_similares = parallelize(aaancestors, calles_fin, pois, aas, horarios, recorridos_similares)
 
     try:
         schemaorg_itemtype = {
