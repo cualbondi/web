@@ -50,7 +50,7 @@ def environment(**options):
         'dividir_columnas': dividir_columnas,
         'partition_horizontal': partition_horizontal,
         'slugify': slugify,
-        'get_current_language': translation.get_language,
+        'get_current_language': lambda: translation.get_language()[:2],
     })
     env.install_gettext_callables(gettext=gettext, ngettext=ngettext, newstyle=True)
     return env

@@ -12,7 +12,17 @@ STATICFILES_DIRS = []
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['cualbondi.org', 'api.cualbondi.org', 'cualbondi.com.ar', 'api3.cualbondi.com.ar', 'api.cualbondi.com.ar', 'www.cualbondi.com.ar', 'localhost'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[
+    'cualbondi.org',
+    'api.cualbondi.org',
+    'cualbondi.com.ar',
+    'api.cualbondi.com.ar',
+    'www.cualbondi.com.ar',
+    'localhost',
+    'cualbondi.com',
+    'www.cualbondi.com',
+    'api.cualbondi.com'
+])
 
 # CACHES
 # ------------------------------------------------------------------------------
