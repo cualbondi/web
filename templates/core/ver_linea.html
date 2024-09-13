@@ -12,7 +12,7 @@
 {% block custom_top_scripts %}
     {% get_lang_list obj as LANGS %}
     {% for LANG in LANGS %}
-        <link rel="{% if LANGUAGE_CODE == LANG.0 %}canonical{% else %}alternate{% endif %}" href="{{ obj.get_absolute_url }}{% if not LANG.2 %}?lang={{ LANG.0 }}{% endif %}" hreflang="{{ LANG.0 }}" />
+        <link rel="{% if LANG.2 %}canonical{% else %}alternate{% endif %}" href="{{ obj.get_absolute_url }}{% if not LANG.2 %}?lang={{ LANG.0 }}{% endif %}" hreflang="{{ LANG.0 }}" />
     {% endfor %}
     <link rel="alternate" href="{{ obj.get_absolute_url }}" hreflang="x-default" />
 
