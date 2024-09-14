@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.sitemaps import Sitemap
+from django.contrib.sitemaps import GenericSitemap
 from django.contrib.sites.models import Site
 from apps.core.models import Recorrido, Linea, Parada
 from apps.catastro.models import Poi, AdministrativeArea
@@ -48,7 +48,7 @@ def get_loc(loc, sitemap_lang_code):
     return loc + '?lang=' + sitemap_lang_code
 
 
-class CBSitemap(Sitemap):
+class CBSitemap(GenericSitemap):
 
     priority = None
     changefreq = None
@@ -61,15 +61,6 @@ class CBSitemap(Sitemap):
         self.changefreq = changefreq
         self.protocol = protocol
         self.lang = lang
-
-    def items(self):
-        # Make sure to return a clone; we don't want premature evaluation.
-        return self.queryset.filter()
-
-    def lastmod(self, item):
-        if self.date_field is not None:
-            return getattr(item, self.date_field)
-        return None
 
     def __get(self, name, obj, default=None):
         try:
@@ -84,10 +75,13 @@ class CBSitemap(Sitemap):
         urls = []
         latest_lastmod = None
         all_items_lastmod = True  # track if all items have a lastmod
-        for item in self.paginator.page(page).object_list:
+
+        paginator_page = self.paginator.page(page)
+        for item in paginator_page.object_list:
             loc = self.__get('location', item)
             priority = self.__get('priority', item)
             lastmod = self.__get('lastmod', item)
+        
             if all_items_lastmod:
                 all_items_lastmod = lastmod is not None
                 if (all_items_lastmod and
@@ -115,7 +109,7 @@ for (lang_code, lang_name) in settings.LANGUAGES:
         'queryset': Linea.objects.defer('envolvente'),
     }, priority=0.6, lang=lang_code)
     sitemaps['recorridos_' + lang_code] = CBSitemap({
-        'queryset': Recorrido.objects.defer('ruta'),
+        'queryset': Recorrido.objects.defer('ruta', 'ruta_simple'),
     }, priority=0.6, lang=lang_code)
     sitemaps['paradas_' + lang_code] = CBSitemap({
         'queryset': Parada.objects.defer('latlng'),
@@ -140,7 +134,7 @@ def getsitemaps(cc):
             'queryset': Linea.objects.defer('envolvente').filter(country_code=cc),
         }, priority=0.6, lang=lang_code)
         sitemaps['recorridos' + suffix] = CBSitemap({
-            'queryset': Recorrido.objects.defer('ruta').filter(country_code=cc),
+            'queryset': Recorrido.objects.defer('ruta', 'ruta_simple').filter(country_code=cc),
         }, priority=0.6, lang=lang_code)
         sitemaps['paradas' + suffix] = CBSitemap({
             'queryset': Parada.objects.defer('latlng').filter(country_code=cc),
