@@ -108,33 +108,17 @@ AWS_PRELOAD_METADATA = True
 # See https://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
         },
     },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
     },
-    'loggers': {
-        'django.security.DisallowedHost': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': True
-        }
-    }
 }
 
 
@@ -144,6 +128,7 @@ LOGGING = {
 CORS_ORIGIN_WHITELIST = [
     'https://cualbondi.com.ar',
     'https://cualbondi.org',
+    'https://cualbondi.com',
 ]
 
 
