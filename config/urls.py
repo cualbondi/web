@@ -3,7 +3,7 @@ from django.contrib.gis import admin
 from django.conf import settings
 
 from django.contrib.sitemaps import views as sitemaps_views
-from .sitemaps import sitemaps, getsitemaps
+from .sitemaps import sitemaps
 from apps.catastro.management.commands.update_osm import kings
 
 from django.views.static import serve
@@ -34,7 +34,7 @@ urlpatterns = [
     # Ranking aka agradecimientos
     re_path(r'^agradecimientos/$', agradecimientos, name='agradecimientos'),
 
-    path('sitemap.xml', sitemaps_views.index, {'sitemaps': sitemaps}),
+    path('sitemap.xml', sitemaps_views.index, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.index'),
     path('sitemap-<section>.xml', sitemaps_views.sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 
     re_path(r'^api/v3/', include(api3Urls)),
@@ -46,12 +46,6 @@ urlpatterns = [
 
     re_path(r'', include('social_django.urls', namespace='social'))
 ]
-
-
-for name,k in kings.items():
-    cc = k['country_code']
-    urlpatterns.append(path(f'{cc}/sitemap.xml', sitemaps_views.index, {'sitemaps': getsitemaps(cc), 'sitemap_url_name': f'django.contrib.sitemaps.views.sitemap-{cc}'}))
-    urlpatterns.append(path(f'{cc}/sitemap-<section>.xml', sitemaps_views.sitemap, {'sitemaps': getsitemaps(cc)}, name=f'django.contrib.sitemaps.views.sitemap-{cc}'))
 
 
 if settings.DEBUG:
