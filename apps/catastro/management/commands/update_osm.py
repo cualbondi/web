@@ -329,6 +329,14 @@ kings = {
         'country_code': 'qa',
         'lang': 'ar_QA',
     },
+    'india': {
+        'name': 'india',
+        'url': 'https://download.geofabrik.de/asia/india-latest.osm.pbf',
+        'id': 304716,
+        'paradas_completas': False,
+        'country_code': 'in',
+        'lang': 'en_IN', # hi_IN
+    }
 }
 
 
