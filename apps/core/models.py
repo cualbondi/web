@@ -135,6 +135,9 @@ class Recorrido(models.Model):
 
     class Meta:
         ordering = ['linea__nombre', 'nombre']
+        indexes = [
+            models.Index(fields=['osm_id'], name='core_recorrido_osm_id_idx'),
+        ]
 
     def get_absolute_url(self, argentina=None):
         sid = self.osm_id
