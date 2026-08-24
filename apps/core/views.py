@@ -85,12 +85,20 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None, country_code=None)
             - 'r': relation de osm, usar osm_id con el campo osm_id
     """
     # TODO: redirect id c123 a r123 si viene con osm_type=c y existe el osm_id
-    linea_q = Linea.objects.only('nombre', 'slug', 'img_cuadrada', 'info_empresa', 'info_terminal', 'img_panorama', 'envolvente')
+    linea_q = Linea.objects.only(
+        'nombre', 'slug', 'img_cuadrada', 'info_empresa', 'info_terminal', 'img_panorama', 'envolvente', 'osm_id',
+        'country_code'
+    )
     linea = None
     if osm_type == 'c':
         linea = get_object_or_404(linea_q, id=osm_id)
     elif osm_type == 'r':
         linea = get_object_or_404(linea_q, osm_id=osm_id)
+
+    # linea found, check if url is ok
+    correct_url = linea.get_absolute_url()
+    if correct_url not in request.build_absolute_uri():
+        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
 
     linea__envolvente = linea.envolvente.simplify(0.001, True)
 
@@ -130,11 +138,6 @@ def ver_linea(request, osm_type=None, osm_id=None, slug=None, country_code=None)
         aa = None
         aaancestors = None
 
-    # linea found, check if url is ok
-    correct_url = linea.get_absolute_url()
-    if correct_url not in request.build_absolute_uri():
-        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
-
     # Zonas por las que pasa el recorrido
     aas = AdministrativeArea.objects \
         .filter(geometry_simple__intersects=linea__envolvente, depth__gt=3) \
@@ -162,7 +165,10 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
             - 'r': relation de osm, usar osm_id con el campo osm_id
     """
     recorrido_q = Recorrido.objects \
-        .only('nombre', 'slug', 'inicio', 'fin', 'img_cuadrada', 'img_panorama', 'ruta', 'linea', 'osm_id') \
+        .only(
+            'nombre', 'slug', 'inicio', 'fin', 'img_cuadrada', 'img_panorama', 'ruta', 'linea', 'osm_id',
+            'country_code'
+        ) \
         .select_related('linea')
     recorrido = None
     if osm_type == 'c':
@@ -175,6 +181,10 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
         else:
             raise Http404
 
+    # recorrido found, check if url is ok
+    correct_url = recorrido.get_absolute_url()
+    if correct_url not in request.build_absolute_uri():
+        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
 
     recorrido_simplified = recorrido.ruta.simplify(0.00005)
     recorrido_buffer = recorrido_simplified.buffer(0.0001)
@@ -197,11 +207,6 @@ def ver_recorrido(request, osm_type=None, osm_id=None, slug=None, country_code=N
     else:
         aa = None
         aaancestors = None
-
-    # recorrido found, check if url is ok
-    correct_url = recorrido.get_absolute_url()
-    if correct_url not in request.build_absolute_uri():
-        return HttpResponsePermanentRedirect(add_lang_qs(correct_url, request))
 
     # Calles por las que pasa el recorrido
     """
